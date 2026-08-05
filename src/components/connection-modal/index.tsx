@@ -168,8 +168,8 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border/50 rounded-xl sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="bg-card border-border/50 rounded-xl sm:max-w-[500px] flex flex-col overflow-hidden p-0">
+        <DialogHeader className="shrink-0 px-6 pt-6 pb-0">
           <DialogTitle className="font-mono text-foreground">
             {isEditing ? "Edit Connection" : "New Connection"}
           </DialogTitle>
@@ -177,83 +177,85 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             {isEditing ? "Update connection details" : "Add a new database connection"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          {!isEditing && (
-            <ConnStringField
-              value={connString}
-              onChange={handleConnStringPaste}
-              error={connStringError}
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+            {!isEditing && (
+              <ConnStringField
+                value={connString}
+                onChange={handleConnStringPaste}
+                error={connStringError}
+              />
+            )}
+
+            <DriverDisplay driver={formData.driver} />
+
+            <NameField
+              value={formData.name}
+              onChange={(value) => setFormData({ ...formData, name: value })}
+              disabled={isEditing}
             />
-          )}
 
-          <DriverDisplay driver={formData.driver} />
+            <HostPortFields
+              host={formData.host}
+              port={formData.port}
+              onHostChange={(value) => setFormData({ ...formData, host: value })}
+              onPortChange={(value) => setFormData({ ...formData, port: value })}
+            />
 
-          <NameField
-            value={formData.name}
-            onChange={(value) => setFormData({ ...formData, name: value })}
-            disabled={isEditing}
-          />
+            <DatabaseField
+              value={formData.database}
+              onChange={(value) => setFormData({ ...formData, database: value })}
+            />
 
-          <HostPortFields
-            host={formData.host}
-            port={formData.port}
-            onHostChange={(value) => setFormData({ ...formData, host: value })}
-            onPortChange={(value) => setFormData({ ...formData, port: value })}
-          />
+            <UsernameField
+              value={formData.username}
+              onChange={(value) => setFormData({ ...formData, username: value })}
+            />
 
-          <DatabaseField
-            value={formData.database}
-            onChange={(value) => setFormData({ ...formData, database: value })}
-          />
+            <PasswordField
+              value={formData.password}
+              onChange={(value) => setFormData({ ...formData, password: value })}
+            />
 
-          <UsernameField
-            value={formData.username}
-            onChange={(value) => setFormData({ ...formData, username: value })}
-          />
+            <SslCheckbox
+              checked={formData.ssl}
+              onChange={(checked) => setFormData({ ...formData, ssl: checked })}
+            />
 
-          <PasswordField
-            value={formData.password}
-            onChange={(value) => setFormData({ ...formData, password: value })}
-          />
+            <SshConfig
+              enabled={formData.sshEnabled}
+              sshHost={formData.sshHost}
+              sshPort={formData.sshPort}
+              sshUser={formData.sshUser}
+              sshPassword={formData.sshPassword}
+              sshKeyPath={formData.sshKeyPath}
+              onEnabledChange={(checked) => setFormData({ ...formData, sshEnabled: checked })}
+              onSshHostChange={(value) => setFormData({ ...formData, sshHost: value })}
+              onSshPortChange={(value) => setFormData({ ...formData, sshPort: value })}
+              onSshUserChange={(value) => setFormData({ ...formData, sshUser: value })}
+              onSshPasswordChange={(value) => setFormData({ ...formData, sshPassword: value })}
+              onSshKeyPathChange={(value) => setFormData({ ...formData, sshKeyPath: value })}
+            />
 
-          <SslCheckbox
-            checked={formData.ssl}
-            onChange={(checked) => setFormData({ ...formData, ssl: checked })}
-          />
+            {testResult && (
+              <div
+                className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-xs font-mono ${
+                  testResult.ok
+                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
+                    : "border-destructive/30 bg-destructive/5 text-destructive"
+                }`}
+              >
+                {testResult.ok ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                )}
+                <span className="break-all">{testResult.message}</span>
+              </div>
+            )}
+          </div>
 
-          <SshConfig
-            enabled={formData.sshEnabled}
-            sshHost={formData.sshHost}
-            sshPort={formData.sshPort}
-            sshUser={formData.sshUser}
-            sshPassword={formData.sshPassword}
-            sshKeyPath={formData.sshKeyPath}
-            onEnabledChange={(checked) => setFormData({ ...formData, sshEnabled: checked })}
-            onSshHostChange={(value) => setFormData({ ...formData, sshHost: value })}
-            onSshPortChange={(value) => setFormData({ ...formData, sshPort: value })}
-            onSshUserChange={(value) => setFormData({ ...formData, sshUser: value })}
-            onSshPasswordChange={(value) => setFormData({ ...formData, sshPassword: value })}
-            onSshKeyPathChange={(value) => setFormData({ ...formData, sshKeyPath: value })}
-          />
-
-          {testResult && (
-            <div
-              className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-xs font-mono ${
-                testResult.ok
-                  ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
-                  : "border-destructive/30 bg-destructive/5 text-destructive"
-              }`}
-            >
-              {testResult.ok ? (
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-              ) : (
-                <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-              )}
-              <span className="break-all">{testResult.message}</span>
-            </div>
-          )}
-
-          <div className="flex justify-between pt-4">
+          <div className="flex shrink-0 justify-between border-border/40 border-t px-6 py-4">
             <Button
               type="button"
               variant="outline"

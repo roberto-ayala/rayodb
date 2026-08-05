@@ -89,7 +89,14 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     <div key={gKey}>
       <TreeRow
         indent={I.server}
-        icon={<Server className="h-3.5 w-3.5 text-primary" />}
+        icon={
+          <Server
+            className={cn(
+              "h-3.5 w-3.5",
+              anyConnected ? "text-success" : anyConnecting ? "text-warning" : "text-primary",
+            )}
+          />
+        }
         label={serverLabel}
         bold
         expanded={isOpen(gKey, true)}
@@ -147,16 +154,6 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
             },
           ])
         }
-        trailing={
-          <div
-            className={cn(
-              "h-2 w-2 rounded-full shrink-0",
-              anyConnected && "bg-success shadow-[0_0_6px_currentColor]",
-              anyConnecting && "bg-warning shadow-[0_0_6px_currentColor]",
-              !anyConnected && !anyConnecting && "bg-muted",
-            )}
-          />
-        }
       />
 
       {isOpen(gKey, true) && (
@@ -187,7 +184,16 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                         isDbConnecting ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                         ) : (
-                          <Database className="h-3.5 w-3.5 text-muted-foreground" />
+                          <Database
+                            className={cn(
+                              "h-3.5 w-3.5",
+                              isDbConnected
+                                ? "text-success"
+                                : isDbFailed
+                                  ? "text-destructive"
+                                  : "text-muted-foreground",
+                            )}
+                          />
                         )
                       }
                       label={dbName}
@@ -262,17 +268,6 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                             destructive: true,
                           },
                         ])
-                      }
-                      trailing={
-                        <div
-                          className={cn(
-                            "h-2 w-2 rounded-full shrink-0",
-                            isDbConnected && "bg-success shadow-[0_0_6px_currentColor]",
-                            isDbConnecting && "bg-warning shadow-[0_0_6px_currentColor]",
-                            isDbFailed && "bg-destructive shadow-[0_0_6px_currentColor]",
-                            !dbConn && "bg-muted",
-                          )}
-                        />
                       }
                     />
 

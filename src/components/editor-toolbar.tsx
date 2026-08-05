@@ -87,7 +87,7 @@ export function EditorToolbar({
 
   return (
     <>
-      <div className="flex items-center gap-1 border-b border-border bg-muted/30 px-2 py-1.5 flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-card px-3 py-1.5">
         <Button
           variant="subtle"
           size="sm"
@@ -111,7 +111,7 @@ export function EditorToolbar({
           Split
         </Button>
 
-        <div className="h-4 w-px bg-border/40 mx-1" />
+        <div className="mx-1.5 h-4 w-px bg-border" />
 
         <div className="flex items-center gap-1">
           <Timer className="h-3 w-3 text-muted-foreground" />
@@ -129,7 +129,7 @@ export function EditorToolbar({
           </select>
         </div>
 
-        <div className="h-4 w-px bg-border/40 mx-1" />
+        <div className="mx-1.5 h-4 w-px bg-border" />
 
         <Button
           variant="outline"

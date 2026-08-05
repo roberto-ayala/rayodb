@@ -3,6 +3,10 @@ import React, { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type { ExplainNode, ExplainPlan } from "@/types";
 
+// A node only counts as a problem past these absolute self-times
+const SLOW_MS = 100;
+const VERY_SLOW_MS = 1000;
+
 interface ExplainPanelProps {
   plan: ExplainPlan;
 }
@@ -53,6 +57,17 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
   const timePercent = maxTime > 0 ? (totalActualTime / maxTime) * 100 : 0;
   const rowEstimateRatio = planRows > 0 ? actualRows / planRows : 1;
 
+  // Time spent in this node itself. A node taking most of the plan is not a
+  // problem — every plan has one — so severity comes from absolute time, and
+  // the bar length alone carries the share.
+  const childrenTime = (node.Plans ?? []).reduce(
+    (sum, child) => sum + (child["Actual Total Time"] ?? 0) * (child["Actual Loops"] ?? 1),
+    0,
+  );
+  const selfTime = Math.max(0, totalActualTime - childrenTime);
+  const isSlow = selfTime >= SLOW_MS;
+  const isVerySlow = selfTime >= VERY_SLOW_MS;
+
   const nodeLabel = useMemo(() => {
     const parts = [node["Node Type"]];
     if (node["Join Type"]) parts[0] = `${node["Join Type"]} ${parts[0]}`;
@@ -98,11 +113,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
             <div
               className={cn(
                 "h-full rounded-full transition-all",
-                timePercent > 80
-                  ? "bg-destructive"
-                  : timePercent > 40
-                    ? "bg-warning"
-                    : "bg-success",
+                isVerySlow ? "bg-destructive" : isSlow ? "bg-warning" : "bg-primary",
               )}
               style={{ width: `${Math.max(1, timePercent)}%` }}
             />
@@ -111,7 +122,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
 
         {/* Stats row */}
         <div className="mt-1 ml-5.5 flex flex-wrap gap-x-4 gap-y-0.5">
-          <Stat label="Time" value={`${totalActualTime.toFixed(2)}ms`} warn={timePercent > 60} />
+          <Stat label="Time" value={`${totalActualTime.toFixed(2)}ms`} warn={isSlow} />
           <Stat label="Rows" value={actualRows.toLocaleString()} />
           <Stat
             label="Est."
@@ -127,7 +138,11 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
             <Stat label="Buffers Hit" value={node["Shared Hit Blocks"].toLocaleString()} />
           )}
           {node["Shared Read Blocks"] != null && node["Shared Read Blocks"] > 0 && (
-            <Stat label="Buffers Read" value={node["Shared Read Blocks"].toLocaleString()} warn />
+            <Stat
+              label="Buffers Read"
+              value={node["Shared Read Blocks"].toLocaleString()}
+              warn={node["Shared Read Blocks"] > 1000}
+            />
           )}
         </div>
 

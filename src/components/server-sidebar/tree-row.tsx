@@ -10,6 +10,7 @@ export function TreeRow({
   bold,
   expanded,
   loading: isLoading,
+  meta,
   trailing,
   selected,
   onClick,
@@ -22,6 +23,8 @@ export function TreeRow({
   bold?: boolean;
   expanded?: boolean;
   loading?: boolean;
+  /** Sits next to the label; the right edge belongs to the chevron */
+  meta?: React.ReactNode;
   trailing?: React.ReactNode;
   selected?: boolean;
   onClick?: () => void;
@@ -43,6 +46,7 @@ export function TreeRow({
       <IndentGuides indent={indent} />
       <span className="shrink-0">{icon}</span>
       <span className={cn("font-mono text-xs", bold && "font-semibold")}>{label}</span>
+      {meta && <span className="shrink-0 font-mono text-3xs text-muted-foreground">{meta}</span>}
       {/* Chevron sits on the right so that every icon keeps its indent column */}
       <span className="ml-auto mr-1 flex shrink-0 items-center gap-1.5">
         {expanded !== undefined &&

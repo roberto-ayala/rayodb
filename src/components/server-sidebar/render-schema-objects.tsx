@@ -171,11 +171,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                           },
                         ]);
                       }}
-                      trailing={
-                        <span className="rounded-full bg-accent/60 px-1.5 py-0.5 font-mono text-3xs text-muted-foreground shrink-0">
-                          {ti.size}
-                        </span>
-                      }
+                      meta={ti.size}
                     />
                     {isTableOpen && renderTableDetails(ctx, pid, schema, ti.name)}
                   </div>

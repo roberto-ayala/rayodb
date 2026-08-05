@@ -1,6 +1,7 @@
 import { Copy, Download } from "lucide-react";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
 import { copyToClipboard, type ExportFormat, exportResults } from "@/lib/export";
 
 interface ToolbarExportProps {
@@ -27,14 +28,10 @@ export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExpor
 
   return (
     <div className="relative" ref={exportRef}>
-      <button
-        type="button"
-        onClick={() => setExportOpen(!exportOpen)}
-        className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-      >
+      <Button variant="subtle" size="sm" onClick={() => setExportOpen(!exportOpen)}>
         <Download className="h-3 w-3" />
         Export
-      </button>
+      </Button>
       {exportOpen &&
         createPortal(
           <>

@@ -10,7 +10,7 @@ const buttonVariants = cva(
         default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
         outline: "border-border bg-transparent text-foreground hover:bg-hover",
         /** Toolbar actions: readable as a control at rest, quiet enough to repeat */
-        subtle: "border-transparent bg-muted/60 text-foreground hover:bg-muted",
+        subtle: "border-border/60 bg-muted text-foreground hover:bg-accent",
         ghost:
           "border-transparent bg-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
         destructive:
@@ -18,7 +18,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-9 px-3",
-        sm: "h-7 px-2 text-xs",
+        sm: "h-7 px-2.5 text-xs font-mono font-normal",
         icon: "h-9 w-9",
         "icon-sm": "h-7 w-7",
       },

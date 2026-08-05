@@ -78,8 +78,10 @@
 }
 
 @theme inline {
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    /* Geist was never bundled, so both aliases resolved to nothing and every
+       font-mono in the app fell back to sans */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-card: var(--card);

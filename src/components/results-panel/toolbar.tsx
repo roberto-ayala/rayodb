@@ -6,16 +6,21 @@ import {
   GitBranch,
   History,
   Loader2,
+  Map as MapIcon,
   Pin,
+  Rows3,
   Search,
   Square,
+  Table2,
   X,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 import { hasGeometryColumn } from "../results-map";
 import { ToolbarEdit } from "./toolbar-edit";
 import { ToolbarExport } from "./toolbar-export";
-import type { ToolbarProps } from "./types";
+import type { PanelView, ToolbarProps } from "./types";
 
 export function ResultsToolbar(props: ToolbarProps) {
   const {
@@ -28,7 +33,6 @@ export function ResultsToolbar(props: ToolbarProps) {
     setSearchTerm,
     filteredCount,
     setViewMode,
-    viewMode,
     hasExplain,
     isExecuting,
     isEditing,
@@ -51,79 +55,48 @@ export function ResultsToolbar(props: ToolbarProps) {
   const pinResult = useUIStore((s) => s.pinResult);
   const clearPinnedResult = useUIStore((s) => s.clearPinnedResult);
 
+  // panelView is the single source of truth for which view is on screen;
+  // viewMode only remembers which of grid/record to return to.
+  const views: { id: PanelView; label: string; icon: typeof Table2; disabled?: boolean }[] = [
+    { id: "grid", label: "Grid", icon: Table2 },
+    {
+      id: "record",
+      label: "Record",
+      icon: Rows3,
+      disabled: !result?.rows.length || !!virtualQuery,
+    },
+    ...(hasExplain ? [{ id: "explain" as const, label: "Explain", icon: GitBranch }] : []),
+    { id: "history", label: "History", icon: History },
+    ...(result && hasGeometryColumn(columns, filteredRows)
+      ? [{ id: "map" as const, label: "Map", icon: MapIcon }]
+      : []),
+  ];
+
   return (
-    <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-2 flex-shrink-0">
+    <div className="flex items-center justify-between border-b border-border bg-card px-3 py-1.5 flex-shrink-0">
       <div className="flex items-center gap-3">
-        {/* Panel tabs — segment control */}
-        <div className="inline-flex rounded-md border border-border bg-muted/60 p-0.5">
-          <button
-            type="button"
-            onClick={() => {
-              setPanelView("grid");
-              setViewMode("grid");
-            }}
-            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 ${
-              panelView !== "history" && viewMode === "grid"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Grid
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPanelView("record");
-              setViewMode("record");
-            }}
-            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 ${
-              panelView !== "history" && viewMode === "record"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            disabled={!result?.rows.length || !!virtualQuery}
-          >
-            Record
-          </button>
-          {hasExplain && (
+        {/* Panel tabs — segmented control */}
+        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-muted p-0.5">
+          {views.map(({ id, label, icon: Icon, disabled }) => (
             <button
+              key={id}
               type="button"
-              onClick={() => setPanelView("explain")}
-              className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
-                panelView === "explain"
+              disabled={disabled}
+              onClick={() => {
+                setPanelView(id);
+                if (id === "grid" || id === "record") setViewMode(id);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 font-mono text-xs transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40",
+                panelView === id
                   ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              <GitBranch className="h-3 w-3" />
-              Explain
+              <Icon className="h-3 w-3" />
+              {label}
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setPanelView("history")}
-            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
-              panelView === "history"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <History className="h-3 w-3" />
-            History
-          </button>
-          {result && hasGeometryColumn(columns, filteredRows) && (
-            <button
-              type="button"
-              onClick={() => setPanelView("map")}
-              className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
-                panelView === "map"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Map
-            </button>
-          )}
+          ))}
         </div>
 
         {/* Result stats */}
@@ -168,14 +141,10 @@ export function ResultsToolbar(props: ToolbarProps) {
 
         {/* Stop button — visible while executing */}
         {isExecuting && onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors"
-          >
+          <Button variant="destructive" size="sm" onClick={onCancel} className="font-mono">
             <Square className="h-3 w-3" />
             Stop
-          </button>
+          </Button>
         )}
       </div>
 
@@ -197,22 +166,23 @@ export function ResultsToolbar(props: ToolbarProps) {
           <>
             {/* Edit button */}
             {panelView !== "history" && editableTable && result && result.rows.length > 0 && (
-              <button
-                type="button"
+              <Button
+                variant="subtle"
+                size="sm"
                 onClick={onEnterEdit}
-                className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className="font-mono"
                 title="Edit table data inline"
               >
                 <Edit3 className="h-3 w-3" />
                 Edit
-              </button>
+              </Button>
             )}
 
             {/* Pin / Diff */}
             {panelView !== "history" && result && result.rows.length > 0 && !virtualQuery && (
               <>
                 {pinnedResult ? (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary border border-primary/20">
+                  <div className="flex h-7 items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 font-mono text-xs text-primary">
                     <Pin className="h-3 w-3" />
                     <span>Pinned: {pinnedResult.label}</span>
                     <button
@@ -225,34 +195,32 @@ export function ResultsToolbar(props: ToolbarProps) {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    type="button"
+                  <Button
+                    variant="subtle"
+                    size="sm"
                     onClick={() =>
                       pinResult(
                         { columns, rows: filteredRows, time: result.time },
                         `${filteredRows.length} rows`,
                       )
                     }
-                    className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    className="font-mono"
                     title="Pin current results for later diff comparison"
                   >
                     <Pin className="h-3 w-3" />
                     Pin
-                  </button>
+                  </Button>
                 )}
                 {pinnedResult && (
-                  <button
-                    type="button"
+                  <Button
+                    variant={panelView === "diff" ? "default" : "subtle"}
+                    size="sm"
                     onClick={() => setPanelView(panelView === "diff" ? "grid" : "diff")}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono transition-colors ${
-                      panelView === "diff"
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`}
+                    className="font-mono"
                   >
                     <Diff className="h-3 w-3" />
                     Diff
-                  </button>
+                  </Button>
                 )}
               </>
             )}

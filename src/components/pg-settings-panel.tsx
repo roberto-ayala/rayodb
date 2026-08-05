@@ -102,13 +102,11 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
       <div className="flex items-center justify-between border-b px-4 py-2">
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">PostgreSQL Settings</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
+          <span className="text-sm font-semibold">PostgreSQL Settings</span>
+          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-3xs text-muted-foreground">
+          <span className="text-3xs text-muted-foreground">
             {filtered.length}/{settings.length}
           </span>
           <Button
@@ -132,12 +130,12 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search settings..."
-          className="h-7 text-xs font-mono w-56 bg-input/50"
+          className="h-7 text-xs w-56 bg-input/50"
         />
         <select
           value={categoryFilter ?? ""}
           onChange={(e) => setCategoryFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 font-mono text-xs text-foreground"
+          className="h-7 rounded-md border bg-input/50 px-2 text-xs text-foreground"
         >
           <option value="">All categories</option>
           {categories.map((c) => (
@@ -149,7 +147,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
         <select
           value={contextFilter ?? ""}
           onChange={(e) => setContextFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 font-mono text-xs text-foreground"
+          className="h-7 rounded-md border bg-input/50 px-2 text-xs text-foreground"
         >
           <option value="">All contexts</option>
           <option value="user">user (SET)</option>
@@ -166,7 +164,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               setCategoryFilter(null);
               setContextFilter(null);
             }}
-            className="font-mono text-3xs text-primary hover:underline"
+            className="text-3xs text-primary hover:underline"
           >
             Clear filters
           </button>
@@ -177,7 +175,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
         {Array.from(grouped.entries()).map(([category, items]) => (
           <div key={category}>
             <div className="sticky top-0 z-10 bg-muted/80 px-4 py-1.5 border-b border-border/60">
-              <span className="font-mono text-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <span className="text-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {category}
               </span>
             </div>
@@ -193,42 +191,38 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
                     )}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-medium">{s.name}</span>
+                      <span className="text-xs font-medium">{s.name}</span>
                       <span
                         className={cn(
-                          "rounded-full px-1.5 py-0.5 font-mono text-3xs",
+                          "rounded-full px-1.5 py-0.5 text-3xs",
                           contextColor(s.context),
                         )}
                       >
                         {s.context}
                       </span>
                       {isModified && (
-                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-3xs text-primary">
+                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-3xs text-primary">
                           modified
                         </span>
                       )}
                       {s.source && s.source !== "default" && (
-                        <span className="font-mono text-3xs text-muted-foreground">
-                          via {s.source}
-                        </span>
+                        <span className="text-3xs text-muted-foreground">via {s.source}</span>
                       )}
                     </div>
                     <div className="mt-1 flex items-center gap-3">
-                      <span className="font-mono text-sm font-bold text-foreground">
+                      <span className="text-sm font-bold text-foreground">
                         {s.setting}
                         {s.unit ? ` ${s.unit}` : ""}
                       </span>
                       {isModified && (
-                        <span className="font-mono text-3xs text-muted-foreground">
+                        <span className="text-3xs text-muted-foreground">
                           default: {s.bootVal}
                           {s.unit ? ` ${s.unit}` : ""}
                         </span>
                       )}
                     </div>
                     {s.description && (
-                      <p className="mt-0.5 font-mono text-3xs text-muted-foreground">
-                        {s.description}
-                      </p>
+                      <p className="mt-0.5 text-3xs text-muted-foreground">{s.description}</p>
                     )}
                   </div>
                 );
@@ -237,7 +231,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             {filter || categoryFilter || contextFilter
               ? "No matching settings"
               : "No settings loaded"}

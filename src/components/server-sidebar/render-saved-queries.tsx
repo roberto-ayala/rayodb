@@ -56,9 +56,7 @@ export function renderSavedQueries(
                 ]);
               }}
               trailing={
-                <span className="font-mono text-3xs text-muted-foreground shrink-0">
-                  {q.projectId}
-                </span>
+                <span className="text-3xs text-muted-foreground shrink-0">{q.projectId}</span>
               }
             />
           ))}

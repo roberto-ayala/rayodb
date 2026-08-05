@@ -90,13 +90,13 @@ export function OverviewContent({
         {/* Scan stats */}
         <PropertySection title="Scan Statistics" icon={<RefreshCw className="h-3.5 w-3.5" />}>
           <div className="grid grid-cols-2 gap-2">
-            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs font-mono">
+            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
               <div className="text-muted-foreground text-3xs uppercase mb-0.5">
                 Sequential Scans
               </div>
               <div className="text-foreground">{Number(tableStats.seqScan).toLocaleString()}</div>
             </div>
-            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs font-mono">
+            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
               <div className="text-muted-foreground text-3xs uppercase mb-0.5">Index Scans</div>
               <div className="text-foreground">{Number(tableStats.idxScan).toLocaleString()}</div>
             </div>
@@ -105,7 +105,7 @@ export function OverviewContent({
 
         {/* Maintenance */}
         <PropertySection title="Maintenance" icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono px-1">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs px-1">
             <InfoRow label="Last Vacuum" value={formatTimestamp(tableStats.lastVacuum)} />
             <InfoRow label="Last Auto Vacuum" value={formatTimestamp(tableStats.lastAutoVacuum)} />
             <InfoRow label="Last Analyze" value={formatTimestamp(tableStats.lastAnalyze)} />
@@ -126,7 +126,7 @@ export function OverviewContent({
                 return (
                   <div
                     key={cName}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs font-mono"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs"
                   >
                     <ConstraintIcon type={f.constraintType} />
                     <span className="text-foreground">{cName}</span>
@@ -150,7 +150,7 @@ export function OverviewContent({
               {trigs.map((t) => (
                 <div
                   key={`${t.triggerName}-${t.event}`}
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs font-mono"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs"
                 >
                   <Zap className="h-3 w-3 text-muted-foreground/50 shrink-0" />
                   <span className="text-foreground">{t.triggerName}</span>
@@ -170,7 +170,7 @@ export function OverviewContent({
               {pols.map((p) => (
                 <div
                   key={p.policyName}
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs font-mono"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs"
                 >
                   <Lock className="h-3 w-3 text-muted-foreground/50 shrink-0" />
                   <span className="text-foreground">{p.policyName}</span>
@@ -190,7 +190,7 @@ export function OverviewContent({
               {rls.map((r) => (
                 <div
                   key={r.ruleName}
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs font-mono"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/20 border border-border/60 text-xs"
                 >
                   <ScrollText className="h-3 w-3 text-muted-foreground/50 shrink-0" />
                   <span className="text-foreground">{r.ruleName}</span>

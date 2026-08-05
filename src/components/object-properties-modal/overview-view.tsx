@@ -26,7 +26,7 @@ export function ViewOverview({
           />
         </div>
         <PropertySection title="View Definition" icon={<FileCode className="h-3.5 w-3.5" />}>
-          <pre className="rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
+          <pre className="font-mono rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
             {viewInfo.definition}
           </pre>
         </PropertySection>
@@ -56,7 +56,7 @@ export function ViewOverview({
           />
         </div>
         <PropertySection title="Definition" icon={<FileCode className="h-3.5 w-3.5" />}>
-          <pre className="rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
+          <pre className="font-mono rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
             {matViewStats.definition}
           </pre>
         </PropertySection>

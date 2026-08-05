@@ -47,7 +47,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground text-sm font-mono">
+      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
         Loading roles...
       </div>
     );
@@ -68,7 +68,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             type="button"
             onClick={() => selectRole(role.name)}
             className={cn(
-              "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs font-mono transition-colors",
+              "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs transition-colors",
               selectedRole === role.name
                 ? "bg-primary/10 text-primary"
                 : "text-foreground hover:bg-muted/30",
@@ -94,7 +94,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       {/* Detail panel */}
       <div className="flex-1 overflow-y-auto p-4">
         {!selected ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
             Select a role
           </div>
         ) : (
@@ -114,7 +114,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                 )}
               </div>
               <div>
-                <div className="font-mono font-semibold text-lg">{selected.name}</div>
+                <div className="font-semibold text-lg">{selected.name}</div>
                 <div className="text-xs text-muted-foreground">
                   {selected.login ? "Login role" : "Group role"}
                   {selected.conn_limit >= 0 && ` (max ${selected.conn_limit} connections)`}
@@ -141,7 +141,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   <span
                     key={label}
                     className={cn(
-                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs font-mono",
+                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs",
                       active
                         ? "bg-primary/10 text-primary border border-primary/20"
                         : "bg-muted/30 text-muted-foreground/40 border border-border/60",
@@ -170,7 +170,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                       key={g}
                       type="button"
                       onClick={() => selectRole(g)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/50 text-xs font-mono hover:bg-accent transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/50 text-xs hover:bg-accent transition-colors"
                     >
                       <Users className="h-2.5 w-2.5" /> {g}
                     </button>
@@ -186,7 +186,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   Database Privileges
                 </div>
                 <div className="rounded-lg border border-border/60 overflow-hidden">
-                  <table className="w-full text-xs font-mono">
+                  <table className="w-full text-xs">
                     <thead>
                       <tr className="bg-muted/20">
                         <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
@@ -220,7 +220,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   Table Privileges ({tableGrants.length})
                 </div>
                 <div className="rounded-lg border border-border/60 overflow-hidden max-h-[300px] overflow-y-auto">
-                  <table className="w-full text-xs font-mono">
+                  <table className="w-full text-xs">
                     <thead className="sticky top-0 bg-muted/40">
                       <tr>
                         <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
@@ -260,7 +260,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             )}
 
             {selected.valid_until && (
-              <div className="text-xs text-muted-foreground font-mono">
+              <div className="text-xs text-muted-foreground">
                 <Key className="h-3 w-3 inline mr-1" />
                 Password valid until: {selected.valid_until}
               </div>

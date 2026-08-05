@@ -62,7 +62,7 @@ export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExpor
                   key={fmt}
                   type="button"
                   onClick={() => handleExport(fmt)}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-xs font-mono hover:bg-accent transition-colors"
+                  className="flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
                 >
                   <Download className="h-3 w-3 text-muted-foreground" />
                   {fmt.toUpperCase()}
@@ -77,7 +77,7 @@ export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExpor
                   key={`copy-${fmt}`}
                   type="button"
                   onClick={() => handleCopy(fmt)}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-xs font-mono hover:bg-accent transition-colors"
+                  className="flex w-full items-center gap-2 px-3 py-1.5 text-xs hover:bg-accent transition-colors"
                 >
                   <Copy className="h-3 w-3 text-muted-foreground" />
                   {fmt.toUpperCase()}

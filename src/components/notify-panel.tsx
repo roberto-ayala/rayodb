@@ -108,7 +108,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           onChange={(e) => setNewChannel(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && subscribe()}
           placeholder="Channel name..."
-          className="h-7 text-xs font-mono flex-1 bg-input/50"
+          className="h-7 text-xs flex-1 bg-input/50"
           list="known-channels"
         />
         {knownChannels.length > 0 && (
@@ -120,12 +120,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
               ))}
           </datalist>
         )}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={subscribe}
-          className="h-7 text-xs font-mono gap-1"
-        >
+        <Button variant="outline" size="sm" onClick={subscribe} className="h-7 text-xs gap-1">
           <Bell className="h-3 w-3" /> Subscribe
         </Button>
       </div>
@@ -150,7 +145,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
                 }}
                 disabled={isActive}
                 className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-mono transition-colors",
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs transition-colors",
                   isActive
                     ? "bg-primary/10 text-primary/50 cursor-default"
                     : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary",
@@ -174,7 +169,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
               key={ch}
               type="button"
               onClick={() => unsubscribe(ch)}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-2xs font-mono hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-2xs hover:bg-destructive/10 hover:text-destructive transition-colors"
               title="Click to unsubscribe"
             >
               {ch} <BellOff className="h-2.5 w-2.5" />
@@ -185,7 +180,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
 
       <div ref={listRef} className="flex-1 overflow-auto p-3 space-y-1">
         {notifications.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
             {channels.length === 0
               ? "Subscribe to a channel to start"
               : "Waiting for notifications..."}
@@ -194,7 +189,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           notifications.map((n, i) => (
             <div
               key={i}
-              className="flex items-start gap-2 text-xs font-mono px-2 py-1.5 rounded-md hover:bg-muted/30"
+              className="flex items-start gap-2 text-xs px-2 py-1.5 rounded-md hover:bg-muted/30"
             >
               <span className="text-muted-foreground/50 shrink-0">
                 {new Date(n.timestamp).toLocaleTimeString()}
@@ -213,21 +208,16 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           value={sendChannel}
           onChange={(e) => setSendChannel(e.target.value)}
           placeholder="Channel"
-          className="h-7 text-xs font-mono w-[140px] bg-input/50"
+          className="h-7 text-xs w-[140px] bg-input/50"
         />
         <Input
           value={sendPayload}
           onChange={(e) => setSendPayload(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendNotify()}
           placeholder="Payload..."
-          className="h-7 text-xs font-mono flex-1 bg-input/50"
+          className="h-7 text-xs flex-1 bg-input/50"
         />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={sendNotify}
-          className="h-7 text-xs font-mono gap-1"
-        >
+        <Button variant="outline" size="sm" onClick={sendNotify} className="h-7 text-xs gap-1">
           <Send className="h-3 w-3" /> Send
         </Button>
         <Button

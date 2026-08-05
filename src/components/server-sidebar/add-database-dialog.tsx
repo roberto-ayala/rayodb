@@ -45,17 +45,17 @@ export function AddDatabaseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="font-mono">Add Database</DialogTitle>
+          <DialogTitle className="">Add Database</DialogTitle>
           <DialogDescription>
             Add a database to{" "}
-            <span className="font-mono font-semibold text-foreground">
+            <span className="font-semibold text-foreground">
               {source?.host}:{source?.port}
             </span>
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3 mt-2">
           <div className="space-y-1">
-            <Label htmlFor="addDbName" className="font-mono text-xs">
+            <Label htmlFor="addDbName" className="text-xs">
               Database Name
             </Label>
             <Input
@@ -67,11 +67,11 @@ export function AddDatabaseDialog({
               }}
               placeholder="analytics_db"
               autoFocus
-              className="font-mono text-sm h-8"
+              className="text-sm h-8"
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="addConnName" className="font-mono text-xs text-muted-foreground">
+            <Label htmlFor="addConnName" className="text-xs text-muted-foreground">
               Connection Name
             </Label>
             <Input
@@ -79,7 +79,7 @@ export function AddDatabaseDialog({
               value={connName}
               onChange={(e) => setConnName(e.target.value)}
               placeholder={dbName || "optional"}
-              className="font-mono text-sm h-8"
+              className="text-sm h-8"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">

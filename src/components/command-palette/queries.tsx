@@ -29,7 +29,7 @@ export function SaveQueryPage({
               setQueryName("");
             }
           }}
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none font-mono"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         />
       </div>
       <div className="px-4 py-3 text-xs text-muted-foreground">

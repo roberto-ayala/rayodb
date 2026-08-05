@@ -12,7 +12,7 @@ interface ConnStringFieldProps {
 export function ConnStringField({ value, onChange, error }: ConnStringFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="connString" className="font-mono text-xs text-foreground">
+      <Label htmlFor="connString" className="text-xs text-foreground">
         Connection URL
       </Label>
       <Input
@@ -20,11 +20,9 @@ export function ConnStringField({ value, onChange, error }: ConnStringFieldProps
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="postgresql://user:password@host:5432/database"
-        className={`bg-input/80 border-border text-foreground font-mono text-sm rounded-md ${error ? "border-destructive" : ""}`}
+        className={`bg-input/80 border-border text-foreground text-sm rounded-md ${error ? "border-destructive" : ""}`}
       />
-      {error && (
-        <p className="text-destructive text-2xs font-mono">Invalid connection URL format</p>
-      )}
+      {error && <p className="text-destructive text-2xs">Invalid connection URL format</p>}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-border/60" />
@@ -44,10 +42,10 @@ interface DriverDisplayProps {
 export function DriverDisplay({ driver }: DriverDisplayProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="driver" className="font-mono text-xs text-foreground">
+      <Label htmlFor="driver" className="text-xs text-foreground">
         Database Type
       </Label>
-      <div className="w-full bg-input/80 border border-border text-foreground font-mono text-sm rounded-md px-3 py-2">
+      <div className="w-full bg-input/80 border border-border text-foreground text-sm rounded-md px-3 py-2">
         {DRIVER_CONFIGS[driver].name}
       </div>
     </div>
@@ -63,7 +61,7 @@ interface NameFieldProps {
 export function NameField({ value, onChange, disabled }: NameFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="name" className="font-mono text-xs text-foreground">
+      <Label htmlFor="name" className="text-xs text-foreground">
         Connection Name
       </Label>
       <Input
@@ -73,7 +71,7 @@ export function NameField({ value, onChange, disabled }: NameFieldProps) {
         placeholder="production-db"
         required
         disabled={disabled}
-        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+        className="bg-input/80 border-border text-foreground text-sm rounded-md"
       />
     </div>
   );
@@ -90,7 +88,7 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="host" className="font-mono text-xs text-foreground">
+        <Label htmlFor="host" className="text-xs text-foreground">
           Host
         </Label>
         <Input
@@ -99,11 +97,11 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
           onChange={(e) => onHostChange(e.target.value)}
           placeholder="localhost"
           required
-          className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+          className="bg-input/80 border-border text-foreground text-sm rounded-md"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="port" className="font-mono text-xs text-foreground">
+        <Label htmlFor="port" className="text-xs text-foreground">
           Port
         </Label>
         <Input
@@ -112,7 +110,7 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
           onChange={(e) => onPortChange(e.target.value)}
           placeholder="5432"
           required
-          className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+          className="bg-input/80 border-border text-foreground text-sm rounded-md"
         />
       </div>
     </div>
@@ -127,7 +125,7 @@ interface DatabaseFieldProps {
 export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="database" className="font-mono text-xs text-foreground">
+      <Label htmlFor="database" className="text-xs text-foreground">
         Database
       </Label>
       <Input
@@ -136,7 +134,7 @@ export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="mydb"
         required
-        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+        className="bg-input/80 border-border text-foreground text-sm rounded-md"
       />
     </div>
   );
@@ -150,7 +148,7 @@ interface UsernameFieldProps {
 export function UsernameField({ value, onChange }: UsernameFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="username" className="font-mono text-xs text-foreground">
+      <Label htmlFor="username" className="text-xs text-foreground">
         Username
       </Label>
       <Input
@@ -159,7 +157,7 @@ export function UsernameField({ value, onChange }: UsernameFieldProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="postgres"
         required
-        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+        className="bg-input/80 border-border text-foreground text-sm rounded-md"
       />
     </div>
   );
@@ -173,7 +171,7 @@ interface PasswordFieldProps {
 export function PasswordField({ value, onChange }: PasswordFieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="password" className="font-mono text-xs text-foreground">
+      <Label htmlFor="password" className="text-xs text-foreground">
         Password
       </Label>
       <Input
@@ -182,7 +180,7 @@ export function PasswordField({ value, onChange }: PasswordFieldProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="••••••••"
-        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
+        className="bg-input/80 border-border text-foreground text-sm rounded-md"
       />
     </div>
   );
@@ -203,7 +201,7 @@ export function SslCheckbox({ checked, onChange }: SslCheckboxProps) {
         onChange={(e) => onChange(e.target.checked)}
         className="h-4 w-4 rounded border-border bg-input"
       />
-      <Label htmlFor="ssl" className="font-mono text-xs text-foreground cursor-pointer">
+      <Label htmlFor="ssl" className="text-xs text-foreground cursor-pointer">
         Use SSL
       </Label>
     </div>

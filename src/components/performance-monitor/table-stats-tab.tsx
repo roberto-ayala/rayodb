@@ -8,7 +8,7 @@ interface TableStatsTabProps {
 export function TableStatsTab({ tableStats }: TableStatsTabProps) {
   return (
     <div className="space-y-2">
-      <p className="font-mono text-3xs text-muted-foreground px-1">
+      <p className="text-3xs text-muted-foreground px-1">
         Cumulative stats since server start or last pg_stat_reset(). Source: pg_stat_user_tables
       </p>
       <div className="rounded-md border">
@@ -31,7 +31,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left font-mono text-3xs font-semibold text-muted-foreground whitespace-nowrap"
+                    className="px-2 py-1.5 text-left text-3xs font-semibold text-muted-foreground whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -46,22 +46,20 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                     : 0;
                 return (
                   <tr key={`${row.schema}.${row.table}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 font-mono text-2xs text-muted-foreground">
-                      {row.schema}
-                    </td>
-                    <td className="px-2 py-1 font-mono text-2xs font-medium">{row.table}</td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs text-muted-foreground">{row.schema}</td>
+                    <td className="px-2 py-1 text-2xs font-medium">{row.table}</td>
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.seqScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.idxScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
                     <td
                       className={cn(
-                        "px-2 py-1 font-mono text-2xs",
+                        "px-2 py-1 text-2xs",
                         deadRatio > 10 && "text-destructive font-medium",
                       )}
                     >
@@ -70,21 +68,21 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                         <span className="ml-1 text-3xs">({deadRatio.toFixed(0)}%)</span>
                       )}
                     </td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.inserts, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.updates, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-2xs">
+                    <td className="px-2 py-1 text-2xs">
                       {parseInt(row.deletes, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}
@@ -94,10 +92,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
               })}
               {tableStats.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={11}
-                    className="py-6 text-center font-mono text-xs text-muted-foreground"
-                  >
+                  <td colSpan={11} className="py-6 text-center text-xs text-muted-foreground">
                     No table stats available
                   </td>
                 </tr>

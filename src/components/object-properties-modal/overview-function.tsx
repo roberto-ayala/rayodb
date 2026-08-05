@@ -31,7 +31,7 @@ export function FunctionOverview({
           icon={<ArrowRight className="h-3.5 w-3.5" />}
         />
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono px-1">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs px-1">
         <InfoRow
           label="Security"
           value={functionMeta.securityDefiner ? "SECURITY DEFINER" : "SECURITY INVOKER"}
@@ -45,7 +45,7 @@ export function FunctionOverview({
       </div>
       {functionMeta.arguments && (
         <PropertySection title="Arguments" icon={<Columns3 className="h-3.5 w-3.5" />}>
-          <div className="rounded-lg bg-[hsl(var(--background))] border border-border/60 px-3 py-2 text-2xs font-mono text-foreground/90">
+          <div className="rounded-lg bg-[hsl(var(--background))] border border-border/60 px-3 py-2 text-2xs text-foreground/90">
             {functionMeta.arguments}
           </div>
         </PropertySection>
@@ -64,7 +64,7 @@ export function FunctionOverview({
               <Copy className="h-3.5 w-3.5" />
             )}
           </button>
-          <pre className="rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[250px] selection:bg-primary/20">
+          <pre className="font-mono rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[250px] selection:bg-primary/20">
             {functionMeta.source}
           </pre>
         </div>

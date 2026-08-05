@@ -10,7 +10,7 @@ export function IndexesContent({ idxs }: { idxs?: import("@/types").IndexDetail[
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-2 text-muted-foreground">
         <Key className="h-6 w-6 text-muted-foreground/30" />
-        <span className="text-xs font-mono">No indexes found</span>
+        <span className="text-xs">No indexes found</span>
       </div>
     );
   }
@@ -24,7 +24,7 @@ export function IndexesContent({ idxs }: { idxs?: import("@/types").IndexDetail[
   return (
     <div className="pt-3">
       <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/10">
-        <table className="w-full text-2xs font-mono">
+        <table className="w-full text-2xs">
           <thead>
             <tr className="bg-muted/30 border-b border-border/60">
               <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest w-8"></th>

@@ -140,10 +140,8 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
       <div className="flex items-center justify-between border-b px-4 py-2">
         <div className="flex items-center gap-2">
           <Package className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">Extensions</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
+          <span className="text-sm font-semibold">Extensions</span>
+          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
         </div>
         <Button
           variant="ghost"
@@ -166,7 +164,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
             type="button"
             onClick={() => setTab("installed")}
             className={cn(
-              "px-3 py-1.5 font-mono text-xs border-b-2 transition-colors",
+              "px-3 py-1.5 text-xs border-b-2 transition-colors",
               tab === "installed"
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
@@ -178,7 +176,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
             type="button"
             onClick={() => setTab("available")}
             className={cn(
-              "px-3 py-1.5 font-mono text-xs border-b-2 transition-colors",
+              "px-3 py-1.5 text-xs border-b-2 transition-colors",
               tab === "available"
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
@@ -191,13 +189,13 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter..."
-          className="h-7 text-xs font-mono ml-auto w-48 bg-input/50"
+          className="h-7 text-xs ml-auto w-48 bg-input/50"
         />
       </div>
 
       {error && (
         <div className="mx-4 mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2">
-          <span className="font-mono text-xs text-destructive">{error}</span>
+          <span className="text-xs text-destructive">{error}</span>
         </div>
       )}
 
@@ -211,8 +209,8 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
               >
                 <div className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-green-500" />
-                  <span className="font-mono text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 font-mono text-3xs text-primary">
+                  <span className="text-sm font-medium">{ext.name}</span>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-3xs text-primary">
                     {ext.installedVersion}
                   </span>
                   {ext.defaultVersion && ext.defaultVersion !== ext.installedVersion && (
@@ -232,7 +230,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     </Button>
                   )}
                   <span className="ml-auto flex items-center gap-2">
-                    <span className="font-mono text-3xs text-muted-foreground">{ext.schema}</span>
+                    <span className="text-3xs text-muted-foreground">{ext.schema}</span>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -250,12 +248,12 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   </span>
                 </div>
                 {ext.comment && (
-                  <p className="mt-1 font-mono text-2xs text-muted-foreground">{ext.comment}</p>
+                  <p className="mt-1 text-2xs text-muted-foreground">{ext.comment}</p>
                 )}
               </div>
             ))}
             {filteredInstalled.length === 0 && (
-              <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+              <div className="py-8 text-center text-xs text-muted-foreground">
                 {filter ? "No matching extensions" : "No extensions installed"}
               </div>
             )}
@@ -271,8 +269,8 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
               >
                 <div className="flex items-center gap-2">
                   <Download className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="font-mono text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-3xs text-muted-foreground">
+                  <span className="text-sm font-medium">{ext.name}</span>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-3xs text-muted-foreground">
                     {ext.version}
                   </span>
                   <Button
@@ -291,12 +289,12 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   </Button>
                 </div>
                 {ext.comment && (
-                  <p className="mt-1 font-mono text-2xs text-muted-foreground">{ext.comment}</p>
+                  <p className="mt-1 text-2xs text-muted-foreground">{ext.comment}</p>
                 )}
               </div>
             ))}
             {filteredAvailable.length === 0 && (
-              <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+              <div className="py-8 text-center text-xs text-muted-foreground">
                 {filter ? "No matching extensions" : "No available extensions"}
               </div>
             )}
@@ -312,14 +310,13 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
       >
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle className="font-mono">Install Extension</DialogTitle>
+            <DialogTitle className="">Install Extension</DialogTitle>
             <DialogDescription>
-              Install{" "}
-              <span className="font-mono font-semibold text-foreground">{confirmInstall}</span> into
+              Install <span className="font-semibold text-foreground">{confirmInstall}</span> into
               the current database?
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-md bg-muted/50 px-3 py-2 font-mono text-xs text-muted-foreground">
+          <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
             CREATE EXTENSION IF NOT EXISTS "{confirmInstall}";
           </div>
           <div className="flex justify-end gap-2">
@@ -341,14 +338,14 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
       >
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle className="font-mono">Drop Extension</DialogTitle>
+            <DialogTitle className="">Drop Extension</DialogTitle>
             <DialogDescription>
               Are you sure you want to drop{" "}
-              <span className="font-mono font-semibold text-foreground">{confirmDrop}</span>? This
-              will also drop all objects that depend on it (CASCADE).
+              <span className="font-semibold text-foreground">{confirmDrop}</span>? This will also
+              drop all objects that depend on it (CASCADE).
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-md bg-muted/50 px-3 py-2 font-mono text-xs text-muted-foreground">
+          <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
             DROP EXTENSION IF EXISTS "{confirmDrop}" CASCADE;
           </div>
           <div className="flex justify-end gap-2">

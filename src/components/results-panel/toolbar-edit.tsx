@@ -43,7 +43,7 @@ export function ToolbarEdit({
         type="button"
         onClick={onCommit}
         disabled={(editState?.cellEdits.size ?? 0) === 0 || isCommitting}
-        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono bg-success text-success-foreground hover:bg-success/90 transition-colors disabled:opacity-50"
+        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs bg-success text-success-foreground hover:bg-success/90 transition-colors disabled:opacity-50"
       >
         {isCommitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
         Commit
@@ -52,7 +52,7 @@ export function ToolbarEdit({
         type="button"
         onClick={onDeleteRows}
         disabled={(editState?.deletedRows.size ?? 0) === 0 || isCommitting}
-        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
       >
         <Trash2 className="h-3 w-3" />
         Delete ({editState?.deletedRows.size ?? 0})
@@ -75,14 +75,14 @@ export function ToolbarEdit({
             <button
               type="button"
               onClick={onCancelDelete}
-              className="px-3 py-1.5 rounded-md text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              className="px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={onConfirmDelete}
-              className="px-3 py-1.5 rounded-md text-xs font-mono bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+              className="px-3 py-1.5 rounded-md text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
             >
               Yes, delete {pendingDeleteCount} row{pendingDeleteCount !== 1 ? "s" : ""}
             </button>
@@ -93,7 +93,7 @@ export function ToolbarEdit({
         type="button"
         onClick={onDiscard}
         disabled={isCommitting}
-        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-50"
+        className="flex items-center gap-1 px-2.5 py-1 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-50"
       >
         <X className="h-3 w-3" />
         Discard

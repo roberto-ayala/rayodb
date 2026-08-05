@@ -41,17 +41,17 @@ export function OverviewTab({ dbStats, projectHistory, avgTime, failedQueries }:
       {/* All stats table */}
       <div className="rounded-md border">
         <div className="border-b px-3 py-2">
-          <span className="font-mono text-xs font-semibold">Database Statistics</span>
+          <span className="text-xs font-semibold">Database Statistics</span>
         </div>
         <div className="divide-y">
           {dbStats.map(([name, val]) => (
             <div key={name} className="flex items-center justify-between px-3 py-1.5">
-              <span className="font-mono text-xs text-muted-foreground">{name}</span>
-              <span className="font-mono text-xs font-medium">{val}</span>
+              <span className="text-xs text-muted-foreground">{name}</span>
+              <span className="text-xs font-medium">{val}</span>
             </div>
           ))}
           {dbStats.length === 0 && (
-            <div className="px-3 py-4 text-center font-mono text-xs text-muted-foreground">
+            <div className="px-3 py-4 text-center text-xs text-muted-foreground">
               No stats available
             </div>
           )}
@@ -61,24 +61,22 @@ export function OverviewTab({ dbStats, projectHistory, avgTime, failedQueries }:
       {/* Session history summary */}
       <div className="rounded-md border">
         <div className="border-b px-3 py-2">
-          <span className="font-mono text-xs font-semibold">Session Query Summary</span>
+          <span className="text-xs font-semibold">Session Query Summary</span>
         </div>
         <div className="grid grid-cols-3 divide-x">
           <div className="p-3 text-center">
-            <div className="font-mono text-lg font-bold">{projectHistory.length}</div>
-            <div className="font-mono text-3xs text-muted-foreground">Total Queries</div>
+            <div className="text-lg font-bold">{projectHistory.length}</div>
+            <div className="text-3xs text-muted-foreground">Total Queries</div>
           </div>
           <div className="p-3 text-center">
-            <div className="font-mono text-lg font-bold">{avgTime.toFixed(1)}ms</div>
-            <div className="font-mono text-3xs text-muted-foreground">Avg Execution Time</div>
+            <div className="text-lg font-bold">{avgTime.toFixed(1)}ms</div>
+            <div className="text-3xs text-muted-foreground">Avg Execution Time</div>
           </div>
           <div className="p-3 text-center">
-            <div
-              className={cn("font-mono text-lg font-bold", failedQueries > 0 && "text-destructive")}
-            >
+            <div className={cn("text-lg font-bold", failedQueries > 0 && "text-destructive")}>
               {failedQueries}
             </div>
-            <div className="font-mono text-3xs text-muted-foreground">Failed Queries</div>
+            <div className="text-3xs text-muted-foreground">Failed Queries</div>
           </div>
         </div>
       </div>
@@ -91,9 +89,9 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
     <div className="rounded-md border p-3">
       <div className="flex items-center gap-2 text-muted-foreground">
         {icon}
-        <span className="font-mono text-3xs">{label}</span>
+        <span className="text-3xs">{label}</span>
       </div>
-      <div className="mt-1 font-mono text-lg font-bold">{value}</div>
+      <div className="mt-1 text-lg font-bold">{value}</div>
     </div>
   );
 }

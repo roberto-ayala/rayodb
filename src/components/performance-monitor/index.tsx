@@ -208,14 +208,12 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
       <div className="flex items-center justify-between border-b px-4 py-2">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">Performance Monitor</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
+          <span className="text-sm font-semibold">Performance Monitor</span>
+          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
         </div>
         <div className="flex items-center gap-2">
           {lastRefresh && (
-            <span className="font-mono text-3xs text-muted-foreground">
+            <span className="text-3xs text-muted-foreground">
               Refreshed at {lastRefresh.toLocaleTimeString()}
             </span>
           )}
@@ -252,7 +250,7 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
             type="button"
             onClick={() => setTab(t.id)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-2 font-mono text-xs border-b-2 transition-colors",
+              "flex items-center gap-1.5 px-3 py-2 text-xs border-b-2 transition-colors",
               tab === t.id
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",

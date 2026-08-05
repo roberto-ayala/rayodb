@@ -29,7 +29,7 @@ export function DDLContent({
         <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
           <AlertTriangle className="h-5 w-5 text-destructive" />
         </div>
-        <p className="text-sm text-destructive font-mono">{ddlError}</p>
+        <p className="text-sm text-destructive">{ddlError}</p>
         <Button variant="outline" size="sm" className="gap-1.5" onClick={onRetry}>
           <RefreshCw className="h-3 w-3" />
           Retry
@@ -42,7 +42,7 @@ export function DDLContent({
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-2 text-muted-foreground">
         <FileCode className="h-6 w-6 text-muted-foreground/30" />
-        <span className="text-xs font-mono">No DDL available</span>
+        <span className="text-xs">No DDL available</span>
       </div>
     );
   }
@@ -55,7 +55,7 @@ export function DDLContent({
         <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60 shrink-0">
           <div className="flex items-center gap-2">
             <FileCode className="h-3 w-3 text-muted-foreground/50" />
-            <span className="text-3xs font-mono text-muted-foreground/60">DDL</span>
+            <span className="text-3xs text-muted-foreground/60">DDL</span>
           </div>
           <div className="flex items-center gap-1">
             <Button
@@ -87,7 +87,7 @@ export function DDLContent({
             </Button>
           </div>
         </div>
-        <pre className="p-4 text-2xs font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed selection:bg-primary/20 flex-1 min-h-0">
+        <pre className="font-mono p-4 text-2xs text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed selection:bg-primary/20 flex-1 min-h-0">
           {ddl}
         </pre>
       </div>

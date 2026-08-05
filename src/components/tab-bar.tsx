@@ -129,7 +129,7 @@ export function TabBar() {
                   : "border-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
               )}
             >
-              <div className="flex items-center gap-1.5 font-mono text-xs">
+              <div className="flex items-center gap-1.5 text-xs">
                 {tab.type === "terminal" ? (
                   <Terminal
                     className={cn("h-3 w-3", isActive ? "text-primary" : "text-muted-foreground")}

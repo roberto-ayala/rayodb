@@ -87,7 +87,7 @@ export function EditorToolbar({
 
   return (
     <>
-      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-card px-3 py-1.5">
+      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-muted/50 px-3 py-1.5">
         <Button
           variant="subtle"
           size="sm"
@@ -118,7 +118,7 @@ export function EditorToolbar({
           <select
             value={activeTab.queryTimeout ?? 0}
             onChange={(e) => setQueryTimeout(selectedTabIndex, Number(e.target.value))}
-            className="h-7 cursor-pointer rounded-md border border-border bg-transparent px-1.5 font-mono text-xs text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-7 cursor-pointer rounded-md border border-border bg-transparent px-1.5 text-xs text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
             title="Query timeout"
           >
             {TIMEOUT_OPTIONS.map((opt) => (
@@ -139,7 +139,7 @@ export function EditorToolbar({
         >
           <GitBranch className="h-3.5 w-3.5" />
           Explain
-          <kbd className="hidden sm:inline-flex ml-0.5 text-3xs text-muted-foreground/60">
+          <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs text-muted-foreground/60">
             {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+Shift+Enter
           </kbd>
         </Button>
@@ -147,7 +147,7 @@ export function EditorToolbar({
           <Button variant="destructive" size="sm" onClick={onCancel}>
             <Square className="h-3 w-3" />
             Stop
-            <kbd className="hidden sm:inline-flex ml-0.5 text-3xs opacity-60">
+            <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs opacity-60">
               {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+.
             </kbd>
           </Button>
@@ -155,7 +155,7 @@ export function EditorToolbar({
           <Button variant="default" size="sm" onClick={onExecute} disabled={!activeProject}>
             <Play className="h-3.5 w-3.5" />
             Execute
-            <kbd className="hidden sm:inline-flex ml-0.5 text-3xs text-primary-foreground/70">
+            <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs text-primary-foreground/70">
               {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+Enter
             </kbd>
           </Button>
@@ -176,7 +176,7 @@ export function EditorToolbar({
             className="space-y-4 mt-2"
           >
             <div className="space-y-2">
-              <label htmlFor="save-query-title" className="font-mono text-xs text-muted-foreground">
+              <label htmlFor="save-query-title" className="text-xs text-muted-foreground">
                 Query Name
               </label>
               <Input

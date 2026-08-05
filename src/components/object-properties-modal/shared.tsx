@@ -28,7 +28,7 @@ export function StatCard({
           <div className="text-3xs text-muted-foreground/60 uppercase tracking-widest font-medium">
             {label}
           </div>
-          <div className="text-sm font-mono font-semibold text-foreground truncate leading-tight mt-0.5">
+          <div className="text-sm font-semibold text-foreground truncate leading-tight mt-0.5">
             {value}
           </div>
         </div>
@@ -86,7 +86,7 @@ export function LoadingPlaceholder() {
         <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" />
         <Loader2 className="h-5 w-5 animate-spin relative" />
       </div>
-      <span className="text-xs font-mono">Loading...</span>
+      <span className="text-xs">Loading...</span>
     </div>
   );
 }

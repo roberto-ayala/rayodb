@@ -102,9 +102,9 @@ export function ModalHeader({
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/40 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>
-              <span className="font-mono text-2xs">{schema}</span>
+              <span className="text-2xs">{schema}</span>
               <span className="text-muted-foreground/30">|</span>
-              <span className="font-mono text-2xs text-muted-foreground/60">{projectId}</span>
+              <span className="text-2xs text-muted-foreground/60">{projectId}</span>
               {loading && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
             </DialogDescription>
           </div>

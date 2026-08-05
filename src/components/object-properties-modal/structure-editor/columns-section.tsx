@@ -94,7 +94,7 @@ export function ColumnsSection({
             value={col.name}
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { name: e.target.value })}
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
           />
           <input
             type="text"
@@ -102,7 +102,7 @@ export function ColumnsSection({
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { dataType: e.target.value })}
             list="pg-types"
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
           />
           <div className="flex items-center justify-center">
             <input
@@ -123,7 +123,7 @@ export function ColumnsSection({
               })
             }
             placeholder="NULL"
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 placeholder:text-muted-foreground/30 disabled:opacity-40"
+            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 placeholder:text-muted-foreground/30 disabled:opacity-40"
           />
           <div className="flex justify-center">
             {col._status === "removed" ? (

@@ -45,8 +45,8 @@ export function TreeRow({
     >
       <IndentGuides indent={indent} />
       <span className="shrink-0">{icon}</span>
-      <span className={cn("font-mono text-xs", bold && "font-semibold")}>{label}</span>
-      {meta && <span className="shrink-0 font-mono text-3xs text-muted-foreground">{meta}</span>}
+      <span className={cn("text-xs", bold && "font-semibold")}>{label}</span>
+      {meta && <span className="shrink-0 text-3xs text-muted-foreground">{meta}</span>}
       {/* Chevron sits on the right so that every icon keeps its indent column */}
       <span className="ml-auto mr-1 flex shrink-0 items-center gap-1.5">
         {expanded !== undefined &&

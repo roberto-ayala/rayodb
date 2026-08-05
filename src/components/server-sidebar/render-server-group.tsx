@@ -355,12 +355,10 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                       }}
                     >
                       <HardDrive className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                      <span className="font-mono text-2xs text-foreground">{name}</span>
-                      <span className="font-mono text-3xs text-muted-foreground">{owner}</span>
+                      <span className="text-2xs text-foreground">{name}</span>
+                      <span className="text-3xs text-muted-foreground">{owner}</span>
                       {location && (
-                        <span className="font-mono text-3xs text-muted-foreground/40">
-                          {location}
-                        </span>
+                        <span className="text-3xs text-muted-foreground/40">{location}</span>
                       )}
                     </div>
                   ))}

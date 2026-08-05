@@ -77,7 +77,7 @@ export function PkSection({
                 }}
                 className="h-3.5 w-3.5 rounded border-border accent-primary"
               />
-              <span className="text-xs font-mono">{colName}</span>
+              <span className="text-xs">{colName}</span>
               {isInPK && <Key className="h-3 w-3 text-primary ml-auto" />}
             </label>
           );
@@ -87,8 +87,7 @@ export function PkSection({
         draft.primaryKey._status !== "removed" &&
         draft.primaryKey.columns.length > 0 && (
           <div className="text-3xs text-muted-foreground px-1">
-            Constraint:{" "}
-            <span className="font-mono text-foreground">{draft.primaryKey.constraintName}</span>
+            Constraint: <span className="text-foreground">{draft.primaryKey.constraintName}</span>
             {" — "}({draft.primaryKey.columns.join(", ")})
           </div>
         )}

@@ -79,7 +79,7 @@ export function DiffView({
     return (
       <div className="flex flex-1 flex-col items-center justify-center text-muted-foreground gap-2 p-4">
         <Diff className="h-8 w-8" />
-        <div className="text-sm font-mono">Column structures differ</div>
+        <div className="text-sm">Column structures differ</div>
         <div className="text-xs">Pinned: {pinnedColumns.join(", ")}</div>
         <div className="text-xs">Current: {currentColumns.join(", ")}</div>
       </div>
@@ -98,7 +98,7 @@ export function DiffView({
   const { added, removed, unchangedCount } = diffResult;
 
   return (
-    <div className="flex-1 overflow-auto p-4 font-mono text-xs">
+    <div className="flex-1 overflow-auto p-4 text-xs">
       <div className="flex items-center gap-4 mb-3">
         <span className="flex items-center gap-1 text-success">
           <span className="h-2 w-2 rounded-full bg-success" /> +{added.length} added
@@ -125,7 +125,7 @@ export function DiffView({
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="font-mono">
           {removed.map((row, i) => (
             <tr key={`r-${i}`} className="bg-destructive/10">
               <td className="border border-border px-2 py-0.5 text-destructive text-center">-</td>

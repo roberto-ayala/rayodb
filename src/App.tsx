@@ -141,9 +141,7 @@ export default function App() {
           {!activeTab ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center space-y-4">
-                <div className="text-muted-foreground/40 text-6xl font-mono font-bold select-none">
-                  RSQL
-                </div>
+                <div className="text-muted-foreground/40 text-6xl font-bold select-none">RSQL</div>
                 <p className="text-muted-foreground/60 text-sm">No tabs open</p>
                 <button
                   type="button"
@@ -238,7 +236,7 @@ export default function App() {
                       </div>
                     ) : activeTab.splitResult ? (
                       <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/60 text-xs font-mono text-muted-foreground">
+                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/60 text-xs text-muted-foreground">
                           <span>{activeTab.splitResult.rows.length} rows</span>
                           {activeTab.splitResult.time > 0 && (
                             <span>· {activeTab.splitResult.time.toFixed(1)}ms</span>
@@ -252,7 +250,7 @@ export default function App() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center text-muted-foreground/40 text-sm font-mono">
+                      <div className="flex-1 flex items-center justify-center text-muted-foreground/40 text-sm">
                         Run a query to see results
                       </div>
                     )}

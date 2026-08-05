@@ -73,10 +73,10 @@ export function ResultsToolbar(props: ToolbarProps) {
   ];
 
   return (
-    <div className="flex items-center justify-between border-b border-border bg-card px-3 py-1.5 flex-shrink-0">
+    <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5 flex-shrink-0">
       <div className="flex items-center gap-3">
         {/* Panel tabs — segmented control */}
-        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-muted p-0.5">
+        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-muted/70 p-0.5">
           {views.map(({ id, label, icon: Icon, disabled }) => (
             <button
               key={id}
@@ -87,7 +87,7 @@ export function ResultsToolbar(props: ToolbarProps) {
                 if (id === "grid" || id === "record") setViewMode(id);
               }}
               className={cn(
-                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 font-mono text-xs transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40",
+                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40",
                 panelView === id
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
@@ -141,7 +141,7 @@ export function ResultsToolbar(props: ToolbarProps) {
 
         {/* Stop button — visible while executing */}
         {isExecuting && onCancel && (
-          <Button variant="destructive" size="sm" onClick={onCancel} className="font-mono">
+          <Button variant="destructive" size="sm" onClick={onCancel} className="">
             <Square className="h-3 w-3" />
             Stop
           </Button>
@@ -170,7 +170,7 @@ export function ResultsToolbar(props: ToolbarProps) {
                 variant="subtle"
                 size="sm"
                 onClick={onEnterEdit}
-                className="font-mono"
+                className=""
                 title="Edit table data inline"
               >
                 <Edit3 className="h-3 w-3" />
@@ -182,7 +182,7 @@ export function ResultsToolbar(props: ToolbarProps) {
             {panelView !== "history" && result && result.rows.length > 0 && !virtualQuery && (
               <>
                 {pinnedResult ? (
-                  <div className="flex h-7 items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 font-mono text-xs text-primary">
+                  <div className="flex h-7 items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 text-xs text-primary">
                     <Pin className="h-3 w-3" />
                     <span>Pinned: {pinnedResult.label}</span>
                     <button
@@ -204,7 +204,7 @@ export function ResultsToolbar(props: ToolbarProps) {
                         `${filteredRows.length} rows`,
                       )
                     }
-                    className="font-mono"
+                    className=""
                     title="Pin current results for later diff comparison"
                   >
                     <Pin className="h-3 w-3" />
@@ -216,7 +216,7 @@ export function ResultsToolbar(props: ToolbarProps) {
                     variant={panelView === "diff" ? "default" : "subtle"}
                     size="sm"
                     onClick={() => setPanelView(panelView === "diff" ? "grid" : "diff")}
-                    className="font-mono"
+                    className=""
                   >
                     <Diff className="h-3 w-3" />
                     Diff
@@ -239,7 +239,7 @@ export function ResultsToolbar(props: ToolbarProps) {
                   placeholder="Search results..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-7 w-48 rounded border border-border bg-input pl-7 pr-7 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="h-7 w-48 rounded border border-border bg-input pl-7 pr-7 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                 />
                 {searchTerm && (
                   <button

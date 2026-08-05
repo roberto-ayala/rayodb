@@ -56,17 +56,15 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
       <div className="flex items-center justify-between border-b px-4 py-2">
         <div className="flex items-center gap-2">
           <List className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">Enum Types</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
+          <span className="text-sm font-semibold">Enum Types</span>
+          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
         </div>
         <div className="flex items-center gap-2">
           <Input
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter..."
-            className="h-7 text-xs font-mono w-48 bg-input/50"
+            className="h-7 text-xs w-48 bg-input/50"
           />
           <Button
             variant="ghost"
@@ -87,7 +85,7 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto p-4">
         {Array.from(grouped.entries()).map(([schema, types]) => (
           <div key={schema} className="mb-4">
-            <div className="mb-2 font-mono text-3xs uppercase tracking-wider text-muted-foreground">
+            <div className="mb-2 text-3xs uppercase tracking-wider text-muted-foreground">
               {schema}
             </div>
             <div className="space-y-2">
@@ -95,8 +93,8 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
                 <div key={`${e.schema}.${e.name}`} className="rounded-md border p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <List className="h-3.5 w-3.5 text-primary/60" />
-                    <span className="font-mono text-sm font-medium">{e.name}</span>
-                    <span className="font-mono text-3xs text-muted-foreground">
+                    <span className="text-sm font-medium">{e.name}</span>
+                    <span className="text-3xs text-muted-foreground">
                       {e.labels.split(", ").length} values
                     </span>
                   </div>
@@ -104,7 +102,7 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
                     {e.labels.split(", ").map((label) => (
                       <span
                         key={label}
-                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 font-mono text-2xs text-primary"
+                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-2xs text-primary"
                       >
                         {label}
                       </span>
@@ -116,7 +114,7 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             {filter ? "No matching enum types" : "No enum types found"}
           </div>
         )}

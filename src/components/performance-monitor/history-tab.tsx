@@ -11,7 +11,7 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
       {/* Slow queries */}
       <div className="rounded-md border">
         <div className="border-b px-3 py-2">
-          <span className="font-mono text-xs font-semibold">Slowest Queries (Session)</span>
+          <span className="text-xs font-semibold">Slowest Queries (Session)</span>
         </div>
         <div className="divide-y">
           {slowQueries.map((q) => (
@@ -19,7 +19,7 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
               <div className="flex items-center justify-between">
                 <span
                   className={cn(
-                    "font-mono text-3xs",
+                    "text-3xs",
                     q.success ? "text-muted-foreground" : "text-destructive",
                   )}
                 >
@@ -28,22 +28,22 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
                 </span>
                 <span
                   className={cn(
-                    "font-mono text-2xs font-medium",
+                    "text-2xs font-medium",
                     q.executionTime > 1000 && "text-destructive",
                   )}
                 >
                   {q.executionTime.toFixed(1)}ms
                 </span>
               </div>
-              <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-3xs text-foreground">
+              <pre className="font-mono mt-1 overflow-x-auto rounded bg-muted/50 p-1.5 text-3xs text-foreground">
                 {q.sql.slice(0, 200)}
                 {q.sql.length > 200 ? "..." : ""}
               </pre>
-              {q.error && <div className="mt-1 font-mono text-3xs text-destructive">{q.error}</div>}
+              {q.error && <div className="mt-1 text-3xs text-destructive">{q.error}</div>}
             </div>
           ))}
           {slowQueries.length === 0 && (
-            <div className="py-6 text-center font-mono text-xs text-muted-foreground">
+            <div className="py-6 text-center text-xs text-muted-foreground">
               No queries executed yet in this session
             </div>
           )}

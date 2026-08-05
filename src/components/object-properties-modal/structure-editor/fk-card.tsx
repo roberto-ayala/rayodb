@@ -63,7 +63,7 @@ export function FKCard({
           type="text"
           value={fk.constraintName}
           onChange={(e) => onChange({ constraintName: e.target.value })}
-          className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+          className="flex-1 h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           placeholder="Constraint name"
         />
         <button
@@ -89,7 +89,7 @@ export function FKCard({
                 targetColumns: [],
               })
             }
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {availableSchemas.map((s) => (
               <option key={s} value={s}>
@@ -105,7 +105,7 @@ export function FKCard({
           <select
             value={fk.targetTable}
             onChange={(e) => onChange({ targetTable: e.target.value, targetColumns: [] })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             <option value="">Select table...</option>
             {targetTableNames.map((t) => (
@@ -139,7 +139,7 @@ export function FKCard({
                   newSrc[idx] = e.target.value;
                   onChange({ sourceColumns: newSrc });
                 }}
-                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+                className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
               >
                 <option value="">Select...</option>
                 {activeColNames.map((c) => (
@@ -157,7 +157,7 @@ export function FKCard({
                   onChange({ targetColumns: newTgt });
                 }}
                 disabled={!fk.targetTable || targetCols.length === 0}
-                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+                className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
               >
                 <option value="">Select...</option>
                 {targetCols.map((c) => (
@@ -202,7 +202,7 @@ export function FKCard({
           <select
             value={fk.onUpdate}
             onChange={(e) => onChange({ onUpdate: e.target.value })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>
@@ -218,7 +218,7 @@ export function FKCard({
           <select
             value={fk.onDelete}
             onChange={(e) => onChange({ onDelete: e.target.value })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>

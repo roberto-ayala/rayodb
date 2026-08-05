@@ -78,7 +78,7 @@ export function FkeysSection({
             key={fk._id}
             className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500/20 bg-red-500/5 opacity-60"
           >
-            <span className="text-xs font-mono line-through flex-1">{fk.constraintName}</span>
+            <span className="text-xs line-through flex-1">{fk.constraintName}</span>
             <button
               type="button"
               onClick={() =>

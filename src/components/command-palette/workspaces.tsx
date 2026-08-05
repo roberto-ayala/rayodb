@@ -33,7 +33,7 @@ export function SaveWorkspacePage({
               setWorkspaceName("");
             }
           }}
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none font-mono"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
         />
       </div>
       <div className="px-4 py-3 text-xs text-muted-foreground">
@@ -62,7 +62,7 @@ export function LoadOrDeleteWorkspacePage({
         ) : (
           <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
         )}
-        <span className="text-sm text-foreground font-mono">
+        <span className="text-sm text-foreground">
           {page === "delete-workspace" ? "Delete Workspace" : "Load Workspace"}
         </span>
       </div>
@@ -81,8 +81,8 @@ export function LoadOrDeleteWorkspacePage({
             >
               <FolderOpen className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1 min-w-0">
-                <span className="font-mono text-sm font-medium text-foreground">{ws.name}</span>
-                <div className="font-mono text-xs text-muted-foreground">
+                <span className="text-sm font-medium text-foreground">{ws.name}</span>
+                <div className="text-xs text-muted-foreground">
                   {(() => {
                     try {
                       return `${JSON.parse(ws.tabs).length} tabs`;

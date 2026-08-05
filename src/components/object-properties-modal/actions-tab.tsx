@@ -191,7 +191,7 @@ export function ActionsContent({
       {actionResult && (
         <div
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-md text-xs font-mono",
+            "flex items-center gap-2 px-3 py-2 rounded-md text-xs",
             actionResult.type === "success"
               ? "bg-success/10 text-success"
               : "bg-destructive/10 text-destructive",
@@ -232,10 +232,7 @@ export function ActionsContent({
               </span>
               <div className="flex-1 min-w-0">
                 <div
-                  className={cn(
-                    "text-xs font-mono font-medium",
-                    action.destructive && "text-destructive",
-                  )}
+                  className={cn("text-xs font-medium", action.destructive && "text-destructive")}
                 >
                   {action.label}
                 </div>
@@ -266,15 +263,14 @@ export function ActionsContent({
               <div className="px-3.5 pb-3 flex items-center gap-2">
                 <div className="flex-1 flex items-center gap-2">
                   <span className="text-3xs text-muted-foreground whitespace-nowrap">
-                    Type <span className="font-mono font-semibold text-foreground">{name}</span> to
-                    confirm
+                    Type <span className="font-semibold text-foreground">{name}</span> to confirm
                   </span>
                   <input
                     type="text"
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={name}
-                    className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
+                    className="flex-1 h-7 px-2 text-xs bg-background border border-border rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
                   />
                 </div>
                 <Button

@@ -25,9 +25,7 @@ export function QueryHistory() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-border px-4 py-2 flex-shrink-0">
-        <span className="font-mono text-xs font-semibold text-foreground">
-          HISTORY ({entries.length})
-        </span>
+        <span className="text-xs font-semibold text-foreground">HISTORY ({entries.length})</span>
         <Button variant="ghost" size="sm" className="h-6 gap-1 text-xs" onClick={clearHistory}>
           <Trash2 className="h-3 w-3" />
           Clear
@@ -75,9 +73,7 @@ function HistoryRow({
         <div className="font-mono text-xs text-foreground whitespace-pre-wrap break-all leading-relaxed">
           {sqlPreview}
         </div>
-        {entry.error && (
-          <div className="mt-1 text-xs text-destructive font-mono truncate">{entry.error}</div>
-        )}
+        {entry.error && <div className="mt-1 text-xs text-destructive truncate">{entry.error}</div>}
         <div className="mt-1 flex items-center gap-3 text-3xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="h-2.5 w-2.5" />

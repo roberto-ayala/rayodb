@@ -19,17 +19,17 @@ export function ExplainPanel({ plan }: ExplainPanelProps) {
     <div className="flex h-full flex-col overflow-auto bg-card">
       {/* Summary bar */}
       <div className="flex items-center gap-4 border-b px-4 py-2 flex-shrink-0">
-        <div className="flex items-center gap-1.5 font-mono text-xs">
+        <div className="flex items-center gap-1.5 text-xs">
           <Timer className="h-3.5 w-3.5 text-primary" />
           <span className="text-muted-foreground">Planning:</span>
           <span className="font-medium">{plan["Planning Time"]?.toFixed(2) ?? "N/A"}ms</span>
         </div>
-        <div className="flex items-center gap-1.5 font-mono text-xs">
+        <div className="flex items-center gap-1.5 text-xs">
           <Clock className="h-3.5 w-3.5 text-primary" />
           <span className="text-muted-foreground">Execution:</span>
           <span className="font-medium">{plan["Execution Time"]?.toFixed(2) ?? "N/A"}ms</span>
         </div>
-        <div className="flex items-center gap-1.5 font-mono text-xs">
+        <div className="flex items-center gap-1.5 text-xs">
           <Layers className="h-3.5 w-3.5 text-primary" />
           <span className="text-muted-foreground">Total Cost:</span>
           <span className="font-medium">{root["Total Cost"]?.toFixed(2)}</span>
@@ -104,7 +104,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
           ) : (
             <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/30" />
           )}
-          <span className="font-mono text-xs font-semibold">{nodeLabel}</span>
+          <span className="text-xs font-semibold">{nodeLabel}</span>
         </div>
 
         {/* Time bar */}
@@ -172,7 +172,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
 
 function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <span className="font-mono text-3xs">
+    <span className="text-3xs">
       <span className="text-muted-foreground">{label}: </span>
       <span className={cn("font-medium", warn && "text-destructive")}>{value}</span>
     </span>

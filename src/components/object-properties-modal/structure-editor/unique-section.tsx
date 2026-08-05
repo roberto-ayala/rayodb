@@ -40,7 +40,7 @@ export function UniqueSection({
                     ),
                   }));
                 }}
-                className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+                className="flex-1 h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
                 placeholder="Constraint name"
               />
               <button
@@ -87,7 +87,7 @@ export function UniqueSection({
                       }));
                     }}
                     className={cn(
-                      "px-2 py-0.5 text-3xs font-mono rounded-md border transition-all",
+                      "px-2 py-0.5 text-3xs rounded-md border transition-all",
                       selected
                         ? "bg-primary/10 border-primary/30 text-foreground"
                         : "border-border/60 text-muted-foreground hover:border-border",
@@ -107,7 +107,7 @@ export function UniqueSection({
             key={uc._id}
             className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500/20 bg-red-500/5 opacity-60"
           >
-            <span className="text-xs font-mono line-through flex-1">{uc.constraintName}</span>
+            <span className="text-xs line-through flex-1">{uc.constraintName}</span>
             <button
               type="button"
               onClick={() =>

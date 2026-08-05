@@ -189,7 +189,7 @@ export function ServerSidebar({
   return (
     <div className="flex h-full flex-col border-r border-sidebar-border bg-sidebar select-none">
       <div className="flex h-12 items-center justify-between border-b border-sidebar-border px-3">
-        <span className="tracking-widest uppercase text-[10px] font-semibold text-sidebar-foreground">
+        <span className="tracking-widest uppercase text-3xs font-semibold text-sidebar-foreground">
           CONNECTIONS
         </span>
         <Button

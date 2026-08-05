@@ -30,23 +30,23 @@ export function ForeignKeysContent({
           title="Outgoing (this table references)"
           icon={<ArrowRight className="h-3.5 w-3.5" />}
         >
-          <div className="overflow-hidden rounded-xl border border-border/30 bg-muted/10">
-            <table className="w-full text-[11px] font-mono">
+          <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/10">
+            <table className="w-full text-2xs font-mono">
               <thead>
-                <tr className="bg-muted/30 border-b border-border/30">
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                <tr className="bg-muted/30 border-b border-border/60">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     Constraint
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     Column
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     References
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     ON DELETE
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     ON UPDATE
                   </th>
                 </tr>
@@ -55,7 +55,7 @@ export function ForeignKeysContent({
                 {outgoingFKs.map((fk, i) => (
                   <tr
                     key={i}
-                    className="border-t border-border/15 hover:bg-primary/[0.04] transition-colors"
+                    className="border-t border-border/60 hover:bg-primary/[0.04] transition-colors"
                   >
                     <td className="px-2 py-1.5 text-foreground">{fk.constraintName}</td>
                     <td className="px-2 py-1.5 text-primary/80">{fk.sourceColumn}</td>
@@ -89,20 +89,20 @@ export function ForeignKeysContent({
           title="Incoming (referenced by)"
           icon={<ArrowRight className="h-3.5 w-3.5 rotate-180" />}
         >
-          <div className="overflow-hidden rounded-xl border border-border/30 bg-muted/10">
-            <table className="w-full text-[11px] font-mono">
+          <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/10">
+            <table className="w-full text-2xs font-mono">
               <thead>
-                <tr className="bg-muted/30 border-b border-border/30">
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                <tr className="bg-muted/30 border-b border-border/60">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     Constraint
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     From Table
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     Column
                   </th>
-                  <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+                  <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                     ON DELETE
                   </th>
                 </tr>
@@ -111,7 +111,7 @@ export function ForeignKeysContent({
                 {incomingFKs.map((fk, i) => (
                   <tr
                     key={i}
-                    className="border-t border-border/15 hover:bg-primary/[0.04] transition-colors"
+                    className="border-t border-border/60 hover:bg-primary/[0.04] transition-colors"
                   >
                     <td className="px-2 py-1.5 text-foreground">{fk.constraintName}</td>
                     <td className="px-2 py-1.5">

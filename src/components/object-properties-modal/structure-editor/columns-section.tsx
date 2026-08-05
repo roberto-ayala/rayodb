@@ -68,7 +68,7 @@ export function ColumnsSection({
 
   return (
     <div className="space-y-1">
-      <div className="grid grid-cols-[1fr_140px_70px_1fr_36px] gap-1.5 px-1 text-[9px] font-semibold text-muted-foreground/60 uppercase tracking-wider">
+      <div className="grid grid-cols-[1fr_140px_70px_1fr_36px] gap-1.5 px-1 text-3xs font-semibold text-muted-foreground/60 uppercase tracking-wider">
         <span>Name</span>
         <span>Type</span>
         <span>Nullable</span>
@@ -79,14 +79,14 @@ export function ColumnsSection({
         <div
           key={col._id}
           className={cn(
-            "grid grid-cols-[1fr_140px_70px_1fr_36px] gap-1.5 items-center px-1 py-1 rounded-lg border transition-all",
+            "grid grid-cols-[1fr_140px_70px_1fr_36px] gap-1.5 items-center px-1 py-1 rounded-md border transition-all",
             col._status === "added" &&
-              "border-l-2 border-l-green-500 border-border/20 bg-green-500/5",
+              "border-l-2 border-l-green-500 border-border/60 bg-green-500/5",
             col._status === "modified" &&
-              "border-l-2 border-l-amber-500 border-border/20 bg-amber-500/5",
+              "border-l-2 border-l-amber-500 border-border/60 bg-amber-500/5",
             col._status === "removed" &&
-              "border-l-2 border-l-red-500 border-border/20 bg-red-500/5 opacity-50",
-            col._status === "existing" && "border-border/20",
+              "border-l-2 border-l-red-500 border-border/60 bg-red-500/5 opacity-50",
+            col._status === "existing" && "border-border/60",
           )}
         >
           <input
@@ -94,7 +94,7 @@ export function ColumnsSection({
             value={col.name}
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { name: e.target.value })}
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
           />
           <input
             type="text"
@@ -102,7 +102,7 @@ export function ColumnsSection({
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { dataType: e.target.value })}
             list="pg-types"
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
           />
           <div className="flex items-center justify-center">
             <input
@@ -123,7 +123,7 @@ export function ColumnsSection({
               })
             }
             placeholder="NULL"
-            className="h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50 placeholder:text-muted-foreground/30 disabled:opacity-40"
+            className="h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 placeholder:text-muted-foreground/30 disabled:opacity-40"
           />
           <div className="flex justify-center">
             {col._status === "removed" ? (
@@ -151,7 +151,7 @@ export function ColumnsSection({
       <button
         type="button"
         onClick={addColumn}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors w-full"
+        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-md transition-colors w-full"
       >
         <Plus className="h-3.5 w-3.5" /> Add Column
       </button>

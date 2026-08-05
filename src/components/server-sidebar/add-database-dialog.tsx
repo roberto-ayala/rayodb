@@ -91,7 +91,7 @@ export function AddDatabaseDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" variant="gradient" className="text-xs" disabled={!dbName.trim()}>
+            <Button type="submit" variant="default" className="text-xs" disabled={!dbName.trim()}>
               Add
             </Button>
           </div>

@@ -15,7 +15,7 @@ export function PkSection({
 }) {
   return (
     <div className="space-y-3 py-1">
-      <div className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider px-1">
+      <div className="text-3xs font-semibold text-muted-foreground/60 uppercase tracking-wider px-1">
         Select columns for primary key
       </div>
       <div className="space-y-1">
@@ -26,7 +26,7 @@ export function PkSection({
             <label
               key={colName}
               className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border/20 cursor-pointer transition-all",
+                "flex items-center gap-2.5 px-3 py-2 rounded-md border border-border/60 cursor-pointer transition-all",
                 isInPK ? "bg-primary/5 border-primary/20" : "hover:bg-muted/20",
               )}
             >
@@ -86,7 +86,7 @@ export function PkSection({
       {draft.primaryKey &&
         draft.primaryKey._status !== "removed" &&
         draft.primaryKey.columns.length > 0 && (
-          <div className="text-[10px] text-muted-foreground px-1">
+          <div className="text-3xs text-muted-foreground px-1">
             Constraint:{" "}
             <span className="font-mono text-foreground">{draft.primaryKey.constraintName}</span>
             {" — "}({draft.primaryKey.columns.join(", ")})

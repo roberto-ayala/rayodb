@@ -45,7 +45,7 @@ export function FunctionOverview({
       </div>
       {functionMeta.arguments && (
         <PropertySection title="Arguments" icon={<Columns3 className="h-3.5 w-3.5" />}>
-          <div className="rounded-xl bg-[hsl(var(--background))] border border-border/30 px-3 py-2 text-[11px] font-mono text-foreground/90">
+          <div className="rounded-lg bg-[hsl(var(--background))] border border-border/60 px-3 py-2 text-2xs font-mono text-foreground/90">
             {functionMeta.arguments}
           </div>
         </PropertySection>
@@ -64,7 +64,7 @@ export function FunctionOverview({
               <Copy className="h-3.5 w-3.5" />
             )}
           </button>
-          <pre className="rounded-xl bg-[hsl(var(--background))] border border-border/30 p-4 text-[11px] font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[250px] selection:bg-primary/20">
+          <pre className="rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[250px] selection:bg-primary/20">
             {functionMeta.source}
           </pre>
         </div>

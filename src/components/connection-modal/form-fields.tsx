@@ -20,16 +20,16 @@ export function ConnStringField({ value, onChange, error }: ConnStringFieldProps
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="postgresql://user:password@host:5432/database"
-        className={`bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg ${error ? "border-destructive" : ""}`}
+        className={`bg-input/80 border-border text-foreground font-mono text-sm rounded-md ${error ? "border-destructive" : ""}`}
       />
       {error && (
-        <p className="text-destructive text-[11px] font-mono">Invalid connection URL format</p>
+        <p className="text-destructive text-2xs font-mono">Invalid connection URL format</p>
       )}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border/30" />
+          <span className="w-full border-t border-border/60" />
         </div>
-        <div className="relative flex justify-center text-[10px]">
+        <div className="relative flex justify-center text-3xs">
           <span className="bg-card px-2 text-muted-foreground">or fill in manually</span>
         </div>
       </div>
@@ -47,7 +47,7 @@ export function DriverDisplay({ driver }: DriverDisplayProps) {
       <Label htmlFor="driver" className="font-mono text-xs text-foreground">
         Database Type
       </Label>
-      <div className="w-full bg-input/80 border border-border/50 text-foreground font-mono text-sm rounded-lg px-3 py-2">
+      <div className="w-full bg-input/80 border border-border text-foreground font-mono text-sm rounded-md px-3 py-2">
         {DRIVER_CONFIGS[driver].name}
       </div>
     </div>
@@ -73,7 +73,7 @@ export function NameField({ value, onChange, disabled }: NameFieldProps) {
         placeholder="production-db"
         required
         disabled={disabled}
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
       />
     </div>
   );
@@ -99,7 +99,7 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
           onChange={(e) => onHostChange(e.target.value)}
           placeholder="localhost"
           required
-          className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+          className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
         />
       </div>
       <div className="space-y-2">
@@ -112,7 +112,7 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
           onChange={(e) => onPortChange(e.target.value)}
           placeholder="5432"
           required
-          className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+          className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
         />
       </div>
     </div>
@@ -136,7 +136,7 @@ export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="mydb"
         required
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
       />
     </div>
   );
@@ -159,7 +159,7 @@ export function UsernameField({ value, onChange }: UsernameFieldProps) {
         onChange={(e) => onChange(e.target.value)}
         placeholder="postgres"
         required
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
       />
     </div>
   );
@@ -182,7 +182,7 @@ export function PasswordField({ value, onChange }: PasswordFieldProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="••••••••"
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
+        className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md"
       />
     </div>
   );

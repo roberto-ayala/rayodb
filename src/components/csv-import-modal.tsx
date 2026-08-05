@@ -133,7 +133,7 @@ export function CSVImportModal({
 
           {/* Preview */}
           {csvHeaders.length > 0 && (
-            <div className="rounded-xl border border-border/40 overflow-hidden">
+            <div className="rounded-lg border border-border overflow-hidden">
               <div className="overflow-x-auto max-h-[200px]">
                 <table className="w-full text-xs font-mono">
                   <thead>
@@ -150,7 +150,7 @@ export function CSVImportModal({
                   </thead>
                   <tbody>
                     {previewRows.map((row, ri) => (
-                      <tr key={ri} className="border-t border-border/20">
+                      <tr key={ri} className="border-t border-border/60">
                         {row.map((cell, ci) => (
                           <td
                             key={ci}
@@ -183,7 +183,7 @@ export function CSVImportModal({
                     <select
                       value={mapping[i] ?? ""}
                       onChange={(e) => setMapping((m) => ({ ...m, [i]: e.target.value }))}
-                      className="flex-1 bg-input/80 border border-border/50 rounded-lg px-2 py-1 text-xs font-mono text-foreground"
+                      className="flex-1 bg-input/80 border border-border rounded-md px-2 py-1 text-xs font-mono text-foreground"
                     >
                       <option value="">-- skip --</option>
                       {tableColumns.map((col) => (
@@ -202,7 +202,7 @@ export function CSVImportModal({
           {result && (
             <div
               className={cn(
-                "flex items-center gap-2 text-xs font-mono px-3 py-2 rounded-lg",
+                "flex items-center gap-2 text-xs font-mono px-3 py-2 rounded-md",
                 result.success
                   ? "bg-success/10 text-success"
                   : "bg-destructive/10 text-destructive",
@@ -229,7 +229,7 @@ export function CSVImportModal({
             </Button>
             {!result?.success && (
               <Button
-                variant="gradient"
+                variant="default"
                 onClick={handleImport}
                 disabled={importing || !filePath || csvHeaders.length === 0}
                 className="font-mono text-xs gap-2"

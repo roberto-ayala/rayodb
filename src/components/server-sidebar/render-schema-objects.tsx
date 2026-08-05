@@ -172,7 +172,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         ]);
                       }}
                       trailing={
-                        <span className="rounded-full bg-accent/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground shrink-0">
+                        <span className="rounded-full bg-accent/60 px-1.5 py-0.5 font-mono text-3xs text-muted-foreground shrink-0">
                           {ti.size}
                         </span>
                       }
@@ -347,10 +347,10 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         }}
                       >
                         <FileCode className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                        <span className="font-mono text-[11px] text-foreground">
+                        <span className="font-mono text-2xs text-foreground">
                           {fn.name}({fn.arguments ? "..." : ""})
                         </span>
-                        <span className="font-mono text-[10px] text-muted-foreground">
+                        <span className="font-mono text-3xs text-muted-foreground">
                           {fn.returnType}
                         </span>
                       </div>
@@ -408,8 +408,8 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         }}
                       >
                         <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                        <span className="font-mono text-[11px] text-foreground">{fn.name}()</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">trigger</span>
+                        <span className="font-mono text-2xs text-foreground">{fn.name}()</span>
+                        <span className="font-mono text-3xs text-muted-foreground">trigger</span>
                       </div>
                     );
                   })}

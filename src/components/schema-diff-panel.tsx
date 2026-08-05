@@ -156,12 +156,12 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Config bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/30">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/60">
         <GitCompare className="h-4 w-4 text-primary shrink-0" />
         <select
           value={leftSchema}
           onChange={(e) => setLeftSchema(e.target.value)}
-          className="bg-input/80 border border-border/50 rounded-lg px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
+          className="bg-input/80 border border-border rounded-md px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
         >
           <option value="">Left schema...</option>
           {schemas.map((s) => (
@@ -174,7 +174,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
         <select
           value={rightSchema}
           onChange={(e) => setRightSchema(e.target.value)}
-          className="bg-input/80 border border-border/50 rounded-lg px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
+          className="bg-input/80 border border-border rounded-md px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
         >
           <option value="">Right schema...</option>
           {schemas.map((s) => (
@@ -184,7 +184,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
           ))}
         </select>
         <Button
-          variant="gradient"
+          variant="default"
           size="sm"
           onClick={runDiff}
           disabled={!leftSchema || !rightSchema || loading}
@@ -201,7 +201,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
 
       {/* Summary bar */}
       {counts && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/20 text-[11px] font-mono">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/60 text-2xs font-mono">
           <button
             type="button"
             onClick={() => setFilter("all")}
@@ -274,7 +274,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
       {/* Content */}
       <div className="flex flex-1 min-h-0">
         {/* List */}
-        <div className="w-[320px] border-r border-border/30 overflow-y-auto">
+        <div className="w-[320px] border-r border-border/60 overflow-y-auto">
           {!diff ? (
             <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
               Select schemas and compare
@@ -317,7 +317,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
                 >
                   {entry.name}
                 </span>
-                <span className="ml-auto text-[9px] text-muted-foreground/40">
+                <span className="ml-auto text-3xs text-muted-foreground/40">
                   {entry.objectType}
                 </span>
               </button>
@@ -344,24 +344,24 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {selected.status === "modified" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground mb-1">
+                    <div className="text-3xs font-mono text-muted-foreground mb-1">
                       {leftSchema}
                     </div>
-                    <pre className="text-xs font-mono bg-destructive/5 border border-destructive/20 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                    <pre className="text-xs font-mono bg-destructive/5 border border-destructive/20 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                       {selected.leftDef}
                     </pre>
                   </div>
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground mb-1">
+                    <div className="text-3xs font-mono text-muted-foreground mb-1">
                       {rightSchema}
                     </div>
-                    <pre className="text-xs font-mono bg-success/5 border border-success/20 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                    <pre className="text-xs font-mono bg-success/5 border border-success/20 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                       {selected.rightDef}
                     </pre>
                   </div>
                 </div>
               ) : (
-                <pre className="text-xs font-mono bg-muted/20 border border-border/30 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                <pre className="text-xs font-mono bg-muted/20 border border-border/60 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                   {selected.leftDef || selected.rightDef || "No definition available"}
                 </pre>
               )}

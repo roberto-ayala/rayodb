@@ -19,7 +19,7 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
               <div className="flex items-center justify-between">
                 <span
                   className={cn(
-                    "font-mono text-[10px]",
+                    "font-mono text-3xs",
                     q.success ? "text-muted-foreground" : "text-destructive",
                   )}
                 >
@@ -28,20 +28,18 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
                 </span>
                 <span
                   className={cn(
-                    "font-mono text-[11px] font-medium",
+                    "font-mono text-2xs font-medium",
                     q.executionTime > 1000 && "text-destructive",
                   )}
                 >
                   {q.executionTime.toFixed(1)}ms
                 </span>
               </div>
-              <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-[10px] text-foreground">
+              <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-3xs text-foreground">
                 {q.sql.slice(0, 200)}
                 {q.sql.length > 200 ? "..." : ""}
               </pre>
-              {q.error && (
-                <div className="mt-1 font-mono text-[10px] text-destructive">{q.error}</div>
-              )}
+              {q.error && <div className="mt-1 font-mono text-3xs text-destructive">{q.error}</div>}
             </div>
           ))}
           {slowQueries.length === 0 && (

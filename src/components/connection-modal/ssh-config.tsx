@@ -45,10 +45,10 @@ export function SshConfig({
         </Label>
       </div>
       {enabled && (
-        <div className="space-y-3 rounded-lg border border-border/50 p-3 bg-muted/20">
+        <div className="space-y-3 rounded-md border border-border p-3 bg-muted/20">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="sshHost" className="font-mono text-[11px] text-muted-foreground">
+              <Label htmlFor="sshHost" className="font-mono text-2xs text-muted-foreground">
                 SSH Host
               </Label>
               <Input
@@ -56,11 +56,11 @@ export function SshConfig({
                 value={sshHost}
                 onChange={(e) => onSshHostChange(e.target.value)}
                 placeholder="bastion.example.com"
-                className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
+                className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md h-8"
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="sshPort" className="font-mono text-[11px] text-muted-foreground">
+              <Label htmlFor="sshPort" className="font-mono text-2xs text-muted-foreground">
                 SSH Port
               </Label>
               <Input
@@ -68,12 +68,12 @@ export function SshConfig({
                 value={sshPort}
                 onChange={(e) => onSshPortChange(e.target.value)}
                 placeholder="22"
-                className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
+                className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md h-8"
               />
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="sshUser" className="font-mono text-[11px] text-muted-foreground">
+            <Label htmlFor="sshUser" className="font-mono text-2xs text-muted-foreground">
               SSH User
             </Label>
             <Input
@@ -81,11 +81,11 @@ export function SshConfig({
               value={sshUser}
               onChange={(e) => onSshUserChange(e.target.value)}
               placeholder="ubuntu"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
+              className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md h-8"
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="sshPassword" className="font-mono text-[11px] text-muted-foreground">
+            <Label htmlFor="sshPassword" className="font-mono text-2xs text-muted-foreground">
               SSH Password
             </Label>
             <Input
@@ -94,11 +94,11 @@ export function SshConfig({
               value={sshPassword}
               onChange={(e) => onSshPasswordChange(e.target.value)}
               placeholder="••••••••"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
+              className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md h-8"
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="sshKeyPath" className="font-mono text-[11px] text-muted-foreground">
+            <Label htmlFor="sshKeyPath" className="font-mono text-2xs text-muted-foreground">
               Private Key Path
             </Label>
             <Input
@@ -106,7 +106,7 @@ export function SshConfig({
               value={sshKeyPath}
               onChange={(e) => onSshKeyPathChange(e.target.value)}
               placeholder="~/.ssh/id_rsa"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
+              className="bg-input/80 border-border text-foreground font-mono text-sm rounded-md h-8"
             />
           </div>
         </div>

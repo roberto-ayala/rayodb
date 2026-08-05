@@ -108,7 +108,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] text-muted-foreground">
+          <span className="font-mono text-3xs text-muted-foreground">
             {filtered.length}/{settings.length}
           </span>
           <Button
@@ -166,7 +166,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               setCategoryFilter(null);
               setContextFilter(null);
             }}
-            className="font-mono text-[10px] text-primary hover:underline"
+            className="font-mono text-3xs text-primary hover:underline"
           >
             Clear filters
           </button>
@@ -176,8 +176,8 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-auto">
         {Array.from(grouped.entries()).map(([category, items]) => (
           <div key={category}>
-            <div className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-1.5 border-b border-border/30">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="sticky top-0 z-10 bg-muted/80 px-4 py-1.5 border-b border-border/60">
+              <span className="font-mono text-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {category}
               </span>
             </div>
@@ -196,19 +196,19 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
                       <span className="font-mono text-xs font-medium">{s.name}</span>
                       <span
                         className={cn(
-                          "rounded-full px-1.5 py-0.5 font-mono text-[9px]",
+                          "rounded-full px-1.5 py-0.5 font-mono text-3xs",
                           contextColor(s.context),
                         )}
                       >
                         {s.context}
                       </span>
                       {isModified && (
-                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] text-primary">
+                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-3xs text-primary">
                           modified
                         </span>
                       )}
                       {s.source && s.source !== "default" && (
-                        <span className="font-mono text-[9px] text-muted-foreground">
+                        <span className="font-mono text-3xs text-muted-foreground">
                           via {s.source}
                         </span>
                       )}
@@ -219,14 +219,14 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
                         {s.unit ? ` ${s.unit}` : ""}
                       </span>
                       {isModified && (
-                        <span className="font-mono text-[10px] text-muted-foreground">
+                        <span className="font-mono text-3xs text-muted-foreground">
                           default: {s.bootVal}
                           {s.unit ? ` ${s.unit}` : ""}
                         </span>
                       )}
                     </div>
                     {s.description && (
-                      <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
+                      <p className="mt-0.5 font-mono text-3xs text-muted-foreground">
                         {s.description}
                       </p>
                     )}

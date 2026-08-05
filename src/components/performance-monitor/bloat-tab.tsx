@@ -34,7 +34,7 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left font-mono text-[10px] font-semibold text-muted-foreground whitespace-nowrap"
+                    className="px-2 py-1.5 text-left font-mono text-3xs font-semibold text-muted-foreground whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -48,14 +48,14 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                   pct > 30 ? "bg-red-500" : pct > 10 ? "bg-yellow-500" : "bg-green-500";
                 return (
                   <tr key={`${row.schema}.${row.table}-${idx}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 font-mono text-[11px] text-muted-foreground">
+                    <td className="px-2 py-1 font-mono text-2xs text-muted-foreground">
                       {row.schema}
                     </td>
-                    <td className="px-2 py-1 font-mono text-[11px] font-medium">{row.table}</td>
-                    <td className="px-2 py-1 font-mono text-[11px]">
+                    <td className="px-2 py-1 font-mono text-2xs font-medium">{row.table}</td>
+                    <td className="px-2 py-1 font-mono text-2xs">
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-[11px]">
+                    <td className="px-2 py-1 font-mono text-2xs">
                       {parseInt(row.deadTuples, 10).toLocaleString()}
                     </td>
                     <td className="px-2 py-1">
@@ -68,7 +68,7 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                         </div>
                         <span
                           className={cn(
-                            "font-mono text-[10px]",
+                            "font-mono text-3xs",
                             pct > 30 && "text-red-600 dark:text-red-400 font-medium",
                             pct > 10 && pct <= 30 && "text-yellow-600 dark:text-yellow-400",
                             pct <= 10 && "text-muted-foreground",
@@ -78,13 +78,13 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-2 py-1 font-mono text-[11px]">{row.totalSize}</td>
-                    <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 font-mono text-2xs">{row.totalSize}</td>
+                    <td className="px-2 py-1 font-mono text-3xs text-muted-foreground whitespace-nowrap">
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 font-mono text-3xs text-muted-foreground whitespace-nowrap">
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}

@@ -148,7 +148,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => useTabStore.getState().openTab()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
                 >
                   <span className="text-lg leading-none">+</span> New Query
                 </button>
@@ -199,7 +199,7 @@ export default function App() {
               />
               <div className="flex flex-1 min-h-0 overflow-hidden">
                 {/* Left pane */}
-                <div className="flex flex-1 flex-col overflow-hidden border-r border-border/30">
+                <div className="flex flex-1 flex-col overflow-hidden border-r border-border/60">
                   <div
                     style={{ height: `${editorHeight}%` }}
                     className="flex flex-col overflow-hidden"
@@ -238,7 +238,7 @@ export default function App() {
                       </div>
                     ) : activeTab.splitResult ? (
                       <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/30 text-xs font-mono text-muted-foreground">
+                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/60 text-xs font-mono text-muted-foreground">
                           <span>{activeTab.splitResult.rows.length} rows</span>
                           {activeTab.splitResult.time > 0 && (
                             <span>· {activeTab.splitResult.time.toFixed(1)}ms</span>

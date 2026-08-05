@@ -33,7 +33,7 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left font-mono text-[10px] font-semibold text-muted-foreground whitespace-nowrap"
+                    className="px-2 py-1.5 text-left font-mono text-3xs font-semibold text-muted-foreground whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -49,16 +49,16 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                     row.status === "waiting" && "bg-yellow-50/50 dark:bg-yellow-900/10",
                   )}
                 >
-                  <td className="px-2 py-1 font-mono text-[11px]">{row.pid}</td>
-                  <td className="px-2 py-1 font-mono text-[11px]">{row.user}</td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{row.mode}</td>
-                  <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                  <td className="px-2 py-1 font-mono text-2xs">{row.pid}</td>
+                  <td className="px-2 py-1 font-mono text-2xs">{row.user}</td>
+                  <td className="px-2 py-1 font-mono text-3xs">{row.mode}</td>
+                  <td className="px-2 py-1 font-mono text-3xs text-muted-foreground">
                     {row.locktype}
                   </td>
                   <td className="px-2 py-1">
                     <span
                       className={cn(
-                        "inline-block rounded px-1.5 py-0.5 font-mono text-[10px]",
+                        "inline-block rounded px-1.5 py-0.5 font-mono text-3xs",
                         row.status === "granted" &&
                           "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                         row.status === "waiting" &&
@@ -68,12 +68,12 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                       {row.status}
                     </span>
                   </td>
-                  <td className="px-2 py-1 font-mono text-[10px]">{row.relation || "-"}</td>
-                  <td className="px-2 py-1 font-mono text-[11px]">
+                  <td className="px-2 py-1 font-mono text-3xs">{row.relation || "-"}</td>
+                  <td className="px-2 py-1 font-mono text-2xs">
                     {parseFloat(row.duration || "0").toFixed(1)}s
                   </td>
                   <td
-                    className="max-w-[300px] truncate px-2 py-1 font-mono text-[10px] text-muted-foreground"
+                    className="max-w-[300px] truncate px-2 py-1 font-mono text-3xs text-muted-foreground"
                     title={row.query}
                   >
                     {row.query}

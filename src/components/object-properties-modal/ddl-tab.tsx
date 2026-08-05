@@ -50,18 +50,18 @@ export function DDLContent({
   return (
     <div className="pt-3 flex-1 flex flex-col min-h-0">
       {/* Code editor style container */}
-      <div className="rounded-xl border border-border/40 overflow-hidden bg-[hsl(var(--background))] flex-1 flex flex-col min-h-0">
+      <div className="rounded-lg border border-border overflow-hidden bg-[hsl(var(--background))] flex-1 flex flex-col min-h-0">
         {/* Title bar */}
-        <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/30 shrink-0">
+        <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60 shrink-0">
           <div className="flex items-center gap-2">
             <FileCode className="h-3 w-3 text-muted-foreground/50" />
-            <span className="text-[10px] font-mono text-muted-foreground/60">DDL</span>
+            <span className="text-3xs font-mono text-muted-foreground/60">DDL</span>
           </div>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+              className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
               onClick={onOpenInTab}
             >
               <Play className="h-2.5 w-2.5" />
@@ -70,7 +70,7 @@ export function DDLContent({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+              className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
               onClick={onCopy}
             >
               {copied === "ddl" ? (
@@ -87,7 +87,7 @@ export function DDLContent({
             </Button>
           </div>
         </div>
-        <pre className="p-4 text-[11px] font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed selection:bg-primary/20 flex-1 min-h-0">
+        <pre className="p-4 text-2xs font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed selection:bg-primary/20 flex-1 min-h-0">
           {ddl}
         </pre>
       </div>

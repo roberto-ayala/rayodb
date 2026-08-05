@@ -79,7 +79,7 @@ export function ModalHeader({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03),transparent_70%)]" />
       <DialogHeader className="relative">
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-background/60 backdrop-blur-sm border border-border/30">
+          <div className="flex items-center justify-center h-8 w-8 rounded-md bg-background/60 border border-border/60">
             {objectIcon[objectType]}
           </div>
           <div className="min-w-0 flex-1">
@@ -99,12 +99,12 @@ export function ModalHeader({
               </button>
             </DialogTitle>
             <DialogDescription className="flex items-center gap-1.5 mt-0.5">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/40 text-[10px] font-medium uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/40 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>
-              <span className="font-mono text-[11px]">{schema}</span>
+              <span className="font-mono text-2xs">{schema}</span>
               <span className="text-muted-foreground/30">|</span>
-              <span className="font-mono text-[11px] text-muted-foreground/60">{projectId}</span>
+              <span className="font-mono text-2xs text-muted-foreground/60">{projectId}</span>
               {loading && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
             </DialogDescription>
           </div>
@@ -112,14 +112,14 @@ export function ModalHeader({
       </DialogHeader>
 
       {/* Tab switcher - pill style */}
-      <div className="relative flex gap-0.5 mt-3 bg-background/30 backdrop-blur-sm rounded-lg p-0.5 border border-border/20">
+      <div className="relative flex gap-0.5 mt-3 bg-background/30 rounded-md p-0.5 border border-border/60">
         {availableTabs.map((tab) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium whitespace-nowrap rounded-md transition-all",
+              "flex items-center gap-1.5 px-3 py-1.5 text-2xs font-medium whitespace-nowrap rounded-md transition-all",
               activeTab === tab.key
                 ? "bg-background text-foreground shadow-sm shadow-black/10"
                 : "text-muted-foreground hover:text-foreground",

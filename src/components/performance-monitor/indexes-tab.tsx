@@ -25,7 +25,7 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
                 {["Schema", "Table", "Index", "Size", "Scans", "Status", "Definition"].map((h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left font-mono text-[10px] font-semibold text-muted-foreground whitespace-nowrap"
+                    className="px-2 py-1.5 text-left font-mono text-3xs font-semibold text-muted-foreground whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -38,19 +38,19 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
                   key={`${row.schema}.${row.table}.${row.index}-${idx}`}
                   className="hover:bg-muted/30"
                 >
-                  <td className="px-2 py-1 font-mono text-[11px] text-muted-foreground">
+                  <td className="px-2 py-1 font-mono text-2xs text-muted-foreground">
                     {row.schema}
                   </td>
-                  <td className="px-2 py-1 font-mono text-[11px] font-medium">{row.table}</td>
-                  <td className="px-2 py-1 font-mono text-[11px]">{row.index}</td>
-                  <td className="px-2 py-1 font-mono text-[11px]">{row.size}</td>
-                  <td className="px-2 py-1 font-mono text-[11px]">
+                  <td className="px-2 py-1 font-mono text-2xs font-medium">{row.table}</td>
+                  <td className="px-2 py-1 font-mono text-2xs">{row.index}</td>
+                  <td className="px-2 py-1 font-mono text-2xs">{row.size}</td>
+                  <td className="px-2 py-1 font-mono text-2xs">
                     {parseInt(row.scans, 10).toLocaleString()}
                   </td>
                   <td className="px-2 py-1">
                     <span
                       className={cn(
-                        "inline-block rounded-full px-2 py-0.5 font-mono text-[10px]",
+                        "inline-block rounded-full px-2 py-0.5 font-mono text-3xs",
                         row.status === "unused" &&
                           "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
                         row.status === "rarely_used" &&
@@ -63,7 +63,7 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
                     </span>
                   </td>
                   <td
-                    className="max-w-[400px] truncate px-2 py-1 font-mono text-[10px] text-muted-foreground"
+                    className="max-w-[400px] truncate px-2 py-1 font-mono text-3xs text-muted-foreground"
                     title={row.definition}
                   >
                     {row.definition}

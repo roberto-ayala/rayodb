@@ -36,9 +36,7 @@ export function TreeRow({
       onContextMenu={onContextMenu}
       className={cn(
         "relative flex w-full items-center gap-1.5 py-1 text-left text-sm transition-colors rounded-sm whitespace-nowrap",
-        selected
-          ? "bg-primary/10 text-foreground"
-          : "hover:bg-white/[0.06] dark:hover:bg-white/[0.06] hover:bg-black/[0.04]",
+        selected ? "bg-primary/10 text-foreground" : "hover:bg-hover",
       )}
       style={{ paddingLeft: `${indent}px` }}
     >

@@ -23,18 +23,18 @@ export function IndexesContent({ idxs }: { idxs?: import("@/types").IndexDetail[
 
   return (
     <div className="pt-3">
-      <div className="overflow-hidden rounded-xl border border-border/30 bg-muted/10">
-        <table className="w-full text-[11px] font-mono">
+      <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/10">
+        <table className="w-full text-2xs font-mono">
           <thead>
-            <tr className="bg-muted/30 border-b border-border/30">
-              <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest w-8"></th>
-              <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+            <tr className="bg-muted/30 border-b border-border/60">
+              <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest w-8"></th>
+              <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                 Index Name
               </th>
-              <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+              <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                 Columns
               </th>
-              <th className="text-left px-3 py-2 text-[9px] text-muted-foreground/60 font-semibold uppercase tracking-widest">
+              <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest">
                 Type
               </th>
             </tr>
@@ -45,7 +45,7 @@ export function IndexesContent({ idxs }: { idxs?: import("@/types").IndexDetail[
               return (
                 <tr
                   key={idxName}
-                  className="border-t border-border/15 hover:bg-primary/[0.04] transition-colors"
+                  className="border-t border-border/60 hover:bg-primary/[0.04] transition-colors"
                 >
                   <td className="px-3 py-2">
                     {f.isPrimary ? (
@@ -62,15 +62,15 @@ export function IndexesContent({ idxs }: { idxs?: import("@/types").IndexDetail[
                   </td>
                   <td className="px-3 py-2">
                     {f.isPrimary ? (
-                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-warning/15 text-warning border border-warning/20">
+                      <span className="text-3xs font-semibold px-2 py-0.5 rounded-full bg-warning/15 text-warning border border-warning/20">
                         PRIMARY KEY
                       </span>
                     ) : f.isUnique ? (
-                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/20">
+                      <span className="text-3xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/20">
                         UNIQUE
                       </span>
                     ) : (
-                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground border border-border/30">
+                      <span className="text-3xs font-semibold px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground border border-border/60">
                         INDEX
                       </span>
                     )}

@@ -16,7 +16,7 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                 (h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left font-mono text-[10px] font-semibold text-muted-foreground"
+                    className="px-2 py-1.5 text-left font-mono text-3xs font-semibold text-muted-foreground"
                   >
                     {h}
                   </th>
@@ -27,12 +27,12 @@ export function ActivityTab({ activity }: ActivityTabProps) {
           <tbody className="divide-y">
             {activity.map((row) => (
               <tr key={row.pid} className="hover:bg-muted/30">
-                <td className="px-2 py-1 font-mono text-[11px]">{row.pid}</td>
-                <td className="px-2 py-1 font-mono text-[11px]">{row.user}</td>
+                <td className="px-2 py-1 font-mono text-2xs">{row.pid}</td>
+                <td className="px-2 py-1 font-mono text-2xs">{row.user}</td>
                 <td className="px-2 py-1">
                   <span
                     className={cn(
-                      "inline-block rounded px-1.5 py-0.5 font-mono text-[10px]",
+                      "inline-block rounded px-1.5 py-0.5 font-mono text-3xs",
                       row.state === "active" &&
                         "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                       row.state === "idle" &&
@@ -44,20 +44,20 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                     {row.state}
                   </span>
                 </td>
-                <td className="px-2 py-1 font-mono text-[11px]">
+                <td className="px-2 py-1 font-mono text-2xs">
                   {parseFloat(row.durationSec).toFixed(1)}s
                 </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <td className="px-2 py-1 font-mono text-3xs text-muted-foreground">
                   {row.waitEvent || "-"}
                 </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <td className="px-2 py-1 font-mono text-3xs text-muted-foreground">
                   {row.backendType}
                 </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <td className="px-2 py-1 font-mono text-3xs text-muted-foreground">
                   {row.clientAddr}
                 </td>
                 <td
-                  className="max-w-[300px] truncate px-2 py-1 font-mono text-[10px] text-muted-foreground"
+                  className="max-w-[300px] truncate px-2 py-1 font-mono text-3xs text-muted-foreground"
                   title={row.query}
                 >
                   {row.query}

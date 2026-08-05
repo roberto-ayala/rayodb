@@ -52,10 +52,10 @@ export function FKCard({
   return (
     <div
       className={cn(
-        "rounded-xl border px-3.5 py-3 space-y-2.5",
+        "rounded-lg border px-3.5 py-3 space-y-2.5",
         fk._status === "added"
           ? "border-green-500/20 bg-green-500/5"
-          : "border-border/25 bg-muted/10",
+          : "border-border/60 bg-muted/10",
       )}
     >
       <div className="flex items-center gap-2">
@@ -63,7 +63,7 @@ export function FKCard({
           type="text"
           value={fk.constraintName}
           onChange={(e) => onChange({ constraintName: e.target.value })}
-          className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+          className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           placeholder="Constraint name"
         />
         <button
@@ -77,7 +77,7 @@ export function FKCard({
 
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             Target Schema
           </div>
           <select
@@ -89,7 +89,7 @@ export function FKCard({
                 targetColumns: [],
               })
             }
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {availableSchemas.map((s) => (
               <option key={s} value={s}>
@@ -99,13 +99,13 @@ export function FKCard({
           </select>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             Target Table
           </div>
           <select
             value={fk.targetTable}
             onChange={(e) => onChange({ targetTable: e.target.value, targetColumns: [] })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             <option value="">Select table...</option>
             {targetTableNames.map((t) => (
@@ -119,12 +119,12 @@ export function FKCard({
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold">
             Column Mapping
           </div>
         </div>
         <div className="space-y-1.5">
-          <div className="grid grid-cols-[1fr_20px_1fr_28px] gap-1.5 text-[9px] text-muted-foreground/50 uppercase tracking-wider font-semibold px-0.5">
+          <div className="grid grid-cols-[1fr_20px_1fr_28px] gap-1.5 text-3xs text-muted-foreground/50 uppercase tracking-wider font-semibold px-0.5">
             <span>Source</span>
             <span />
             <span>Target</span>
@@ -139,7 +139,7 @@ export function FKCard({
                   newSrc[idx] = e.target.value;
                   onChange({ sourceColumns: newSrc });
                 }}
-                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
               >
                 <option value="">Select...</option>
                 {activeColNames.map((c) => (
@@ -157,7 +157,7 @@ export function FKCard({
                   onChange({ targetColumns: newTgt });
                 }}
                 disabled={!fk.targetTable || targetCols.length === 0}
-                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+                className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
               >
                 <option value="">Select...</option>
                 {targetCols.map((c) => (
@@ -187,7 +187,7 @@ export function FKCard({
                 targetColumns: [...fk.targetColumns, ""],
               });
             }}
-            className="flex items-center gap-1 px-1 py-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-1 py-1 text-3xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <Plus className="h-3 w-3" /> Add column pair
           </button>
@@ -196,13 +196,13 @@ export function FKCard({
 
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             On Update
           </div>
           <select
             value={fk.onUpdate}
             onChange={(e) => onChange({ onUpdate: e.target.value })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>
@@ -212,13 +212,13 @@ export function FKCard({
           </select>
         </div>
         <div>
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             On Delete
           </div>
           <select
             value={fk.onDelete}
             onChange={(e) => onChange({ onDelete: e.target.value })}
-            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+            className="w-full h-7 px-2 text-xs font-mono bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>

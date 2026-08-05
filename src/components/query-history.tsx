@@ -78,7 +78,7 @@ function HistoryRow({
         {entry.error && (
           <div className="mt-1 text-xs text-destructive font-mono truncate">{entry.error}</div>
         )}
-        <div className="mt-1 flex items-center gap-3 text-[10px] text-muted-foreground">
+        <div className="mt-1 flex items-center gap-3 text-3xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Clock className="h-2.5 w-2.5" />
             {timeStr}

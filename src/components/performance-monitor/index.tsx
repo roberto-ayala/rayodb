@@ -215,7 +215,7 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
         </div>
         <div className="flex items-center gap-2">
           {lastRefresh && (
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="font-mono text-3xs text-muted-foreground">
               Refreshed at {lastRefresh.toLocaleTimeString()}
             </span>
           )}

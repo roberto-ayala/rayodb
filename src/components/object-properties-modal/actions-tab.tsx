@@ -146,7 +146,7 @@ export function ActionsContent({
       {/* Quick open in tab */}
       {objectType === "table" && (
         <div className="space-y-2">
-          <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+          <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
             Quick Queries
           </div>
           <div className="flex flex-wrap gap-2">
@@ -207,7 +207,7 @@ export function ActionsContent({
       )}
 
       {/* Action buttons */}
-      <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+      <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
         Maintenance & Operations
       </div>
       <div className="space-y-2">
@@ -215,10 +215,10 @@ export function ActionsContent({
           <div
             key={action.label}
             className={cn(
-              "rounded-xl border bg-muted/10 transition-all",
+              "rounded-lg border bg-muted/10 transition-all",
               confirmAction === action.label
-                ? "border-border/40 bg-muted/20"
-                : "border-border/25 hover:border-border/40 hover:bg-muted/20",
+                ? "border-border bg-muted/20"
+                : "border-border/60 hover:border-border hover:bg-muted/20",
             )}
           >
             <div className="flex items-center gap-3 px-3.5 py-3">
@@ -239,7 +239,7 @@ export function ActionsContent({
                 >
                   {action.label}
                 </div>
-                <div className="text-[11px] text-muted-foreground">{action.description}</div>
+                <div className="text-2xs text-muted-foreground">{action.description}</div>
               </div>
               {confirmAction !== action.label && (
                 <Button
@@ -265,7 +265,7 @@ export function ActionsContent({
             {confirmAction === action.label && (
               <div className="px-3.5 pb-3 flex items-center gap-2">
                 <div className="flex-1 flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                  <span className="text-3xs text-muted-foreground whitespace-nowrap">
                     Type <span className="font-mono font-semibold text-foreground">{name}</span> to
                     confirm
                   </span>
@@ -274,14 +274,14 @@ export function ActionsContent({
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={name}
-                    className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/40 rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
+                    className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
                   />
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-[11px] font-medium",
+                    "h-7 px-3 text-2xs font-medium",
                     action.destructive
                       ? "text-destructive hover:bg-destructive/10"
                       : "text-foreground hover:bg-muted/50",
@@ -294,7 +294,7 @@ export function ActionsContent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 text-[11px] text-muted-foreground"
+                  className="h-7 px-2 text-2xs text-muted-foreground"
                   onClick={() => setConfirmAction(null)}
                 >
                   Cancel

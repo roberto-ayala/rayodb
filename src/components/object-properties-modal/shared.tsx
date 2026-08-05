@@ -15,7 +15,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border/30 bg-gradient-to-br from-muted/40 to-muted/10 px-3 py-2.5 group hover:border-border/50 transition-colors",
+        "relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/10 px-3 py-2.5 group hover:border-border transition-colors",
         accent,
       )}
     >
@@ -25,7 +25,7 @@ export function StatCard({
           {icon}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[9px] text-muted-foreground/60 uppercase tracking-widest font-medium">
+          <div className="text-3xs text-muted-foreground/60 uppercase tracking-widest font-medium">
             {label}
           </div>
           <div className="text-sm font-mono font-semibold text-foreground truncate leading-tight mt-0.5">
@@ -39,9 +39,9 @@ export function StatCard({
 
 export function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-1.5 border-b border-border/20 last:border-0">
-      <span className="text-muted-foreground/70 text-[11px]">{label}</span>
-      <span className="text-foreground text-[11px] font-medium text-right">{value}</span>
+    <div className="flex items-center justify-between py-1.5 border-b border-border/60 last:border-0">
+      <span className="text-muted-foreground/70 text-2xs">{label}</span>
+      <span className="text-foreground text-2xs font-medium text-right">{value}</span>
     </div>
   );
 }
@@ -61,7 +61,7 @@ export function PropertySection({
         <div className="flex items-center justify-center h-5 w-5 rounded-md bg-muted/40 text-muted-foreground/60">
           {icon}
         </div>
-        <span className="text-[10px] font-semibold text-muted-foreground/80 uppercase tracking-widest">
+        <span className="text-3xs font-semibold text-muted-foreground/80 uppercase tracking-widest">
           {title}
         </span>
         <div className="flex-1 h-px bg-border/30" />

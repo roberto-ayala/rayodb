@@ -212,14 +212,14 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                 <div className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-green-500" />
                   <span className="font-mono text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 font-mono text-3xs text-primary">
                     {ext.installedVersion}
                   </span>
                   {ext.defaultVersion && ext.defaultVersion !== ext.installedVersion && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 gap-1 text-[10px] text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+                      className="h-6 gap-1 text-3xs text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
                       onClick={() => updateExt(ext.name)}
                       disabled={busy === ext.name}
                     >
@@ -232,9 +232,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     </Button>
                   )}
                   <span className="ml-auto flex items-center gap-2">
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {ext.schema}
-                    </span>
+                    <span className="font-mono text-3xs text-muted-foreground">{ext.schema}</span>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -252,7 +250,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   </span>
                 </div>
                 {ext.comment && (
-                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">{ext.comment}</p>
+                  <p className="mt-1 font-mono text-2xs text-muted-foreground">{ext.comment}</p>
                 )}
               </div>
             ))}
@@ -274,13 +272,13 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                 <div className="flex items-center gap-2">
                   <Download className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="font-mono text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-3xs text-muted-foreground">
                     {ext.version}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="ml-auto h-6 gap-1 text-[10px]"
+                    className="ml-auto h-6 gap-1 text-3xs"
                     onClick={() => installExt(ext.name)}
                     disabled={busy === ext.name}
                   >
@@ -293,7 +291,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   </Button>
                 </div>
                 {ext.comment && (
-                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">{ext.comment}</p>
+                  <p className="mt-1 font-mono text-2xs text-muted-foreground">{ext.comment}</p>
                 )}
               </div>
             ))}
@@ -328,7 +326,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
             <Button variant="ghost" className="text-xs" onClick={() => setConfirmInstall(null)}>
               Cancel
             </Button>
-            <Button variant="gradient" className="text-xs" onClick={confirmInstallExt}>
+            <Button variant="default" className="text-xs" onClick={confirmInstallExt}>
               Install
             </Button>
           </div>

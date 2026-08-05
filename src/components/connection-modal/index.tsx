@@ -168,7 +168,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border/50 rounded-xl sm:max-w-[500px] flex flex-col overflow-hidden p-0">
+      <DialogContent className="bg-card border-border rounded-lg sm:max-w-[500px] flex flex-col overflow-hidden p-0">
         <DialogHeader className="shrink-0 px-6 pt-6 pb-0">
           <DialogTitle className="font-mono text-foreground">
             {isEditing ? "Edit Connection" : "New Connection"}
@@ -239,7 +239,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
 
             {testResult && (
               <div
-                className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-xs font-mono ${
+                className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs font-mono ${
                   testResult.ok
                     ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
                     : "border-destructive/30 bg-destructive/5 text-destructive"
@@ -255,7 +255,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             )}
           </div>
 
-          <div className="flex shrink-0 justify-between border-border/40 border-t px-6 py-4">
+          <div className="flex shrink-0 justify-between border-border border-t px-6 py-4">
             <Button
               type="button"
               variant="outline"
@@ -275,7 +275,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="gradient" className="font-mono text-xs">
+              <Button type="submit" variant="default" className="font-mono text-xs">
                 {isEditing ? "Save Changes" : "Connect"}
               </Button>
             </div>

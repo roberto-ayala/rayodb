@@ -135,7 +135,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
         {details.length > 0 && (
           <div className="mt-1 ml-5.5 space-y-0.5">
             {details.map((d) => (
-              <div key={d} className="font-mono text-[10px] text-muted-foreground">
+              <div key={d} className="font-mono text-3xs text-muted-foreground">
                 {d}
               </div>
             ))}
@@ -145,7 +145,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
 
       {/* Children */}
       {expanded && hasChildren && (
-        <div className="border-l border-border/50 ml-2.5">
+        <div className="border-l border-border ml-2.5">
           {node.Plans?.map((child, i) => (
             <PlanNode key={i} node={child} depth={depth + 1} maxTime={maxTime} />
           ))}
@@ -157,7 +157,7 @@ function PlanNode({ node, depth, maxTime }: { node: ExplainNode; depth: number; 
 
 function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <span className="font-mono text-[10px]">
+    <span className="font-mono text-3xs">
       <span className="text-muted-foreground">{label}: </span>
       <span className={cn("font-medium", warn && "text-destructive")}>{value}</span>
     </span>

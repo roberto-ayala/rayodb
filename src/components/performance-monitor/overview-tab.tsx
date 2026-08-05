@@ -66,11 +66,11 @@ export function OverviewTab({ dbStats, projectHistory, avgTime, failedQueries }:
         <div className="grid grid-cols-3 divide-x">
           <div className="p-3 text-center">
             <div className="font-mono text-lg font-bold">{projectHistory.length}</div>
-            <div className="font-mono text-[10px] text-muted-foreground">Total Queries</div>
+            <div className="font-mono text-3xs text-muted-foreground">Total Queries</div>
           </div>
           <div className="p-3 text-center">
             <div className="font-mono text-lg font-bold">{avgTime.toFixed(1)}ms</div>
-            <div className="font-mono text-[10px] text-muted-foreground">Avg Execution Time</div>
+            <div className="font-mono text-3xs text-muted-foreground">Avg Execution Time</div>
           </div>
           <div className="p-3 text-center">
             <div
@@ -78,7 +78,7 @@ export function OverviewTab({ dbStats, projectHistory, avgTime, failedQueries }:
             >
               {failedQueries}
             </div>
-            <div className="font-mono text-[10px] text-muted-foreground">Failed Queries</div>
+            <div className="font-mono text-3xs text-muted-foreground">Failed Queries</div>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
     <div className="rounded-md border p-3">
       <div className="flex items-center gap-2 text-muted-foreground">
         {icon}
-        <span className="font-mono text-[10px]">{label}</span>
+        <span className="font-mono text-3xs">{label}</span>
       </div>
       <div className="mt-1 font-mono text-lg font-bold">{value}</div>
     </div>

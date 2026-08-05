@@ -111,14 +111,14 @@ export function StructureEditorContent({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 pt-2">
-      <div className="flex gap-0.5 bg-background/30 rounded-lg p-0.5 border border-border/20 shrink-0 mb-2">
+      <div className="flex gap-0.5 bg-background/30 rounded-md p-0.5 border border-border/60 shrink-0 mb-2">
         {subTabs.map((t) => (
           <button
             key={t.key}
             type="button"
             onClick={() => setSubTab(t.key)}
             className={cn(
-              "px-2.5 py-1 text-[10px] font-medium rounded-md transition-all",
+              "px-2.5 py-1 text-3xs font-medium rounded-md transition-all",
               subTab === t.key
                 ? "bg-background text-foreground shadow-sm shadow-black/10"
                 : "text-muted-foreground hover:text-foreground",
@@ -176,14 +176,14 @@ export function StructureEditorContent({
       </div>
 
       {showSql && sqlStatements.length > 0 && (
-        <div className="shrink-0 mt-2 rounded-xl border border-border/40 overflow-hidden bg-[hsl(var(--background))]">
-          <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/30">
-            <span className="text-[10px] font-mono text-muted-foreground/60">SQL Preview</span>
+        <div className="shrink-0 mt-2 rounded-lg border border-border overflow-hidden bg-[hsl(var(--background))]">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60">
+            <span className="text-3xs font-mono text-muted-foreground/60">SQL Preview</span>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+                className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   openTab(projectId, sqlPreview);
                   onOpenChange(false);
@@ -194,14 +194,14 @@ export function StructureEditorContent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+                className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
                 onClick={() => navigator.clipboard.writeText(sqlPreview)}
               >
                 <Copy className="h-2.5 w-2.5" /> Copy
               </Button>
             </div>
           </div>
-          <pre className="p-3 text-[11px] font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed max-h-[150px] selection:bg-primary/20">
+          <pre className="p-3 text-2xs font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed max-h-[150px] selection:bg-primary/20">
             {sqlPreview}
           </pre>
         </div>
@@ -215,15 +215,15 @@ export function StructureEditorContent({
       )}
 
       {changes > 0 && (
-        <div className="shrink-0 mt-2 flex items-center gap-2 pt-2 border-t border-border/20">
-          <span className="text-[10px] font-medium text-muted-foreground">
+        <div className="shrink-0 mt-2 flex items-center gap-2 pt-2 border-t border-border/60">
+          <span className="text-3xs font-medium text-muted-foreground">
             {changes} change{changes !== 1 ? "s" : ""}
           </span>
           <div className="flex-1" />
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-[11px] text-muted-foreground"
+            className="h-7 px-2 text-2xs text-muted-foreground"
             onClick={() => {
               setDraft(initialState);
               setError(null);
@@ -235,7 +235,7 @@ export function StructureEditorContent({
           <Button
             variant="outline"
             size="sm"
-            className="h-7 px-2 text-[11px]"
+            className="h-7 px-2 text-2xs"
             onClick={() => setShowSql((v) => !v)}
           >
             <FileCode className="h-3 w-3 mr-1" />
@@ -243,7 +243,7 @@ export function StructureEditorContent({
           </Button>
           <Button
             size="sm"
-            className="h-7 px-3 text-[11px]"
+            className="h-7 px-3 text-2xs"
             disabled={applying || sqlStatements.length === 0}
             onClick={() => void applyChanges()}
           >

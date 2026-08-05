@@ -1,5 +1,5 @@
 // Indent levels (px), one step per nesting level
-export const INDENT_STEP = 16;
+export const INDENT_STEP = 14;
 
 const INDENT_BASE = 4;
 const level = (depth: number) => INDENT_BASE + depth * INDENT_STEP;

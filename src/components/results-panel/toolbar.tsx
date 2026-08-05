@@ -52,19 +52,19 @@ export function ResultsToolbar(props: ToolbarProps) {
   const clearPinnedResult = useUIStore((s) => s.clearPinnedResult);
 
   return (
-    <div className="flex items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur px-4 py-2 flex-shrink-0">
+    <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-2 flex-shrink-0">
       <div className="flex items-center gap-3">
         {/* Panel tabs — segment control */}
-        <div className="inline-flex rounded-lg bg-muted p-0.5">
+        <div className="inline-flex rounded-md border border-border bg-muted/60 p-0.5">
           <button
             type="button"
             onClick={() => {
               setPanelView("grid");
               setViewMode("grid");
             }}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 ${
+            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 ${
               panelView !== "history" && viewMode === "grid"
-                ? "bg-accent text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -76,9 +76,9 @@ export function ResultsToolbar(props: ToolbarProps) {
               setPanelView("record");
               setViewMode("record");
             }}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 ${
+            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 ${
               panelView !== "history" && viewMode === "record"
-                ? "bg-accent text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
             disabled={!result?.rows.length || !!virtualQuery}
@@ -89,9 +89,9 @@ export function ResultsToolbar(props: ToolbarProps) {
             <button
               type="button"
               onClick={() => setPanelView("explain")}
-              className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
+              className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
                 panelView === "explain"
-                  ? "bg-accent text-foreground shadow-sm"
+                  ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -102,9 +102,9 @@ export function ResultsToolbar(props: ToolbarProps) {
           <button
             type="button"
             onClick={() => setPanelView("history")}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
+            className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
               panelView === "history"
-                ? "bg-accent text-foreground shadow-sm"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -115,9 +115,9 @@ export function ResultsToolbar(props: ToolbarProps) {
             <button
               type="button"
               onClick={() => setPanelView("map")}
-              className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
+              className={`rounded-sm px-2.5 py-1 text-xs font-mono transition-colors duration-150 flex items-center gap-1 ${
                 panelView === "map"
-                  ? "bg-accent text-foreground shadow-sm"
+                  ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

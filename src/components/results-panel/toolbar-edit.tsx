@@ -75,14 +75,14 @@ export function ToolbarEdit({
             <button
               type="button"
               onClick={onCancelDelete}
-              className="px-3 py-1.5 rounded-lg text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              className="px-3 py-1.5 rounded-md text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={onConfirmDelete}
-              className="px-3 py-1.5 rounded-lg text-xs font-mono bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+              className="px-3 py-1.5 rounded-md text-xs font-mono bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
             >
               Yes, delete {pendingDeleteCount} row{pendingDeleteCount !== 1 ? "s" : ""}
             </button>

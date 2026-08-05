@@ -114,11 +114,11 @@ export function DiffView({
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            <th className="border border-border px-2 py-1 text-left bg-secondary text-[10px] w-8" />
+            <th className="border border-border px-2 py-1 text-left bg-secondary text-3xs w-8" />
             {pinnedColumns.map((col) => (
               <th
                 key={col}
-                className="border border-border px-2 py-1 text-left bg-secondary text-[10px]"
+                className="border border-border px-2 py-1 text-left bg-secondary text-3xs"
               >
                 {col}
               </th>

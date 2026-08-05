@@ -57,7 +57,7 @@ export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExpor
                 })(),
               }}
             >
-              <div className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="px-2 py-1 text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Download
               </div>
               {(["csv", "json", "sql", "markdown", "xml"] as ExportFormat[]).map((fmt) => (
@@ -72,7 +72,7 @@ export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExpor
                 </button>
               ))}
               <div className="border-t border-border my-1" />
-              <div className="px-2 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="px-2 py-1 text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Copy to clipboard
               </div>
               {(["csv", "json", "sql", "markdown"] as ExportFormat[]).map((fmt) => (

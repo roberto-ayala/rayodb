@@ -75,8 +75,8 @@ export function TabBar() {
   const projects = useProjectStore((s) => s.projects);
 
   return (
-    <div className="flex items-center bg-card/40 backdrop-blur-md min-h-[40px] border-b border-border/40">
-      <div className="flex flex-1 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none gap-0.5 px-1.5 py-1">
+    <div className="flex items-center bg-muted/40 min-h-[38px] border-b border-border">
+      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none px-1.5 pt-1">
         {tabs.map((tab, idx) => {
           if (!tab) return null;
           const projectName = tab.projectId;
@@ -121,10 +121,12 @@ export function TabBar() {
                 ])
               }
               className={cn(
-                "group flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 cursor-pointer select-none",
+                // Active tab shares the panel background and drops its bottom
+                // border, so it reads as the front edge of the content below
+                "group relative flex shrink-0 items-center gap-2 rounded-t-md border border-b-0 px-3 py-1.5 transition-colors duration-150 cursor-pointer select-none -mb-px",
                 isActive
-                  ? "bg-accent/80 text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground",
+                  ? "border-border bg-background text-foreground"
+                  : "border-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
               )}
             >
               <div className="flex items-center gap-1.5 font-mono text-xs">
@@ -179,7 +181,7 @@ export function TabBar() {
                   e.stopPropagation();
                   handleCloseTab(idx);
                 }}
-                className="opacity-0 transition-all hover:bg-destructive/20 hover:text-destructive rounded-md p-0.5 group-hover:opacity-100"
+                className="rounded-sm p-0.5 opacity-0 transition-opacity hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -188,20 +190,13 @@ export function TabBar() {
         })}
       </div>
       <div className="flex items-center gap-0.5 pr-1.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => openTab()}
-          className="h-7 w-7 shrink-0 rounded-lg"
-          title="New query tab"
-        >
+        <Button variant="ghost" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           onClick={openTerminalTab}
-          className="h-7 w-7 shrink-0 rounded-lg"
           title="Open terminal (Cmd+`)"
         >
           <Terminal className="h-3.5 w-3.5" />

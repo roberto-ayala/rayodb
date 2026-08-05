@@ -43,18 +43,20 @@ export function TreeRow({
       style={{ paddingLeft: `${indent}px` }}
     >
       <IndentGuides indent={indent} />
-      {expanded !== undefined ? (
-        isLoading ? (
-          <Loader2 className="h-3 w-3 shrink-0 animate-spin text-muted-foreground" />
-        ) : expanded ? (
-          <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
-        ) : (
-          <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-        )
-      ) : null}
       <span className="shrink-0">{icon}</span>
       <span className={cn("font-mono text-xs", bold && "font-semibold")}>{label}</span>
-      {trailing && <span className="ml-auto mr-1">{trailing}</span>}
+      {/* Chevron sits on the right so that every icon keeps its indent column */}
+      <span className="ml-auto mr-1 flex shrink-0 items-center gap-1.5">
+        {expanded !== undefined &&
+          (isLoading ? (
+            <Loader2 className="h-3 w-3 shrink-0 animate-spin text-muted-foreground" />
+          ) : expanded ? (
+            <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
+          ) : (
+            <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" />
+          ))}
+        {trailing}
+      </span>
     </button>
   );
 }

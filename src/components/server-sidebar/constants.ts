@@ -1,11 +1,16 @@
-// Indent levels (px)
+// Indent levels (px), one step per nesting level
+export const INDENT_STEP = 14;
+
+const INDENT_BASE = 4;
+const level = (depth: number) => INDENT_BASE + depth * INDENT_STEP;
+
 export const I = {
-  server: 4,
-  cat: 14,
-  db: 24,
-  schema: 32,
-  schemaObj: 40,
-  table: 48,
-  section: 56,
-  item: 64,
+  server: level(0),
+  cat: level(1),
+  db: level(2),
+  schema: level(3),
+  schemaObj: level(4),
+  table: level(5),
+  section: level(6),
+  item: level(7),
 };

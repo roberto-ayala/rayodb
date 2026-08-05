@@ -1,9 +1,9 @@
-import { I } from "./constants";
+import { I, INDENT_STEP } from "./constants";
 
 export function IndentGuides({ indent }: { indent: number }) {
   const guides: number[] = [];
-  // Draw guides at each nesting level (every 12px starting from the first nested level)
-  for (let x = I.cat + 4; x < indent; x += 12) {
+  // One guide per ancestor level, centered on that level's icon
+  for (let x = I.cat + 4; x < indent; x += INDENT_STEP) {
     guides.push(x);
   }
   return (

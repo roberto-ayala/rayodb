@@ -24,13 +24,13 @@ export function SectionHeader({
       style={{ paddingLeft: `${indent}px` }}
     >
       <IndentGuides indent={indent} />
-      {expanded ? (
-        <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
-      ) : (
-        <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground" />
-      )}
       <span className="shrink-0">{icon}</span>
       <span className="font-mono text-[11px] font-semibold text-muted-foreground">{label}</span>
+      {expanded ? (
+        <ChevronDown className="ml-auto mr-1 h-3 w-3 shrink-0 text-muted-foreground" />
+      ) : (
+        <ChevronRight className="ml-auto mr-1 h-3 w-3 shrink-0 text-muted-foreground" />
+      )}
     </button>
   );
 }

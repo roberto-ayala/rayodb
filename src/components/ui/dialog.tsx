@@ -15,7 +15,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-md",
+      "fixed inset-0 z-50 bg-black/50",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
@@ -35,9 +35,8 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "relative my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain bg-card/95 backdrop-blur-xl text-foreground rounded-2xl w-full max-w-md p-6 outline-none",
-          "border border-border/40 shadow-2xl shadow-black/50",
-          "ring-1 ring-white/[0.05]",
+          "relative my-auto max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain bg-popover text-popover-foreground rounded-xl w-full max-w-md p-6 outline-none",
+          "border border-border shadow-[var(--shadow-popover)]",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
@@ -48,7 +47,7 @@ const DialogContent = React.forwardRef<
       >
         {children}
         {!hideClose && (
-          <DialogPrimitive.Close className="absolute right-3 top-3 rounded-lg p-1.5 text-muted-foreground/60 transition-colors hover:text-foreground hover:bg-muted/50 focus:outline-none focus:ring-1 focus:ring-ring">
+          <DialogPrimitive.Close className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>

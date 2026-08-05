@@ -130,12 +130,6 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /* SF Mono renders ~4% taller than the UI sans at the same font-size, so mono
-     text reads oversized next to a label. Pin its x-height to the sans one
-     (0.527em measured at 12px) instead of scaling every mono size by hand. */
-  .font-mono {
-    font-size-adjust: ex-height 0.527;
-  }
   html,
   body {
     @apply bg-background text-foreground;

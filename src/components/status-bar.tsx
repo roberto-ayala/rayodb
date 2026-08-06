@@ -90,7 +90,7 @@ export function StatusBar() {
         )}
       </div>
 
-      <div className="flex items-center gap-3 justify-self-center">
+      <div className="flex items-center gap-6 justify-self-center">
         <Metric label="CPU" value={cpu} width="6ch" />
         <Metric label="RSS" value={rss} width="8ch" />
         <Metric label="PROC" value={proc} width="3ch" />
@@ -100,8 +100,7 @@ export function StatusBar() {
           width="6ch"
           note={waiting > 0 ? `${waiting} waiting` : undefined}
         />
-        <Metric label="NET" value={`↓ ${rx}`} width="13ch" />
-        <Metric label="" value={`↑ ${tx}`} width="13ch" />
+        <Metric label="NET" value={`↓ ${rx} ↑ ${tx}`} width="27ch" />
       </div>
 
       <div className="flex items-center justify-self-end gap-2">
@@ -129,9 +128,9 @@ function Metric({
   note?: string;
 }) {
   return (
-    <span className="flex items-center gap-1.5" title={note}>
+    <span className="flex items-center gap-1" title={note}>
       {label && <span className="text-3xs font-semibold uppercase tracking-widest">{label}</span>}
-      <span className="whitespace-nowrap text-right font-mono tabular-nums text-foreground/80" style={{ width }}>
+      <span className="whitespace-nowrap font-mono tabular-nums text-foreground/80" style={{ width }}>
         {value}
       </span>
       <span

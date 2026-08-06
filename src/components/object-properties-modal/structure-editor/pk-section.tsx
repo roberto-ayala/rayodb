@@ -86,7 +86,7 @@ export function PkSection({
       {draft.primaryKey &&
         draft.primaryKey._status !== "removed" &&
         draft.primaryKey.columns.length > 0 && (
-          <div className="text-3xs text-muted-foreground px-1">
+          <div className="px-1 text-xs text-muted-foreground">
             Constraint: <span className="text-foreground">{draft.primaryKey.constraintName}</span>
             {" — "}({draft.primaryKey.columns.join(", ")})
           </div>

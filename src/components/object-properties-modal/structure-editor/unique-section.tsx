@@ -118,7 +118,7 @@ export function UniqueSection({
                   ),
                 }))
               }
-              className="text-3xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground"
             >
               Restore
             </button>

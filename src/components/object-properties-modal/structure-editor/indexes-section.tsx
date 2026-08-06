@@ -43,7 +43,7 @@ export function IndexesSection({
                 className="flex-1 h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
                 placeholder="Index name"
               />
-              <label className="flex items-center gap-1.5 text-3xs text-muted-foreground">
+              <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={idx.isUnique}
@@ -134,7 +134,7 @@ export function IndexesSection({
                   ),
                 }))
               }
-              className="text-3xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground"
             >
               Restore
             </button>

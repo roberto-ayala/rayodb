@@ -119,7 +119,7 @@ export function StructureEditorContent({
             type="button"
             onClick={() => setSubTab(t.key)}
             className={cn(
-              "rounded-sm px-2.5 py-1 text-3xs font-medium transition-colors",
+              "rounded-sm px-2.5 py-1 text-xs font-medium transition-colors",
               subTab === t.key
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -179,12 +179,14 @@ export function StructureEditorContent({
       {showSql && sqlStatements.length > 0 && (
         <div className="shrink-0 mt-2 rounded-lg border border-border overflow-hidden bg-[hsl(var(--background))]">
           <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60">
-            <span className="text-3xs text-muted-foreground/60">SQL Preview</span>
+            <span className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+              SQL Preview
+            </span>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
+                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   openTab(projectId, sqlPreview);
                   onOpenChange(false);
@@ -195,7 +197,7 @@ export function StructureEditorContent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
+                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
                 onClick={() => navigator.clipboard.writeText(sqlPreview)}
               >
                 <Copy className="h-2.5 w-2.5" /> Copy
@@ -215,7 +217,7 @@ export function StructureEditorContent({
 
       {changes > 0 && (
         <div className="shrink-0 mt-2 flex items-center gap-2 pt-2 border-t border-border/60">
-          <span className="text-3xs font-medium text-muted-foreground">
+          <span className="text-xs font-medium text-muted-foreground">
             {changes} change{changes !== 1 ? "s" : ""}
           </span>
           <div className="flex-1" />

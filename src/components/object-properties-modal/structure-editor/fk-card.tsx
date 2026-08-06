@@ -187,7 +187,7 @@ export function FKCard({
                 targetColumns: [...fk.targetColumns, ""],
               });
             }}
-            className="flex items-center gap-1 px-1 py-1 text-3xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-1 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             <Plus className="h-3 w-3" /> Add column pair
           </button>

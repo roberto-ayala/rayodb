@@ -33,14 +33,6 @@ const objectLabel: Record<ObjectType, string> = {
   "trigger-function": "Trigger Function",
 };
 
-export const typeColor: Record<ObjectType, string> = {
-  table: "from-primary/20 to-primary/5",
-  view: "from-blue-500/20 to-blue-500/5",
-  matview: "from-purple-500/20 to-purple-500/5",
-  function: "from-amber-500/20 to-amber-500/5",
-  "trigger-function": "from-orange-500/20 to-orange-500/5",
-};
-
 const tabIcons: Partial<Record<Tab, React.ReactNode>> = {
   overview: <Database className="h-3 w-3" />,
   columns: <Columns3 className="h-3 w-3" />,
@@ -75,11 +67,10 @@ export function ModalHeader({
   setActiveTab: (tab: Tab) => void;
 }) {
   return (
-    <div className={cn("relative px-5 pt-5 pb-3 bg-gradient-to-b", typeColor[objectType])}>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03),transparent_70%)]" />
-      <DialogHeader className="relative">
+    <div className="border-b border-border bg-muted/40 px-5 pt-5 pb-3">
+      <DialogHeader>
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center h-8 w-8 rounded-md bg-background/60 border border-border/60">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background">
             {objectIcon[objectType]}
           </div>
           <div className="min-w-0 flex-1">
@@ -99,7 +90,7 @@ export function ModalHeader({
               </button>
             </DialogTitle>
             <DialogDescription className="flex items-center gap-1.5 mt-0.5">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/40 text-3xs font-medium uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>
               <span className="text-2xs">{schema}</span>
@@ -112,16 +103,16 @@ export function ModalHeader({
       </DialogHeader>
 
       {/* Tab switcher - pill style */}
-      <div className="relative flex gap-0.5 mt-3 bg-background/30 rounded-md p-0.5 border border-border/60">
+      <div className="mt-3 flex gap-0.5 rounded-md border border-border bg-muted p-0.5">
         {availableTabs.map((tab) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-2xs font-medium whitespace-nowrap rounded-md transition-all",
+              "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-2xs font-medium transition-colors",
               activeTab === tab.key
-                ? "bg-background text-foreground shadow-sm shadow-black/10"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

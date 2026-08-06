@@ -111,16 +111,16 @@ export function StructureEditorContent({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 pt-2">
-      <div className="flex gap-0.5 bg-background/30 rounded-md p-0.5 border border-border/60 shrink-0 mb-2">
+      <div className="mb-2 flex shrink-0 gap-0.5 rounded-md border border-border bg-muted p-0.5">
         {subTabs.map((t) => (
           <button
             key={t.key}
             type="button"
             onClick={() => setSubTab(t.key)}
             className={cn(
-              "px-2.5 py-1 text-3xs font-medium rounded-md transition-all",
+              "rounded-sm px-2.5 py-1 text-3xs font-medium transition-colors",
               subTab === t.key
-                ? "bg-background text-foreground shadow-sm shadow-black/10"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

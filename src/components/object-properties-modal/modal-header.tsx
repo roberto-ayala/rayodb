@@ -69,8 +69,9 @@ export function ModalHeader({
   return (
     <div className="border-b border-border bg-muted/40 px-5 pt-5 pb-3">
       <DialogHeader>
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background">
+        <div className="flex items-stretch gap-2.5">
+          {/* Square, sized by the two text rows next to it */}
+          <div className="flex w-11 shrink-0 items-center justify-center rounded-md border border-border bg-background">
             {objectIcon[objectType]}
           </div>
           <div className="min-w-0 flex-1">
@@ -89,7 +90,7 @@ export function ModalHeader({
                 )}
               </button>
             </DialogTitle>
-            <DialogDescription className="flex items-center gap-1.5 mt-0.5">
+            <DialogDescription className="mt-0.5 flex items-center gap-1.5">
               <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>

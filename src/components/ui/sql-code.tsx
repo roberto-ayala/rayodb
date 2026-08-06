@@ -31,8 +31,11 @@ export function SqlCode({ code, className }: { code: string; className?: string 
     };
   }, [code, theme]);
 
+  // No `monaco-editor` class here: its stylesheet is injected after Tailwind
+  // and would win on font-family and overflow. The theme's .mtk rules are
+  // global, so the token colors apply without it.
   const classes = cn(
-    "monaco-editor font-mono text-code leading-relaxed whitespace-pre-wrap selection:bg-primary/20",
+    "font-mono text-code leading-relaxed whitespace-pre-wrap selection:bg-primary/20",
     className,
   );
 

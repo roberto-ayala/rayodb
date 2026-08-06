@@ -105,7 +105,7 @@ export function OverviewContent({
 
         {/* Maintenance */}
         <PropertySection title="Maintenance" icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs px-1">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 px-1 [&>*:nth-last-child(-n+2)]:border-b-0">
             <InfoRow label="Last Vacuum" value={formatTimestamp(tableStats.lastVacuum)} />
             <InfoRow label="Last Auto Vacuum" value={formatTimestamp(tableStats.lastAutoVacuum)} />
             <InfoRow label="Last Analyze" value={formatTimestamp(tableStats.lastAnalyze)} />

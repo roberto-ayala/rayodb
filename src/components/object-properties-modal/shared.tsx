@@ -39,9 +39,9 @@ export function StatCard({
 
 export function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-1.5 border-b border-border/60 last:border-0">
-      <span className="text-muted-foreground/70 text-2xs">{label}</span>
-      <span className="text-foreground text-2xs font-medium text-right">{value}</span>
+    <div className="flex items-center justify-between border-b border-border/60 py-1.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-right text-xs font-medium text-foreground">{value}</span>
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function FunctionOverview({
           icon={<ArrowRight className="h-3.5 w-3.5" />}
         />
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs px-1">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 px-1 [&>*:nth-last-child(-n+2)]:border-b-0">
         <InfoRow
           label="Security"
           value={functionMeta.securityDefiner ? "SECURITY DEFINER" : "SECURITY INVOKER"}
@@ -46,7 +46,7 @@ export function FunctionOverview({
       </div>
       {functionMeta.arguments && (
         <PropertySection title="Arguments" icon={<Columns3 className="h-3.5 w-3.5" />}>
-          <div className="rounded-lg bg-[hsl(var(--background))] border border-border/60 px-3 py-2 text-2xs text-foreground/90">
+          <div className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-code text-foreground/90">
             {functionMeta.arguments}
           </div>
         </PropertySection>

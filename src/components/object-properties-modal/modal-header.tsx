@@ -94,9 +94,9 @@ export function ModalHeader({
               <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>
-              <span className="text-2xs">{schema}</span>
+              <span className="text-xs">{schema}</span>
               <span className="text-muted-foreground/30">|</span>
-              <span className="text-2xs text-muted-foreground/60">{projectId}</span>
+              <span className="text-xs text-muted-foreground/60">{projectId}</span>
               {loading && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
             </DialogDescription>
           </div>
@@ -111,7 +111,7 @@ export function ModalHeader({
             type="button"
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-2xs font-medium transition-colors",
+              "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-xs font-medium transition-colors",
               activeTab === tab.key
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",

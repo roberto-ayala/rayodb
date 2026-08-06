@@ -236,7 +236,7 @@ export function ActionsContent({
                 >
                   {action.label}
                 </div>
-                <div className="text-2xs text-muted-foreground">{action.description}</div>
+                <div className="text-xs text-muted-foreground">{action.description}</div>
               </div>
               {confirmAction !== action.label && (
                 <Button
@@ -277,7 +277,7 @@ export function ActionsContent({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-2xs font-medium",
+                    "h-7 px-3 text-xs font-medium",
                     action.destructive
                       ? "text-destructive hover:bg-destructive/10"
                       : "text-foreground hover:bg-muted/50",
@@ -290,7 +290,7 @@ export function ActionsContent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 text-2xs text-muted-foreground"
+                  className="h-7 px-2 text-xs text-muted-foreground"
                   onClick={() => setConfirmAction(null)}
                 >
                   Cancel

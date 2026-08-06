@@ -2,6 +2,7 @@ import { AlertTriangle, Copy, FileCode, Loader2, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { SqlCode } from "@/components/ui/sql-code";
 import type { StructureEditorState } from "@/lib/alter-table-sql";
 import { countChanges, generateAlterTableSQL } from "@/lib/alter-table-sql";
 import type { DriverFactory } from "@/lib/database-driver";
@@ -201,9 +202,7 @@ export function StructureEditorContent({
               </Button>
             </div>
           </div>
-          <pre className="font-mono p-3 text-2xs text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed max-h-[150px] selection:bg-primary/20">
-            {sqlPreview}
-          </pre>
+          <SqlCode code={sqlPreview} className="max-h-[150px] overflow-y-auto p-3" />
         </div>
       )}
 
@@ -223,7 +222,7 @@ export function StructureEditorContent({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-2xs text-muted-foreground"
+            className="h-7 px-2 text-xs text-muted-foreground"
             onClick={() => {
               setDraft(initialState);
               setError(null);
@@ -235,7 +234,7 @@ export function StructureEditorContent({
           <Button
             variant="outline"
             size="sm"
-            className="h-7 px-2 text-2xs"
+            className="h-7 px-2 text-xs"
             onClick={() => setShowSql((v) => !v)}
           >
             <FileCode className="h-3 w-3 mr-1" />
@@ -243,7 +242,7 @@ export function StructureEditorContent({
           </Button>
           <Button
             size="sm"
-            className="h-7 px-3 text-2xs"
+            className="h-7 px-3 text-xs"
             disabled={applying || sqlStatements.length === 0}
             onClick={() => void applyChanges()}
           >

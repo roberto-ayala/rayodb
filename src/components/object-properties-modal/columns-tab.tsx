@@ -15,7 +15,7 @@ export function ColumnsContent({
   return (
     <div className="pt-3">
       <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/10">
-        <table className="w-full text-2xs">
+        <table className="w-full text-xs">
           <thead>
             <tr className="bg-muted/30 border-b border-border/60">
               <th className="text-left px-3 py-2 text-3xs text-muted-foreground/60 font-semibold uppercase tracking-widest w-6">

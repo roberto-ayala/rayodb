@@ -56,13 +56,15 @@ export function DDLContent({
         <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60 shrink-0">
           <div className="flex items-center gap-2">
             <FileCode className="h-3 w-3 text-muted-foreground/50" />
-            <span className="text-3xs text-muted-foreground/60">DDL</span>
+            <span className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+              DDL
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
+              className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
               onClick={onOpenInTab}
             >
               <Play className="h-2.5 w-2.5" />
@@ -71,7 +73,7 @@ export function DDLContent({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 gap-1 text-3xs px-2 text-muted-foreground hover:text-foreground"
+              className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
               onClick={onCopy}
             >
               {copied === "ddl" ? (

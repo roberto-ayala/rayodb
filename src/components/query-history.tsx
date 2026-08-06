@@ -16,7 +16,7 @@ export function QueryHistory() {
 
   if (entries.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
+      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
         No query history yet
       </div>
     );

@@ -79,7 +79,7 @@ export function DiffView({
     return (
       <div className="flex flex-1 flex-col items-center justify-center text-muted-foreground gap-2 p-4">
         <Diff className="h-8 w-8" />
-        <div className="text-sm">Column structures differ</div>
+        <div className="text-xs">Column structures differ</div>
         <div className="text-xs">Pinned: {pinnedColumns.join(", ")}</div>
         <div className="text-xs">Current: {currentColumns.join(", ")}</div>
       </div>
@@ -90,7 +90,7 @@ export function DiffView({
     return (
       <div className="flex flex-1 items-center justify-center text-muted-foreground gap-2">
         <Loader2 className="h-5 w-5 animate-spin" />
-        <span className="text-sm">Computing diff...</span>
+        <span className="text-xs">Computing diff...</span>
       </div>
     );
   }

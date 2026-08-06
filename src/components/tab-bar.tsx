@@ -191,12 +191,12 @@ export function TabBar() {
           );
         })}
       </div>
-      <div className="flex items-center gap-0.5 pr-1.5">
-        <Button variant="ghost" size="icon-sm" onClick={() => openTab()} title="New query tab">
+      <div className="flex items-center gap-1 px-2">
+        <Button variant="outline" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon-sm"
           onClick={openTerminalTab}
           title="Open terminal (Cmd+`)"

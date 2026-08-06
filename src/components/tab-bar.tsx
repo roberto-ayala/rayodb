@@ -75,7 +75,7 @@ export function TabBar() {
   const projects = useProjectStore((s) => s.projects);
 
   return (
-    <div className="flex items-center bg-muted/40 min-h-[38px] border-b border-border">
+    <div className="flex min-h-[38px] items-center border-b border-border bg-muted/40">
       <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none px-1.5 pt-1">
         {tabs.map((tab, idx) => {
           if (!tab) return null;
@@ -121,11 +121,11 @@ export function TabBar() {
                 ])
               }
               className={cn(
-                // Active tab shares the panel background and drops its bottom
-                // border, so it reads as the front edge of the content below
-                "group relative flex shrink-0 items-center gap-2 rounded-t-md border border-b-0 px-3 py-1.5 transition-colors duration-150 cursor-pointer select-none -mb-px",
+                // The active tab carries the surface of the bar right below it
+                // and covers the divider, so the two read as one region
+                "group relative z-10 flex shrink-0 items-center gap-2 rounded-t-md border border-b-0 px-3 py-1.5 transition-colors duration-150 cursor-pointer select-none -mb-px",
                 isActive
-                  ? "border-border bg-background text-foreground"
+                  ? "border-border bg-muted text-foreground"
                   : "border-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
               )}
             >

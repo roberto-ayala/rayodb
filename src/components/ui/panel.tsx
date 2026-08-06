@@ -205,7 +205,7 @@ export function StatTile({
 export const tableClasses = {
   wrapper: "w-full overflow-auto",
   table: "w-full border-collapse text-xs",
-  head: "sticky top-0 z-10 bg-muted/60 backdrop-blur",
+  head: "sticky top-0 z-10 bg-table-header backdrop-blur",
   th: "px-3 py-1.5 text-left text-3xs font-semibold uppercase tracking-widest text-muted-foreground",
   row: "border-t border-border/60 transition-colors hover:bg-hover",
   td: "px-3 py-1.5 align-middle",

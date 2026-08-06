@@ -170,7 +170,7 @@ export function buildGridTheme(_theme: string): Partial<Theme> {
     accentLight: token("--primary", 0.12),
     bgCell: token("--card"),
     bgCellMedium: token("--muted", 0.35),
-    bgHeader: token("--muted"),
+    bgHeader: token("--table-header"),
     bgHeaderHasFocus: token("--accent"),
     bgHeaderHovered: token("--accent", 0.7),
     borderColor: token("--border"),

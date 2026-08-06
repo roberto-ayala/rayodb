@@ -141,46 +141,50 @@ export function buildCellContent(cell: Item, ctx: CellContentContext): GridCell 
   return baseCell;
 }
 
-export function buildGridTheme(theme: string): Partial<Theme> {
-  if (theme === "dark") {
-    return {
-      accentColor: "hsl(260, 70%, 60%)",
-      accentLight: "hsla(260, 70%, 60%, 0.15)",
-      bgCell: "hsl(250, 15%, 13%)",
-      bgCellMedium: "hsl(250, 15%, 15%)",
-      bgHeader: "hsl(250, 15%, 18%)",
-      bgHeaderHasFocus: "hsl(250, 15%, 22%)",
-      bgHeaderHovered: "hsl(250, 15%, 20%)",
-      borderColor: "hsl(250, 12%, 22%)",
-      drilldownBorder: "hsl(250, 12%, 30%)",
-      fontFamily: CODE_FONT_FAMILY,
-      headerFontStyle: `bold ${codeFontSize()}px`,
-      baseFontStyle: `${codeFontSize()}px`,
-      textDark: "hsl(250, 15%, 85%)",
-      textMedium: "hsl(250, 10%, 60%)",
-      textLight: "hsl(250, 10%, 45%)",
-      textHeader: "hsl(250, 15%, 75%)",
-      textHeaderSelected: "hsl(260, 70%, 75%)",
-      bgBubble: "hsl(250, 15%, 20%)",
-      bgBubbleSelected: "hsl(260, 70%, 60%)",
-      textBubble: "hsl(250, 15%, 85%)",
-    };
-  }
+/**
+ * Resolve a theme token to a concrete color. The grid paints on canvas, which
+ * cannot read CSS variables, so values are read from the document and
+ * normalised through a 2d context — the tokens are oklch, which the grid's own
+ * colour maths does not parse.
+ */
+const colorProbe: CanvasRenderingContext2D | null =
+  typeof document === "undefined"
+    ? null
+    : document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+
+function token(name: string, alpha?: number): string {
+  if (!colorProbe) return "#000000";
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // Paint one pixel and read it back: the tokens are oklch, which canvas keeps
+  // verbatim and the grid's colour maths cannot parse.
+  colorProbe.clearRect(0, 0, 1, 1);
+  colorProbe.fillStyle = raw;
+  colorProbe.fillRect(0, 0, 1, 1);
+  const [r, g, b] = colorProbe.getImageData(0, 0, 1, 1).data;
+  return alpha === undefined ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export function buildGridTheme(_theme: string): Partial<Theme> {
   return {
-    accentColor: "hsl(260, 70%, 55%)",
-    accentLight: "hsla(260, 70%, 55%, 0.1)",
-    bgCell: "#ffffff",
-    bgCellMedium: "#fafafa",
-    bgHeader: "#f5f5f8",
-    bgHeaderHasFocus: "#eeeef2",
-    bgHeaderHovered: "#f0f0f4",
-    borderColor: "#e2e2e8",
+    accentColor: token("--primary"),
+    accentLight: token("--primary", 0.12),
+    bgCell: token("--card"),
+    bgCellMedium: token("--muted", 0.35),
+    bgHeader: token("--muted"),
+    bgHeaderHasFocus: token("--accent"),
+    bgHeaderHovered: token("--accent", 0.7),
+    borderColor: token("--border"),
+    drilldownBorder: token("--border"),
     fontFamily: CODE_FONT_FAMILY,
-    headerFontStyle: `bold ${codeFontSize()}px`,
+    headerFontStyle: `600 ${codeFontSize()}px`,
     baseFontStyle: `${codeFontSize()}px`,
-    textDark: "#1a1a2e",
-    textMedium: "#666680",
-    textLight: "#9999a8",
-    textHeader: "#333340",
+    textDark: token("--foreground"),
+    textMedium: token("--muted-foreground"),
+    textLight: token("--muted-foreground", 0.7),
+    textHeader: token("--foreground"),
+    textHeaderSelected: token("--primary"),
+    bgBubble: token("--muted"),
+    bgBubbleSelected: token("--primary"),
+    textBubble: token("--foreground"),
   };
 }

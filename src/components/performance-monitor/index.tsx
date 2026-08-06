@@ -236,7 +236,7 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
       </PanelToolbar>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-auto bg-card p-4">
         {tab === "overview" && (
           <OverviewTab
             dbStats={dbStats}

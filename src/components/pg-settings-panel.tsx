@@ -167,7 +167,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
         )}
       </PanelToolbar>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-card">
         {Array.from(grouped.entries()).map(([category, items]) => (
           <div key={category}>
             <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-muted/60 px-3 backdrop-blur">

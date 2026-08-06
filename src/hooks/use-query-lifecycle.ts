@@ -19,6 +19,7 @@ interface UseQueryLifecycleArgs {
 
 export function useQueryLifecycle({ setCommandPaletteOpen }: UseQueryLifecycleArgs) {
   const updateResult = useTabStore((s) => s.updateResult);
+  const setQueryError = useTabStore((s) => s.setQueryError);
   const setExecuting = useTabStore((s) => s.setExecuting);
   const closeTab = useTabStore((s) => s.closeTab);
   const setExplainResult = useTabStore((s) => s.setExplainResult);
@@ -138,11 +139,7 @@ export function useQueryLifecycle({ setCommandPaletteOpen }: UseQueryLifecycleAr
       const elapsed = Date.now() - startTime;
       const errorMsg = err?.message ?? String(err);
       const cancelled = isQueryCancelledError(errorMsg);
-      updateResult(idx, {
-        columns: [cancelled ? "Info" : "Error"],
-        rows: [[cancelled ? "Query cancelled" : errorMsg]],
-        time: 0,
-      });
+      setQueryError(idx, { message: cancelled ? "Query cancelled" : errorMsg, cancelled });
       if (!cancelled) {
         notifyQueryComplete(tab.editorValue, elapsed, false);
       }
@@ -158,7 +155,7 @@ export function useQueryLifecycle({ setCommandPaletteOpen }: UseQueryLifecycleAr
       });
     }
     useUIStore.getState().setSelectedRow(0);
-  }, [setExecuting, updateResult, setVirtualQuery, addHistoryEntry, connectProject]);
+  }, [setExecuting, updateResult, setQueryError, setVirtualQuery, addHistoryEntry, connectProject]);
 
   const runExplain = useCallback(async () => {
     const { tabs, selectedTabIndex: idx } = useTabStore.getState();
@@ -210,7 +207,7 @@ export function useQueryLifecycle({ setCommandPaletteOpen }: UseQueryLifecycleAr
       setExplainResult(idx, undefined);
     }
     setExecuting(idx, false);
-  }, [setExecuting, updateResult, setExplainResult, connectProject]);
+  }, [setExecuting, updateResult, setQueryError, setExplainResult, connectProject]);
 
   const cancelQuery = useCallback(async () => {
     const { tabs, selectedTabIndex: idx } = useTabStore.getState();
@@ -251,13 +248,9 @@ export function useQueryLifecycle({ setCommandPaletteOpen }: UseQueryLifecycleAr
     } catch (err: any) {
       const errorMsg = err?.message ?? String(err);
       const cancelled = isQueryCancelledError(errorMsg);
-      setSplitResult(idx, {
-        columns: [cancelled ? "Info" : "Error"],
-        rows: [[cancelled ? "Query cancelled" : errorMsg]],
-        time: 0,
-      });
+      setQueryError(idx, { message: cancelled ? "Query cancelled" : errorMsg, cancelled });
     }
-  }, [setSplitExecuting, setSplitResult, connectProject]);
+  }, [setSplitExecuting, setSplitResult, setQueryError, connectProject]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

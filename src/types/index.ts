@@ -39,6 +39,8 @@ export interface Tab {
   editorValue: string;
   isExecuting: boolean;
   result?: QueryResult;
+  /** Set when the last run failed; a failure is not a result set */
+  queryError?: { message: string; cancelled?: boolean };
   explainResult?: ExplainPlan;
   virtualQuery?: VirtualQuery;
   queryTimeout?: number;

@@ -10,6 +10,7 @@ import { ResultsGrid } from "../results-grid";
 import { ResultsMap } from "../results-map";
 import { ResultsRecord } from "../results-record";
 import { DiffView } from "./diff-view";
+import { QueryErrorState } from "./query-error-state";
 import { ResultsToolbar } from "./toolbar";
 import type { PanelView } from "./types";
 import { useEditMode } from "./use-edit-mode";
@@ -35,6 +36,7 @@ export function ResultsPanel() {
   }, [searchTerm]);
 
   const result = activeTab?.result;
+  const queryError = activeTab?.queryError;
   const isExecuting = activeTab?.isExecuting;
   const vq = activeTab?.virtualQuery;
 
@@ -194,6 +196,21 @@ export function ResultsPanel() {
           filteredCount={filteredRows.length}
         />
         <ResultsMap columns={result.columns} rows={filteredRows} />
+      </div>
+    );
+  }
+
+  if (queryError) {
+    return (
+      <div className="flex h-full flex-col border-t border-border bg-card">
+        <ResultsToolbar
+          {...toolbarProps}
+          result={null}
+          columns={[]}
+          filteredRows={[]}
+          filteredCount={0}
+        />
+        <QueryErrorState error={queryError} />
       </div>
     );
   }

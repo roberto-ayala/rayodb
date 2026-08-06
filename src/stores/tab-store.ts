@@ -28,6 +28,7 @@ interface TabState {
   selectTab: (index: number) => void;
   updateContent: (index: number, value: string) => void;
   updateResult: (index: number, result: QueryResult) => void;
+  setQueryError: (index: number, error?: { message: string; cancelled?: boolean }) => void;
   setResult: (index: number, result: QueryResult) => void;
   setExecuting: (index: number, executing: boolean) => void;
   setProjectId: (index: number, projectId: string) => void;
@@ -163,6 +164,13 @@ export const useTabStore = create<TabState>()(
       updateResult: (index, result) =>
         set((s) => {
           s.tabs[index].result = result;
+          s.tabs[index].queryError = undefined;
+          s.tabs[index].isExecuting = false;
+        }),
+
+      setQueryError: (index, error) =>
+        set((s) => {
+          s.tabs[index].queryError = error;
           s.tabs[index].isExecuting = false;
         }),
       setResult: (index, result) =>

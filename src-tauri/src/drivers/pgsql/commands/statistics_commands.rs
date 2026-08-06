@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError};
 use crate::drivers::pgsql::{
     DbStat, FKDetail, ForeignKeyInfo, ObjectStats, load_active_locks, load_activity,
     load_database_stats, load_fk_details, load_foreign_keys, load_index_usage, load_table_bloat,

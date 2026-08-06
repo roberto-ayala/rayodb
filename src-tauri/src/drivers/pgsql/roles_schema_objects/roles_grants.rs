@@ -1,4 +1,4 @@
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct PgRole {
@@ -30,7 +30,7 @@ pub async fn load_roles(client: &deadpool_postgres::Client) -> Result<Vec<PgRole
             &[],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let mut roles = Vec::new();
     for row in rows {
@@ -74,7 +74,7 @@ pub async fn load_table_grants(
             &[&role_name],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let mut grants = Vec::new();
     for row in rows {
@@ -113,7 +113,7 @@ pub async fn load_database_grants(
             &[&role_name],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let mut grants = Vec::new();
     for row in rows {

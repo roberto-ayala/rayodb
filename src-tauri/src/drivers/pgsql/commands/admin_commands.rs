@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError};
 use crate::drivers::pgsql::{
     DbGrant, PgRole, SchemaObject, TableGrant, execute_query, extract_schema_objects,
     import_csv_to_table, load_available_extensions, load_database_grants, load_enum_types,

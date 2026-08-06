@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 use crate::drivers::pgsql::discover_notify_channels;
 
 use futures_util::StreamExt;
@@ -162,7 +162,7 @@ pub async fn pgsql_notify_send(
     client
         .batch_execute(&sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     Ok(true)
 }
 

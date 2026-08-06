@@ -47,3 +47,21 @@ impl From<AppError> for tauri::Error {
         tauri::Error::Io(std::io::Error::other(e.to_string()))
     }
 }
+
+/// tokio_postgres::Error prints as "db error" and keeps what actually went
+/// wrong in its DbError source, so surfacing e.to_string() loses the message,
+/// the SQLSTATE and the hint the server sent back.
+pub fn pg_error_message(e: &tokio_postgres::Error) -> String {
+    let Some(db) = e.as_db_error() else {
+        return e.to_string();
+    };
+
+    let mut out = db.message().to_string();
+    if let Some(detail) = db.detail() {
+        out.push_str(&format!(" — {detail}"));
+    }
+    if let Some(hint) = db.hint() {
+        out.push_str(&format!(" (hint: {hint})"));
+    }
+    format!("{out} [{}]", db.code().code())
+}

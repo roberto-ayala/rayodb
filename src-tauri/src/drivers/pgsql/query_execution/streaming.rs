@@ -1,7 +1,7 @@
 use std::time::Instant;
 use tokio_postgres::{Client, SimpleQueryMessage};
 
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 
 use super::super::CELL_SEP;
 use super::helpers::{join_sep, pack_rows_vec, process_simple_messages};
@@ -40,7 +40,7 @@ pub async fn execute_query_streamed(
     client
         .batch_execute("BEGIN")
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let cursor_sql = format!("DECLARE _rsql_cur NO SCROLL CURSOR FOR {}", sql);
     match client.batch_execute(&cursor_sql).await {
@@ -56,7 +56,7 @@ pub async fn execute_query_streamed(
                     Ok(msgs) => msgs,
                     Err(e) => {
                         let _ = client.batch_execute("CLOSE _rsql_cur; ROLLBACK").await;
-                        return Err(AppError::QueryFailed(e.to_string()));
+                        return Err(AppError::QueryFailed(pg_error_message(&e)));
                     }
                 };
 
@@ -131,7 +131,7 @@ pub async fn execute_query_streamed(
             let messages = client
                 .simple_query(sql)
                 .await
-                .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+                .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
             let (columns, rows) = process_simple_messages(messages);
 

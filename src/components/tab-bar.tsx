@@ -128,7 +128,7 @@ export function TabBar() {
                   ? "border-border bg-muted text-foreground"
                   : // Hovering an inactive tab outlines it rather than filling it: a
                     // fill would land on the active tab's own surface
-                    "border-transparent text-muted-foreground hover:border-border hover:bg-hover/50 hover:text-foreground",
+                    "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
               )}
             >
               <div className="flex items-center gap-1.5 text-xs">

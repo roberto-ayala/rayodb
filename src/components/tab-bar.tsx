@@ -126,7 +126,9 @@ export function TabBar() {
                 "group relative flex shrink-0 items-center gap-2 rounded-t-md border border-b-0 px-3 py-1.5 transition-colors duration-150 cursor-pointer select-none",
                 isActive
                   ? "border-border bg-muted text-foreground"
-                  : "border-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
+                  : // Hovering an inactive tab outlines it rather than filling it: a
+                    // fill would land on the active tab's own surface
+                    "border-transparent text-muted-foreground hover:border-border hover:bg-hover/50 hover:text-foreground",
               )}
             >
               <div className="flex items-center gap-1.5 text-xs">

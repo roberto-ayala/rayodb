@@ -24,7 +24,7 @@ export function TopBar({
   const activeProjectDetails = activeProject ? projects[activeProject] : undefined;
 
   return (
-    <div className="flex h-11 items-center justify-between border-b border-border bg-muted px-4">
+    <div className="flex h-11 items-center justify-between border-b border-border bg-window-chrome px-4">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4 text-primary" />

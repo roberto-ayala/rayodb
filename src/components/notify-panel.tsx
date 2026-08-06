@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { Bell, BellOff, Radio, Send, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PanelHeader, PanelToolbar } from "@/components/ui/panel";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -101,8 +102,13 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border/60">
-        <Bell className="h-3.5 w-3.5 text-primary" />
+      <PanelHeader
+        icon={<Bell className="h-3.5 w-3.5" />}
+        title="LISTEN / NOTIFY"
+        subtitle={`${channels.length} subscribed`}
+      />
+
+      <PanelToolbar>
         <Input
           value={newChannel}
           onChange={(e) => setNewChannel(e.target.value)}
@@ -124,13 +130,13 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
         <Button variant="outline" size="sm" onClick={subscribe}>
           <Bell className="h-3 w-3" /> Subscribe
         </Button>
-      </div>
+      </PanelToolbar>
 
       {/* Discovered channels */}
       {knownChannels.length > 0 && (
-        <div className="flex items-center gap-1 px-3 py-1.5 border-b border-border/60 flex-wrap">
+        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-card px-3 py-1.5">
           <Radio className="h-3 w-3 text-muted-foreground/50 mr-0.5" />
-          <span className="text-3xs text-muted-foreground uppercase tracking-wider mr-1">
+          <span className="mr-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
             Available:
           </span>
           {knownChannels.map((ch) => {
@@ -149,7 +155,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
                   "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs transition-colors",
                   isActive
                     ? "bg-primary/10 text-primary/50 cursor-default"
-                    : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                    : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary",
                 )}
               >
                 {ch}
@@ -161,8 +167,8 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
       )}
 
       {channels.length > 0 && (
-        <div className="flex items-center gap-1 px-3 py-1.5 border-b border-border/60 flex-wrap">
-          <span className="text-3xs text-muted-foreground uppercase tracking-wider mr-1">
+        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-card px-3 py-1.5">
+          <span className="mr-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
             Listening:
           </span>
           {channels.map((ch) => (
@@ -179,9 +185,9 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
         </div>
       )}
 
-      <div ref={listRef} className="flex-1 overflow-auto p-3 space-y-1">
+      <div ref={listRef} className="flex-1 overflow-auto">
         {notifications.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
             {channels.length === 0
               ? "Subscribe to a channel to start"
               : "Waiting for notifications..."}
@@ -190,13 +196,13 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           notifications.map((n, i) => (
             <div
               key={i}
-              className="flex items-start gap-2 text-xs px-2 py-1.5 rounded-md hover:bg-muted/30"
+              className="flex items-start gap-2 border-b border-border/60 px-3 py-1.5 text-xs hover:bg-hover"
             >
-              <span className="text-muted-foreground/50 shrink-0">
+              <span className="shrink-0 font-mono text-3xs text-muted-foreground">
                 {new Date(n.timestamp).toLocaleTimeString()}
               </span>
               <span className="text-primary font-medium shrink-0">{n.channel}</span>
-              <span className="text-foreground break-all">
+              <span className="break-all font-mono text-foreground">
                 {n.payload || <span className="text-muted-foreground/40 italic">empty</span>}
               </span>
             </div>
@@ -204,7 +210,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-border/60">
+      <div className="flex items-center gap-2 border-t border-border bg-card px-3 py-1.5">
         <Input
           value={sendChannel}
           onChange={(e) => setSendChannel(e.target.value)}

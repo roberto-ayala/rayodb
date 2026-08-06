@@ -9,8 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PanelHeader, PanelSection, PanelToolbar, SegmentedTabs } from "@/components/ui/panel";
 import { DriverFactory } from "@/lib/database-driver";
-import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 
 interface Extension {
@@ -137,48 +137,29 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Package className="h-4 w-4 text-primary" />
-          <span className="text-sm font-semibold">Extensions</span>
-          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
-        </div>
-        <Button variant="ghost" size="icon" onClick={() => void refresh()} disabled={isLoading}>
+      <PanelHeader
+        icon={<Package className="h-3.5 w-3.5" />}
+        title="Extensions"
+        subtitle={details?.database ?? projectId}
+      >
+        <Button variant="ghost" size="icon-sm" onClick={() => void refresh()} disabled={isLoading}>
           {isLoading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <RefreshCw className="h-3.5 w-3.5" />
           )}
         </Button>
-      </div>
+      </PanelHeader>
 
-      <div className="flex items-center gap-2 border-b px-4 py-2">
-        <div className="flex gap-0">
-          <button
-            type="button"
-            onClick={() => setTab("installed")}
-            className={cn(
-              "px-3 py-1.5 text-xs border-b-2 transition-colors",
-              tab === "installed"
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Installed ({installed.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("available")}
-            className={cn(
-              "px-3 py-1.5 text-xs border-b-2 transition-colors",
-              tab === "available"
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Available ({available.length})
-          </button>
-        </div>
+      <PanelToolbar>
+        <SegmentedTabs
+          tabs={[
+            { id: "installed" as const, label: "Installed", count: installed.length },
+            { id: "available" as const, label: "Available", count: available.length },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
         <Input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -186,7 +167,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           size="sm"
           className="ml-auto w-48"
         />
-      </div>
+      </PanelToolbar>
 
       {error && (
         <div className="mx-4 mt-2 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2">
@@ -196,11 +177,11 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
 
       <div className="flex-1 overflow-auto p-4">
         {tab === "installed" && (
-          <div className="space-y-2">
+          <PanelSection title={`Installed (${filteredInstalled.length})`}>
             {filteredInstalled.map((ext) => (
               <div
                 key={ext.name}
-                className="rounded-md border p-3 hover:bg-muted/30 transition-colors"
+                className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
               >
                 <div className="flex items-center gap-2">
                   <Check className="h-3.5 w-3.5 text-green-500" />
@@ -250,15 +231,15 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                 {filter ? "No matching extensions" : "No extensions installed"}
               </div>
             )}
-          </div>
+          </PanelSection>
         )}
 
         {tab === "available" && (
-          <div className="space-y-2">
+          <PanelSection title={`Available (${filteredAvailable.length})`}>
             {filteredAvailable.map((ext) => (
               <div
                 key={ext.name}
-                className="rounded-md border p-3 hover:bg-muted/30 transition-colors"
+                className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
               >
                 <div className="flex items-center gap-2">
                   <Download className="h-3.5 w-3.5 text-muted-foreground" />
@@ -289,7 +270,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                 {filter ? "No matching extensions" : "No available extensions"}
               </div>
             )}
-          </div>
+          </PanelSection>
         )}
       </div>
 

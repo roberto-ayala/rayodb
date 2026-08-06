@@ -1,3 +1,4 @@
+import { PanelSection, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { ActivityRow } from "./types";
 
@@ -7,28 +8,25 @@ interface ActivityTabProps {
 
 export function ActivityTab({ activity }: ActivityTabProps) {
   return (
-    <div className="rounded-md border">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+    <PanelSection>
+      <div className={tableClasses.wrapper}>
+        <table className={tableClasses.table}>
           <thead>
-            <tr className="border-b bg-muted/50">
+            <tr className={tableClasses.head}>
               {["PID", "User", "State", "Duration", "Wait", "Backend", "Client", "Query"].map(
                 (h) => (
-                  <th
-                    key={h}
-                    className="px-2 py-1.5 text-left text-3xs font-semibold uppercase tracking-widest text-muted-foreground"
-                  >
+                  <th key={h} className={tableClasses.th}>
                     {h}
                   </th>
                 ),
               )}
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody>
             {activity.map((row) => (
-              <tr key={row.pid} className="hover:bg-muted/30">
-                <td className="px-2 py-1 text-xs">{row.pid}</td>
-                <td className="px-2 py-1 text-xs">{row.user}</td>
+              <tr key={row.pid} className={tableClasses.row}>
+                <td className={tableClasses.td}>{row.pid}</td>
+                <td className={tableClasses.td}>{row.user}</td>
                 <td className="px-2 py-1">
                   <span
                     className={cn(
@@ -44,10 +42,12 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                     {row.state}
                   </span>
                 </td>
-                <td className="px-2 py-1 text-xs">{parseFloat(row.durationSec).toFixed(1)}s</td>
-                <td className="px-2 py-1 text-xs text-muted-foreground">{row.waitEvent || "-"}</td>
-                <td className="px-2 py-1 text-xs text-muted-foreground">{row.backendType}</td>
-                <td className="px-2 py-1 text-xs text-muted-foreground">{row.clientAddr}</td>
+                <td className={tableClasses.td}>{parseFloat(row.durationSec).toFixed(1)}s</td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>
+                  {row.waitEvent || "-"}
+                </td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.backendType}</td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.clientAddr}</td>
                 <td
                   className="max-w-[300px] truncate px-2 py-1 text-3xs text-muted-foreground"
                   title={row.query}
@@ -66,6 +66,6 @@ export function ActivityTab({ activity }: ActivityTabProps) {
           </tbody>
         </table>
       </div>
-    </div>
+    </PanelSection>
   );
 }

@@ -1,3 +1,4 @@
+import { PanelSection, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { BloatRow } from "./types";
 
@@ -17,11 +18,11 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
           </span>
         </div>
       )}
-      <div className="rounded-md border">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <PanelSection>
+        <div className={tableClasses.wrapper}>
+          <table className={tableClasses.table}>
             <thead>
-              <tr className="border-b bg-muted/50">
+              <tr className={tableClasses.head}>
                 {[
                   "Schema",
                   "Table",
@@ -41,19 +42,19 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody>
               {bloat.map((row, idx) => {
                 const pct = parseFloat(row.bloatPct) || 0;
                 const barColor =
                   pct > 30 ? "bg-red-500" : pct > 10 ? "bg-yellow-500" : "bg-green-500";
                 return (
-                  <tr key={`${row.schema}.${row.table}-${idx}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 text-xs text-muted-foreground">{row.schema}</td>
-                    <td className="px-2 py-1 text-xs font-medium">{row.table}</td>
-                    <td className="px-2 py-1 text-xs">
+                  <tr key={`${row.schema}.${row.table}-${idx}`} className={tableClasses.row}>
+                    <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.schema}</td>
+                    <td className={cn(tableClasses.td, "font-medium")}>{row.table}</td>
+                    <td className={tableClasses.td}>
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.deadTuples, 10).toLocaleString()}
                     </td>
                     <td className="px-2 py-1">
@@ -76,13 +77,13 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-2 py-1 text-xs">{row.totalSize}</td>
-                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className={tableClasses.td}>{row.totalSize}</td>
+                    <td className={cn(tableClasses.td, "text-muted-foreground whitespace-nowrap")}>
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className={cn(tableClasses.td, "text-muted-foreground whitespace-nowrap")}>
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}
@@ -100,7 +101,7 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
             </tbody>
           </table>
         </div>
-      </div>
+      </PanelSection>
     </div>
   );
 }

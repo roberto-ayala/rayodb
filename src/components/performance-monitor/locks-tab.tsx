@@ -1,3 +1,4 @@
+import { PanelSection, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { LockRow } from "./types";
 
@@ -16,11 +17,11 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
           </span>
         </div>
       )}
-      <div className="rounded-md border">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <PanelSection>
+        <div className={tableClasses.wrapper}>
+          <table className={tableClasses.table}>
             <thead>
-              <tr className="border-b bg-muted/50">
+              <tr className={tableClasses.head}>
                 {[
                   "PID",
                   "User",
@@ -40,7 +41,7 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody>
               {locks.map((row, idx) => (
                 <tr
                   key={`${row.pid}-${row.mode}-${row.locktype}-${idx}`}
@@ -49,10 +50,10 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                     row.status === "waiting" && "bg-yellow-50/50 dark:bg-yellow-900/10",
                   )}
                 >
-                  <td className="px-2 py-1 text-xs">{row.pid}</td>
-                  <td className="px-2 py-1 text-xs">{row.user}</td>
-                  <td className="px-2 py-1 text-xs">{row.mode}</td>
-                  <td className="px-2 py-1 text-xs text-muted-foreground">{row.locktype}</td>
+                  <td className={tableClasses.td}>{row.pid}</td>
+                  <td className={tableClasses.td}>{row.user}</td>
+                  <td className={tableClasses.td}>{row.mode}</td>
+                  <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.locktype}</td>
                   <td className="px-2 py-1">
                     <span
                       className={cn(
@@ -66,10 +67,8 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                       {row.status}
                     </span>
                   </td>
-                  <td className="px-2 py-1 text-xs">{row.relation || "-"}</td>
-                  <td className="px-2 py-1 text-xs">
-                    {parseFloat(row.duration || "0").toFixed(1)}s
-                  </td>
+                  <td className={tableClasses.td}>{row.relation || "-"}</td>
+                  <td className={tableClasses.td}>{parseFloat(row.duration || "0").toFixed(1)}s</td>
                   <td
                     className="max-w-[300px] truncate px-2 py-1 text-3xs text-muted-foreground"
                     title={row.query}
@@ -88,7 +87,7 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
             </tbody>
           </table>
         </div>
-      </div>
+      </PanelSection>
     </div>
   );
 }

@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { PanelHeader, PanelToolbar, SegmentedTabs } from "@/components/ui/panel";
 import { DriverFactory } from "@/lib/database-driver";
-import { cn } from "@/lib/utils";
 import { useHistoryStore } from "@/stores/history-store";
 import { useProjectStore } from "@/stores/project-store";
 import { ActivityTab } from "./activity-tab";
@@ -193,7 +193,7 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
   const waitingLocks = locks.filter((l) => l.status === "waiting");
 
   const tabs: { id: MonitorTab; label: string; icon: React.ReactNode }[] = [
-    { id: "overview", label: "Overview", icon: <BarChart3 className="h-3.5 w-3.5" /> },
+    { id: "overview", label: "Overview", icon: <BarChart3 className="h-3 w-3" /> },
     { id: "activity", label: "Activity", icon: <Activity className="h-3.5 w-3.5" /> },
     { id: "tables", label: "Table Stats", icon: <Table className="h-3.5 w-3.5" /> },
     { id: "history", label: "Query History", icon: <Clock className="h-3.5 w-3.5" /> },
@@ -204,56 +204,36 @@ export function PerformanceMonitor({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-primary" />
-          <span className="text-sm font-semibold">Performance Monitor</span>
-          <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {lastRefresh && (
-            <span className="text-3xs text-muted-foreground">
-              Refreshed at {lastRefresh.toLocaleTimeString()}
-            </span>
+      <PanelHeader
+        icon={<Activity className="h-3.5 w-3.5" />}
+        title="Performance Monitor"
+        subtitle={details?.database ?? projectId}
+      >
+        {lastRefresh && (
+          <span className="text-3xs text-muted-foreground">
+            Refreshed {lastRefresh.toLocaleTimeString()}
+          </span>
+        )}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setAutoRefresh(!autoRefresh)}
+          title={autoRefresh ? "Pause auto-refresh" : "Start auto-refresh (5s)"}
+        >
+          {autoRefresh ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+        </Button>
+        <Button variant="ghost" size="icon-sm" onClick={() => void refresh()} disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            title={autoRefresh ? "Pause auto-refresh" : "Start auto-refresh (5s)"}
-          >
-            {autoRefresh ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => void refresh()} disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </div>
-      </div>
+        </Button>
+      </PanelHeader>
 
-      {/* Tab bar */}
-      <div className="flex gap-0 border-b px-2">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-2 text-xs border-b-2 transition-colors",
-              tab === t.id
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.icon}
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <PanelToolbar>
+        <SegmentedTabs tabs={tabs} value={tab} onChange={setTab} />
+      </PanelToolbar>
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-4">

@@ -10,6 +10,7 @@ import {
   Table,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { PanelHeader, PanelToolbar } from "@/components/ui/panel";
 import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
@@ -156,9 +157,9 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Config bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/60">
-        <GitCompare className="h-4 w-4 text-primary shrink-0" />
+      <PanelHeader icon={<GitCompare className="h-3.5 w-3.5" />} title="Schema Diff" />
+
+      <PanelToolbar>
         <Select
           value={leftSchema}
           onChange={(e) => setLeftSchema(e.target.value)}
@@ -191,7 +192,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
           size="sm"
           onClick={runDiff}
           disabled={!leftSchema || !rightSchema || loading}
-          className="text-xs gap-1"
+          className="gap-1"
         >
           {loading ? (
             <RefreshCw className="h-3 w-3 animate-spin" />
@@ -200,18 +201,18 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
           )}
           Compare
         </Button>
-      </div>
+      </PanelToolbar>
 
       {/* Summary bar */}
       {counts && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/60 text-xs">
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border bg-card px-3 py-1.5 text-xs">
           <button
             type="button"
             onClick={() => setFilter("all")}
             className={cn(
-              "px-2 py-0.5 rounded-full transition-colors",
+              "rounded-full border border-transparent px-2 py-0.5 transition-colors",
               filter === "all"
-                ? "bg-accent text-foreground"
+                ? "border-border bg-muted text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -221,9 +222,9 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
             type="button"
             onClick={() => setFilter("changes")}
             className={cn(
-              "px-2 py-0.5 rounded-full transition-colors",
+              "rounded-full border border-transparent px-2 py-0.5 transition-colors",
               filter === "changes"
-                ? "bg-accent text-foreground"
+                ? "border-border bg-muted text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -234,7 +235,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("modified")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "modified"
                   ? "bg-amber-500/20 text-amber-500"
                   : "text-amber-500/60 hover:text-amber-500",
@@ -248,7 +249,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("only-left")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "only-left"
                   ? "bg-destructive/20 text-destructive"
                   : "text-destructive/60 hover:text-destructive",
@@ -262,7 +263,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("only-right")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "only-right"
                   ? "bg-success/20 text-success"
                   : "text-success/60 hover:text-success",

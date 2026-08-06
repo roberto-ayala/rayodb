@@ -1,3 +1,4 @@
+import { PanelSection, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { TableStatRow } from "./types";
 
@@ -11,11 +12,11 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
       <p className="text-3xs text-muted-foreground px-1">
         Cumulative stats since server start or last pg_stat_reset(). Source: pg_stat_user_tables
       </p>
-      <div className="rounded-md border">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <PanelSection>
+        <div className={tableClasses.wrapper}>
+          <table className={tableClasses.table}>
             <thead>
-              <tr className="border-b bg-muted/50">
+              <tr className={tableClasses.head}>
                 {[
                   "Schema",
                   "Table",
@@ -38,28 +39,28 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody>
               {tableStats.map((row) => {
                 const deadRatio =
                   parseInt(row.liveTuples, 10) > 0
                     ? (parseInt(row.deadTuples, 10) / parseInt(row.liveTuples, 10)) * 100
                     : 0;
                 return (
-                  <tr key={`${row.schema}.${row.table}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 text-xs text-muted-foreground">{row.schema}</td>
-                    <td className="px-2 py-1 text-xs font-medium">{row.table}</td>
-                    <td className="px-2 py-1 text-xs">
+                  <tr key={`${row.schema}.${row.table}`} className={tableClasses.row}>
+                    <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.schema}</td>
+                    <td className={cn(tableClasses.td, "font-medium")}>{row.table}</td>
+                    <td className={tableClasses.td}>
                       {parseInt(row.seqScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.idxScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
                     <td
                       className={cn(
-                        "px-2 py-1 text-xs",
+                        tableClasses.td,
                         deadRatio > 10 && "text-destructive font-medium",
                       )}
                     >
@@ -68,21 +69,21 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                         <span className="ml-1 text-3xs">({deadRatio.toFixed(0)}%)</span>
                       )}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.inserts, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.updates, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs">
+                    <td className={tableClasses.td}>
                       {parseInt(row.deletes, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className={cn(tableClasses.td, "text-muted-foreground whitespace-nowrap")}>
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
+                    <td className={cn(tableClasses.td, "text-muted-foreground whitespace-nowrap")}>
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}
@@ -100,7 +101,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
             </tbody>
           </table>
         </div>
-      </div>
+      </PanelSection>
     </div>
   );
 }

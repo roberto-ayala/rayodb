@@ -26,6 +26,9 @@
   --table-header: oklch(0.945 0.005 260);
   /* Outermost bars: the window chrome tone, per theme */
   --window-chrome: color(srgb 0.9336 0.9417 0.955);
+  /* Segmented control: trough and the selected segment on top of it */
+  --segment: oklch(0.955 0.005 260);
+  --segment-active: oklch(1 0 0);
   --ring: oklch(0.5 0.2 280);
   --hover: oklch(0.15 0.01 260 / 0.05);
   /* Single size for every code surface — editor, terminal, grid, SQL previews.
@@ -70,6 +73,8 @@
   --input: oklch(0.28 0.012 260);
   --table-header: oklch(0.33 0.012 260);
   --window-chrome: color(srgb 0.0915 0.105 0.1266);
+  --segment: oklch(0.24 0.012 260);
+  --segment-active: oklch(0.38 0.014 260);
   --ring: oklch(0.68 0.17 280);
   --hover: oklch(1 0 0 / 0.06);
   --shadow-popover: 0 8px 24px -8px oklch(0.08 0.01 260 / 0.6);
@@ -124,6 +129,8 @@
     --color-hover: var(--hover);
     --color-table-header: var(--table-header);
     --color-window-chrome: var(--window-chrome);
+    --color-segment: var(--segment);
+    --color-segment-active: var(--segment-active);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);

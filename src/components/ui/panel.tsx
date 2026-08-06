@@ -72,7 +72,7 @@ export function SegmentedTabs<T extends string>({
   return (
     <div
       className={cn(
-        "items-center gap-0.5 rounded-md border border-border bg-background p-0.5",
+        "items-center gap-0.5 rounded-md border border-border bg-segment p-0.5",
         stretch ? "flex" : "inline-flex",
         className,
       )}
@@ -86,7 +86,7 @@ export function SegmentedTabs<T extends string>({
           className={cn(
             "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-40",
             value === id
-              ? "bg-card text-foreground shadow-sm"
+              ? "bg-segment-active text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}
         >

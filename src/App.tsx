@@ -21,6 +21,7 @@ import { TabBar } from "@/components/tab-bar";
 import { TerminalPanel } from "@/components/terminal-panel";
 import { TopBar } from "@/components/top-bar";
 import { useAppStartup } from "@/hooks/use-app-startup";
+import { useOsWindowColor } from "@/hooks/use-os-window-color";
 import { useQueryLifecycle } from "@/hooks/use-query-lifecycle";
 import { checkForUpdates } from "@/lib/updater";
 import { useProjectStore } from "@/stores/project-store";
@@ -30,6 +31,8 @@ import type { ProjectDetails } from "@/types";
 import "@/monaco/setup";
 
 export default function App() {
+  useOsWindowColor();
+
   const sidebarWidth = useUIStore((s) => s.sidebarWidth);
   const editorHeight = useUIStore((s) => s.editorHeight);
   const connectionModalOpen = useUIStore((s) => s.connectionModalOpen);

@@ -29,12 +29,12 @@ interface UIState {
 }
 
 /** Narrowest the connections sidebar may get, in px */
-export const SIDEBAR_MIN_WIDTH = 360;
+export const SIDEBAR_MIN_WIDTH = 300;
 
 export const useUIStore = create<UIState>()(
   immer((set) => ({
     theme: "light",
-    sidebarWidth: 280,
+    sidebarWidth: SIDEBAR_MIN_WIDTH,
     editorHeight: 50,
     connectionModalOpen: false,
     viewMode: "grid",

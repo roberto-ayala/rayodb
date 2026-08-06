@@ -16,7 +16,7 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                 (h) => (
                   <th
                     key={h}
-                    className="px-2 py-1.5 text-left text-3xs font-semibold text-muted-foreground"
+                    className="px-2 py-1.5 text-left text-3xs font-semibold uppercase tracking-widest text-muted-foreground"
                   >
                     {h}
                   </th>
@@ -27,8 +27,8 @@ export function ActivityTab({ activity }: ActivityTabProps) {
           <tbody className="divide-y">
             {activity.map((row) => (
               <tr key={row.pid} className="hover:bg-muted/30">
-                <td className="px-2 py-1 text-2xs">{row.pid}</td>
-                <td className="px-2 py-1 text-2xs">{row.user}</td>
+                <td className="px-2 py-1 text-xs">{row.pid}</td>
+                <td className="px-2 py-1 text-xs">{row.user}</td>
                 <td className="px-2 py-1">
                   <span
                     className={cn(
@@ -44,10 +44,10 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                     {row.state}
                   </span>
                 </td>
-                <td className="px-2 py-1 text-2xs">{parseFloat(row.durationSec).toFixed(1)}s</td>
-                <td className="px-2 py-1 text-3xs text-muted-foreground">{row.waitEvent || "-"}</td>
-                <td className="px-2 py-1 text-3xs text-muted-foreground">{row.backendType}</td>
-                <td className="px-2 py-1 text-3xs text-muted-foreground">{row.clientAddr}</td>
+                <td className="px-2 py-1 text-xs">{parseFloat(row.durationSec).toFixed(1)}s</td>
+                <td className="px-2 py-1 text-xs text-muted-foreground">{row.waitEvent || "-"}</td>
+                <td className="px-2 py-1 text-xs text-muted-foreground">{row.backendType}</td>
+                <td className="px-2 py-1 text-xs text-muted-foreground">{row.clientAddr}</td>
                 <td
                   className="max-w-[300px] truncate px-2 py-1 text-3xs text-muted-foreground"
                   title={row.query}

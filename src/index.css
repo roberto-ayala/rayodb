@@ -110,12 +110,11 @@
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
-    /* Dense UI type scale: metadata, dense rows, body, headings */
+    /* Type scale: 10px labels, chips and row metadata; 12px body and chrome;
+       14px dialog copy; 18px headings. Nothing sits between 10 and 12. */
     --text-code: var(--text-code);
     --text-3xs: 0.625rem;
     --text-3xs--line-height: 0.875rem;
-    --text-2xs: 0.6875rem;
-    --text-2xs--line-height: 1rem;
     --color-hover: var(--hover);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);

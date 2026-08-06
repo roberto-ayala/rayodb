@@ -201,7 +201,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
 
       {/* Summary bar */}
       {counts && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/60 text-2xs">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/60 text-xs">
           <button
             type="button"
             onClick={() => setFilter("all")}

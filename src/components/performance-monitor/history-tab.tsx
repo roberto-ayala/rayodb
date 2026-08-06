@@ -28,7 +28,7 @@ export function HistoryTab({ slowQueries }: HistoryTabProps) {
                 </span>
                 <span
                   className={cn(
-                    "text-2xs font-medium",
+                    "text-xs font-medium",
                     q.executionTime > 1000 && "text-destructive",
                   )}
                 >

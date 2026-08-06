@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { SqlCode } from "@/components/ui/sql-code";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
@@ -189,10 +190,11 @@ export function EditorToolbar({
               />
             </div>
             <div className="rounded-md bg-muted/50 p-2 max-h-24 overflow-auto">
-              <pre className="font-mono text-2xs text-muted-foreground whitespace-pre-wrap">
-                {activeTab?.editorValue?.slice(0, 300)}
-                {(activeTab?.editorValue?.length ?? 0) > 300 ? "..." : ""}
-              </pre>
+              <SqlCode
+                code={`${activeTab?.editorValue?.slice(0, 300) ?? ""}${
+                  (activeTab?.editorValue?.length ?? 0) > 300 ? "..." : ""
+                }`}
+              />
             </div>
             <div className="flex justify-end gap-2">
               <Button

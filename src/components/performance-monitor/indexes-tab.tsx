@@ -38,11 +38,11 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
                   key={`${row.schema}.${row.table}.${row.index}-${idx}`}
                   className="hover:bg-muted/30"
                 >
-                  <td className="px-2 py-1 text-2xs text-muted-foreground">{row.schema}</td>
-                  <td className="px-2 py-1 text-2xs font-medium">{row.table}</td>
-                  <td className="px-2 py-1 text-2xs">{row.index}</td>
-                  <td className="px-2 py-1 text-2xs">{row.size}</td>
-                  <td className="px-2 py-1 text-2xs">{parseInt(row.scans, 10).toLocaleString()}</td>
+                  <td className="px-2 py-1 text-xs text-muted-foreground">{row.schema}</td>
+                  <td className="px-2 py-1 text-xs font-medium">{row.table}</td>
+                  <td className="px-2 py-1 text-xs">{row.index}</td>
+                  <td className="px-2 py-1 text-xs">{row.size}</td>
+                  <td className="px-2 py-1 text-xs">{parseInt(row.scans, 10).toLocaleString()}</td>
                   <td className="px-2 py-1">
                     <span
                       className={cn(

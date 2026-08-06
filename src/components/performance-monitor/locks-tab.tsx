@@ -49,10 +49,10 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                     row.status === "waiting" && "bg-yellow-50/50 dark:bg-yellow-900/10",
                   )}
                 >
-                  <td className="px-2 py-1 text-2xs">{row.pid}</td>
-                  <td className="px-2 py-1 text-2xs">{row.user}</td>
-                  <td className="px-2 py-1 text-3xs">{row.mode}</td>
-                  <td className="px-2 py-1 text-3xs text-muted-foreground">{row.locktype}</td>
+                  <td className="px-2 py-1 text-xs">{row.pid}</td>
+                  <td className="px-2 py-1 text-xs">{row.user}</td>
+                  <td className="px-2 py-1 text-xs">{row.mode}</td>
+                  <td className="px-2 py-1 text-xs text-muted-foreground">{row.locktype}</td>
                   <td className="px-2 py-1">
                     <span
                       className={cn(
@@ -66,8 +66,8 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
                       {row.status}
                     </span>
                   </td>
-                  <td className="px-2 py-1 text-3xs">{row.relation || "-"}</td>
-                  <td className="px-2 py-1 text-2xs">
+                  <td className="px-2 py-1 text-xs">{row.relation || "-"}</td>
+                  <td className="px-2 py-1 text-xs">
                     {parseFloat(row.duration || "0").toFixed(1)}s
                   </td>
                   <td

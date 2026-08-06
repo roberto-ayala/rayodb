@@ -217,7 +217,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 gap-1 text-3xs text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+                      className="h-7 gap-1 text-xs text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
                       onClick={() => updateExt(ext.name)}
                       disabled={busy === ext.name}
                     >
@@ -247,9 +247,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     </Button>
                   </span>
                 </div>
-                {ext.comment && (
-                  <p className="mt-1 text-2xs text-muted-foreground">{ext.comment}</p>
-                )}
+                {ext.comment && <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>}
               </div>
             ))}
             {filteredInstalled.length === 0 && (
@@ -276,7 +274,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="ml-auto h-6 gap-1 text-3xs"
+                    className="ml-auto h-7 gap-1 text-xs"
                     onClick={() => installExt(ext.name)}
                     disabled={busy === ext.name}
                   >
@@ -288,9 +286,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     Install
                   </Button>
                 </div>
-                {ext.comment && (
-                  <p className="mt-1 text-2xs text-muted-foreground">{ext.comment}</p>
-                )}
+                {ext.comment && <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>}
               </div>
             ))}
             {filteredAvailable.length === 0 && (

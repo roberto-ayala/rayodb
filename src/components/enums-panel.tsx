@@ -102,7 +102,7 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
                     {e.labels.split(", ").map((label) => (
                       <span
                         key={label}
-                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-2xs text-primary"
+                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-3xs text-primary"
                       >
                         {label}
                       </span>

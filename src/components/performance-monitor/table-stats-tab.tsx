@@ -46,20 +46,20 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                     : 0;
                 return (
                   <tr key={`${row.schema}.${row.table}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 text-2xs text-muted-foreground">{row.schema}</td>
-                    <td className="px-2 py-1 text-2xs font-medium">{row.table}</td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs text-muted-foreground">{row.schema}</td>
+                    <td className="px-2 py-1 text-xs font-medium">{row.table}</td>
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.seqScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.idxScan, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
                     <td
                       className={cn(
-                        "px-2 py-1 text-2xs",
+                        "px-2 py-1 text-xs",
                         deadRatio > 10 && "text-destructive font-medium",
                       )}
                     >
@@ -68,21 +68,21 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
                         <span className="ml-1 text-3xs">({deadRatio.toFixed(0)}%)</span>
                       )}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.inserts, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.updates, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.deletes, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}

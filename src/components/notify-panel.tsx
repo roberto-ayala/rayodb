@@ -145,7 +145,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
                 }}
                 disabled={isActive}
                 className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs transition-colors",
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs transition-colors",
                   isActive
                     ? "bg-primary/10 text-primary/50 cursor-default"
                     : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary",
@@ -169,7 +169,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
               key={ch}
               type="button"
               onClick={() => unsubscribe(ch)}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-2xs hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-3xs hover:bg-destructive/10 hover:text-destructive transition-colors"
               title="Click to unsubscribe"
             >
               {ch} <BellOff className="h-2.5 w-2.5" />

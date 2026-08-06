@@ -48,12 +48,12 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                   pct > 30 ? "bg-red-500" : pct > 10 ? "bg-yellow-500" : "bg-green-500";
                 return (
                   <tr key={`${row.schema}.${row.table}-${idx}`} className="hover:bg-muted/30">
-                    <td className="px-2 py-1 text-2xs text-muted-foreground">{row.schema}</td>
-                    <td className="px-2 py-1 text-2xs font-medium">{row.table}</td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs text-muted-foreground">{row.schema}</td>
+                    <td className="px-2 py-1 text-xs font-medium">{row.table}</td>
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.liveTuples, 10).toLocaleString()}
                     </td>
-                    <td className="px-2 py-1 text-2xs">
+                    <td className="px-2 py-1 text-xs">
                       {parseInt(row.deadTuples, 10).toLocaleString()}
                     </td>
                     <td className="px-2 py-1">
@@ -76,13 +76,13 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
                         </span>
                       </div>
                     </td>
-                    <td className="px-2 py-1 text-2xs">{row.totalSize}</td>
-                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-xs">{row.totalSize}</td>
+                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
                       {row.lastVacuum === "never"
                         ? "never"
                         : new Date(row.lastVacuum).toLocaleDateString()}
                     </td>
-                    <td className="px-2 py-1 text-3xs text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-1 text-xs text-muted-foreground whitespace-nowrap">
                       {row.lastAnalyze === "never"
                         ? "never"
                         : new Date(row.lastAnalyze).toLocaleDateString()}

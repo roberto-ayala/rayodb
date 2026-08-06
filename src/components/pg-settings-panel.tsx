@@ -164,7 +164,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               setCategoryFilter(null);
               setContextFilter(null);
             }}
-            className="text-3xs text-primary hover:underline"
+            className="text-xs text-primary hover:underline"
           >
             Clear filters
           </button>
@@ -222,7 +222,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
                       )}
                     </div>
                     {s.description && (
-                      <p className="mt-0.5 text-3xs text-muted-foreground">{s.description}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{s.description}</p>
                     )}
                   </div>
                 );

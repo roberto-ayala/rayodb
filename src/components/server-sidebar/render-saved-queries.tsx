@@ -62,7 +62,7 @@ export function renderSavedQueries(
           ))}
         </div>
       ) : (
-        <div className="px-3 pb-2 text-2xs text-muted-foreground/60">
+        <div className="px-3 pb-2 text-xs text-muted-foreground/60">
           No saved queries yet. Use the Save button in the toolbar to save the current query.
         </div>
       )}

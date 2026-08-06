@@ -22,7 +22,7 @@ export function ConnStringField({ value, onChange, error }: ConnStringFieldProps
         placeholder="postgresql://user:password@host:5432/database"
         className={`bg-input/80 border-border text-foreground text-sm rounded-md ${error ? "border-destructive" : ""}`}
       />
-      {error && <p className="text-destructive text-2xs">Invalid connection URL format</p>}
+      {error && <p className="text-xs text-destructive">Invalid connection URL format</p>}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-border/60" />

@@ -60,7 +60,7 @@ export function StatusBar() {
   const waiting = resources?.db_connections_waiting ?? 0;
 
   return (
-    <div className="grid h-7 grid-cols-[1fr_auto_1fr] items-center border-t border-border bg-window-chrome px-3 text-xs text-muted-foreground">
+    <div className="grid h-7 grid-cols-[1fr_auto_1fr] items-center border-t border-border bg-window-chrome px-3 pb-px text-xs text-muted-foreground">
       <div className="flex items-center gap-2">
         {projectId && details ? (
           <div

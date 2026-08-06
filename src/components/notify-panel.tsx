@@ -134,7 +134,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
 
       {/* Discovered channels */}
       {knownChannels.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-card px-3 py-1.5">
+        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted px-3 py-1.5">
           <Radio className="h-3 w-3 text-muted-foreground/50 mr-0.5" />
           <span className="mr-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
             Available:
@@ -167,7 +167,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
       )}
 
       {channels.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-card px-3 py-1.5">
+        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted px-3 py-1.5">
           <span className="mr-1 text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
             Listening:
           </span>
@@ -210,7 +210,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-2 border-t border-border bg-card px-3 py-1.5">
+      <div className="flex items-center gap-2 border-t border-border bg-muted px-3 py-1.5">
         <Input
           value={sendChannel}
           onChange={(e) => setSendChannel(e.target.value)}

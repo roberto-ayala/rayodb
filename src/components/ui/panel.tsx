@@ -18,7 +18,7 @@ export function PanelHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="flex h-10 shrink-0 items-center justify-between border-b border-border bg-muted/50 px-3">
+    <div className="flex h-10 shrink-0 items-center justify-between border-b border-border bg-muted px-3">
       <div className="flex min-w-0 items-center gap-2">
         <span className="shrink-0 text-primary">{icon}</span>
         <span className="text-xs font-semibold text-foreground">{title}</span>
@@ -45,7 +45,7 @@ export function PanelToolbar({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center gap-2 border-b border-border bg-card px-3 py-1.5",
+        "flex shrink-0 items-center gap-2 border-b border-border bg-muted px-3 py-1.5",
         className,
       )}
     >
@@ -69,7 +69,7 @@ export function SegmentedTabs<T extends string>({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-md border border-border bg-muted p-0.5",
+        "inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5",
         className,
       )}
     >
@@ -81,7 +81,7 @@ export function SegmentedTabs<T extends string>({
           className={cn(
             "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium transition-colors",
             value === id
-              ? "bg-background text-foreground shadow-sm"
+              ? "bg-card text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -120,7 +120,7 @@ export function PanelSection({
   return (
     <section className={cn("overflow-hidden rounded-lg border border-border bg-card", className)}>
       {title && (
-        <header className="flex h-8 items-center justify-between border-b border-border bg-muted/40 px-3">
+        <header className="flex h-8 items-center justify-between border-b border-border bg-muted/50 px-3">
           <div className="flex items-center gap-1.5 text-muted-foreground">
             {icon}
             <span className="text-3xs font-semibold uppercase tracking-widest">{title}</span>

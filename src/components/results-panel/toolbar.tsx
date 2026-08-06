@@ -74,10 +74,10 @@ export function ResultsToolbar(props: ToolbarProps) {
   ];
 
   return (
-    <div className="flex items-center justify-between border-b border-border bg-muted/50 px-3 py-1.5 flex-shrink-0">
+    <div className="flex items-center justify-between border-b border-border bg-muted px-3 py-1.5 flex-shrink-0">
       <div className="flex items-center gap-3">
         {/* Panel tabs — segmented control */}
-        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-muted/70 p-0.5">
+        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5">
           {views.map(({ id, label, icon: Icon, disabled }) => (
             <button
               key={id}
@@ -90,7 +90,7 @@ export function ResultsToolbar(props: ToolbarProps) {
               className={cn(
                 "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40",
                 panelView === id
-                  ? "bg-background text-foreground shadow-sm"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >

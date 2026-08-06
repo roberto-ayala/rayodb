@@ -90,7 +90,7 @@ export function EditorToolbar({
 
   return (
     <>
-      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-muted/50 px-3 py-1.5">
+      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-muted px-3 py-1.5">
         <Button
           variant="subtle"
           size="sm"

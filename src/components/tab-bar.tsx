@@ -75,8 +75,8 @@ export function TabBar() {
   const projects = useProjectStore((s) => s.projects);
 
   return (
-    <div className="flex min-h-[38px] items-center border-b border-border bg-muted/40">
-      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none px-1.5 pt-1">
+    <div className="relative flex min-h-[38px] items-center border-b border-border bg-muted/40">
+      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none pl-1.5 pr-[74px] pt-1">
         {tabs.map((tab, idx) => {
           if (!tab) return null;
           const projectName = tab.projectId;
@@ -123,7 +123,7 @@ export function TabBar() {
               className={cn(
                 // The active tab carries the surface of the bar right below it
                 // and covers the divider, so the two read as one region
-                "group relative z-10 flex shrink-0 items-center gap-2 rounded-t-md border border-b-0 px-3 py-1.5 transition-colors duration-150 cursor-pointer select-none -mb-px",
+                "group relative z-10 flex shrink-0 items-center gap-2 h-7 rounded-t-md border border-b-0 px-3 transition-colors duration-150 cursor-pointer select-none -mb-px",
                 isActive
                   ? "border-border bg-muted text-foreground"
                   : // Hovering an inactive tab outlines it rather than filling it: a
@@ -191,7 +191,8 @@ export function TabBar() {
           );
         })}
       </div>
-      <div className="flex items-center gap-1 px-2">
+      {/* Floats over the strip so tabs scroll under it */}
+      <div className="absolute inset-y-0 right-0 z-20 -mb-px flex items-end gap-1 bg-muted/50 px-2 pt-1 backdrop-blur-sm">
         <Button variant="outline" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>

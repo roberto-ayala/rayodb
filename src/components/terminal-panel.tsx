@@ -87,7 +87,8 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
     term.open(containerRef.current);
-    fitAddon.fit();
+    // Measure after the browser has laid the container out, or fit() sees zero
+    requestAnimationFrame(() => fitAddon.fit());
 
     terminalRef.current = term;
     fitAddonRef.current = fitAddon;
@@ -143,7 +144,7 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 min-h-0 overflow-hidden px-2 py-1"
+      className="h-full w-full overflow-hidden px-2 py-1"
       style={{ backgroundColor: "var(--editor-bg)" }}
     />
   );

@@ -25,7 +25,7 @@ import { useQueryLifecycle } from "@/hooks/use-query-lifecycle";
 import { checkForUpdates } from "@/lib/updater";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
-import { useUIStore } from "@/stores/ui-store";
+import { SIDEBAR_MIN_WIDTH, useUIStore } from "@/stores/ui-store";
 import type { ProjectDetails } from "@/types";
 import "@/monaco/setup";
 
@@ -129,7 +129,7 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden">
         <div
-          style={{ width: `${sidebarWidth}px`, minWidth: "180px" }}
+          style={{ width: `${sidebarWidth}px`, minWidth: `${SIDEBAR_MIN_WIDTH}px` }}
           className="flex-shrink-0 overflow-hidden"
         >
           <ServerSidebar onEditConnection={handleEditConnection} />

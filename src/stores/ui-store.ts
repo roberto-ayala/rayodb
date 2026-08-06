@@ -28,6 +28,9 @@ interface UIState {
   clearPinnedResult: () => void;
 }
 
+/** Narrowest the connections sidebar may get, in px */
+export const SIDEBAR_MIN_WIDTH = 360;
+
 export const useUIStore = create<UIState>()(
   immer((set) => ({
     theme: "light",
@@ -60,7 +63,7 @@ export const useUIStore = create<UIState>()(
 
     setSidebarWidth: (delta) => {
       set((s) => {
-        s.sidebarWidth = Math.max(180, Math.min(700, s.sidebarWidth + delta));
+        s.sidebarWidth = Math.max(SIDEBAR_MIN_WIDTH, Math.min(700, s.sidebarWidth + delta));
       });
     },
 

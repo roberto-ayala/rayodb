@@ -5,6 +5,7 @@ import {
   type Item,
   type Theme,
 } from "@glideapps/glide-data-grid";
+import { themeColor } from "@/lib/theme-color";
 import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 import * as virtualCache from "@/lib/virtual-cache";
 import type { VirtualQuery } from "@/types";
@@ -147,44 +148,27 @@ export function buildCellContent(cell: Item, ctx: CellContentContext): GridCell 
  * normalised through a 2d context — the tokens are oklch, which the grid's own
  * colour maths does not parse.
  */
-const colorProbe: CanvasRenderingContext2D | null =
-  typeof document === "undefined"
-    ? null
-    : document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-
-function token(name: string, alpha?: number): string {
-  if (!colorProbe) return "#000000";
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  // Paint one pixel and read it back: the tokens are oklch, which canvas keeps
-  // verbatim and the grid's colour maths cannot parse.
-  colorProbe.clearRect(0, 0, 1, 1);
-  colorProbe.fillStyle = raw;
-  colorProbe.fillRect(0, 0, 1, 1);
-  const [r, g, b] = colorProbe.getImageData(0, 0, 1, 1).data;
-  return alpha === undefined ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
 export function buildGridTheme(_theme: string): Partial<Theme> {
   return {
-    accentColor: token("--primary"),
-    accentLight: token("--primary", 0.12),
-    bgCell: token("--card"),
-    bgCellMedium: token("--muted", 0.35),
-    bgHeader: token("--table-header"),
-    bgHeaderHasFocus: token("--accent"),
-    bgHeaderHovered: token("--accent", 0.7),
-    borderColor: token("--border"),
-    drilldownBorder: token("--border"),
+    accentColor: themeColor("--primary"),
+    accentLight: themeColor("--primary", 0.12),
+    bgCell: themeColor("--card"),
+    bgCellMedium: themeColor("--muted", 0.35),
+    bgHeader: themeColor("--table-header"),
+    bgHeaderHasFocus: themeColor("--accent"),
+    bgHeaderHovered: themeColor("--accent", 0.7),
+    borderColor: themeColor("--border"),
+    drilldownBorder: themeColor("--border"),
     fontFamily: CODE_FONT_FAMILY,
     headerFontStyle: `600 ${codeFontSize()}px`,
     baseFontStyle: `${codeFontSize()}px`,
-    textDark: token("--foreground"),
-    textMedium: token("--muted-foreground"),
-    textLight: token("--muted-foreground", 0.7),
-    textHeader: token("--foreground"),
-    textHeaderSelected: token("--primary"),
-    bgBubble: token("--muted"),
-    bgBubbleSelected: token("--primary"),
-    textBubble: token("--foreground"),
+    textDark: themeColor("--foreground"),
+    textMedium: themeColor("--muted-foreground"),
+    textLight: themeColor("--muted-foreground", 0.7),
+    textHeader: themeColor("--foreground"),
+    textHeaderSelected: themeColor("--primary"),
+    bgBubble: themeColor("--muted"),
+    bgBubbleSelected: themeColor("--primary"),
+    textBubble: themeColor("--foreground"),
   };
 }

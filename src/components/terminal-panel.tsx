@@ -5,6 +5,7 @@ import { Terminal } from "@xterm/xterm";
 import { useCallback, useEffect, useRef } from "react";
 import { useUIStore } from "@/stores/ui-store";
 import "@xterm/xterm/css/xterm.css";
+import { themeColor } from "@/lib/theme-color";
 import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 
 interface TerminalPanelProps {
@@ -21,11 +22,11 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
   const getTermTheme = useCallback(() => {
     if (theme === "dark") {
       return {
-        background: "hsl(250, 15%, 10%)",
-        foreground: "hsl(250, 10%, 88%)",
-        cursor: "hsl(260, 70%, 65%)",
-        cursorAccent: "hsl(250, 15%, 10%)",
-        selectionBackground: "hsla(260, 70%, 60%, 0.3)",
+        background: themeColor("--editor-bg"),
+        foreground: themeColor("--foreground"),
+        cursor: themeColor("--primary"),
+        cursorAccent: themeColor("--editor-bg"),
+        selectionBackground: themeColor("--primary", 0.3),
         black: "#16141f",
         red: "#ef4444",
         green: "#34d399",
@@ -45,11 +46,11 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
       };
     }
     return {
-      background: "#faf9ff",
-      foreground: "#1a1830",
-      cursor: "hsl(260, 70%, 50%)",
-      cursorAccent: "#faf9ff",
-      selectionBackground: "rgba(120, 80, 220, 0.15)",
+      background: themeColor("--editor-bg"),
+      foreground: themeColor("--foreground"),
+      cursor: themeColor("--primary"),
+      cursorAccent: themeColor("--editor-bg"),
+      selectionBackground: themeColor("--primary", 0.15),
       black: "#1a1830",
       red: "#dc2626",
       green: "#16a34a",
@@ -143,7 +144,7 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
     <div
       ref={containerRef}
       className="flex-1 min-h-0 overflow-hidden px-2 py-1"
-      style={{ backgroundColor: theme === "dark" ? "hsl(250, 15%, 10%)" : "#faf9ff" }}
+      style={{ backgroundColor: "var(--editor-bg)" }}
     />
   );
 }

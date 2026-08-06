@@ -1,7 +1,8 @@
 import Editor from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
+import { defineEditorThemes } from "@/monaco/setup";
 import { useUIStore } from "@/stores/ui-store";
 
 interface QueryEditorProps {
@@ -13,6 +14,11 @@ interface QueryEditorProps {
 
 export function QueryEditor({ value, onChange, onExecute, onExplain }: QueryEditorProps) {
   const theme = useUIStore((s) => s.theme);
+
+  // Token values change with the theme, so the editor themes are rebuilt
+  useEffect(() => {
+    defineEditorThemes();
+  }, [theme]);
   const onExecuteRef = useRef(onExecute);
   onExecuteRef.current = onExecute;
   const onExplainRef = useRef(onExplain);

@@ -192,7 +192,7 @@ export function TabBar() {
         })}
       </div>
       {/* Floats over the strip so tabs scroll under it */}
-      <div className="absolute inset-y-0 right-0 z-20 -mb-px flex items-end gap-1 border-l border-border bg-muted/25 px-2 pt-1 backdrop-blur-md">
+      <div className="absolute inset-y-0 right-0 z-20 flex items-center gap-1 border-l border-border bg-muted/25 px-2 backdrop-blur-md">
         <Button variant="outline" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>

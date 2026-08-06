@@ -7,7 +7,7 @@ const selectVariants = cva(
   {
     variants: {
       size: {
-        default: "h-9 px-3 text-sm",
+        default: "h-8 px-3 text-xs",
         sm: "h-7 px-2 text-xs",
       },
     },

@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 import { hasGeometryColumn } from "../results-map";
@@ -234,12 +235,13 @@ export function ResultsToolbar(props: ToolbarProps) {
             {panelView !== "history" && result && !virtualQuery && (
               <div className="relative flex items-center">
                 <Search className="absolute left-2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                <input
+                <Input
+                  size="sm"
                   type="text"
                   placeholder="Search results..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-7 w-48 rounded border border-border bg-input pl-7 pr-7 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-48 pl-7 pr-7"
                 />
                 {searchTerm && (
                   <button

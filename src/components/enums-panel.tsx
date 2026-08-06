@@ -64,7 +64,8 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter..."
-            className="h-7 text-xs w-48 bg-input/50"
+            size="sm"
+            className="w-48"
           />
           <Button
             variant="ghost"

@@ -131,7 +131,8 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search settings..."
-          className="h-7 text-xs w-56 bg-input/50"
+          size="sm"
+          className="w-56"
         />
         <Select
           value={categoryFilter ?? ""}

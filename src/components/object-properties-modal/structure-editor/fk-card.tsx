@@ -1,5 +1,6 @@
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import type { DraftForeignKey } from "@/lib/alter-table-sql";
 import { FK_ACTIONS } from "@/lib/alter-table-sql";
@@ -60,11 +61,12 @@ export function FKCard({
       )}
     >
       <div className="flex items-center gap-2">
-        <input
+        <Input
+          size="sm"
           type="text"
           value={fk.constraintName}
           onChange={(e) => onChange({ constraintName: e.target.value })}
-          className="flex-1 h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+          className="flex-1"
           placeholder="Constraint name"
         />
         <button

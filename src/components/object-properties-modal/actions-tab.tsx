@@ -1,5 +1,6 @@
 import { AlertTriangle, Check, Key, Loader2, Play, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { ObjectType } from "./types";
 
@@ -265,12 +266,13 @@ export function ActionsContent({
                   <span className="text-3xs text-muted-foreground whitespace-nowrap">
                     Type <span className="font-semibold text-foreground">{name}</span> to confirm
                   </span>
-                  <input
+                  <Input
+                    size="sm"
                     type="text"
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={name}
-                    className="flex-1 h-7 px-2 text-xs bg-background border border-border rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
+                    className="flex-1"
                   />
                 </div>
                 <Button

@@ -177,7 +177,7 @@ export function EditorToolbar({
               e.preventDefault();
               void handleSaveSubmit();
             }}
-            className="space-y-4 mt-2"
+            className="mt-2 space-y-3"
           >
             <Field label="Query Name" htmlFor="save-query-title">
               <Input

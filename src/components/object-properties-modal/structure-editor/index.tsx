@@ -224,7 +224,7 @@ export function StructureEditorContent({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-xs text-muted-foreground"
+            className="text-muted-foreground"
             onClick={() => {
               setDraft(initialState);
               setError(null);
@@ -233,18 +233,12 @@ export function StructureEditorContent({
           >
             Discard
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={() => setShowSql((v) => !v)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowSql((v) => !v)}>
             <FileCode className="h-3 w-3 mr-1" />
             {showSql ? "Hide SQL" : "Review SQL"}
           </Button>
           <Button
             size="sm"
-            className="h-7 px-3 text-xs"
             disabled={applying || sqlStatements.length === 0}
             onClick={() => void applyChanges()}
           >

@@ -178,7 +178,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 py-4">
             {!isEditing && (
               <ConnStringField
                 value={connString}

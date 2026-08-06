@@ -53,7 +53,7 @@ export function AddDatabaseDialog({
             </span>
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="mt-2 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-2 space-y-3">
           <Field label="Database Name" htmlFor="addDbName">
             <Input
               id="addDbName"

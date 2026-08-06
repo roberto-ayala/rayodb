@@ -189,7 +189,8 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter..."
-          className="h-7 text-xs ml-auto w-48 bg-input/50"
+          size="sm"
+          className="ml-auto w-48"
         />
       </div>
 
@@ -274,7 +275,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="ml-auto h-7 gap-1 text-xs"
+                    className="ml-auto"
                     onClick={() => installExt(ext.name)}
                     disabled={busy === ext.name}
                   >

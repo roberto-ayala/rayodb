@@ -1,4 +1,5 @@
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import type { DraftColumn, StructureEditorState } from "@/lib/alter-table-sql";
 import { PG_COMMON_TYPES } from "@/lib/alter-table-sql";
 import { cn } from "@/lib/utils";
@@ -89,20 +90,22 @@ export function ColumnsSection({
             col._status === "existing" && "border-border/60",
           )}
         >
-          <input
+          <Input
+            size="sm"
             type="text"
             value={col.name}
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { name: e.target.value })}
-            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="disabled:opacity-40"
           />
-          <input
+          <Input
+            size="sm"
             type="text"
             value={col.dataType}
             disabled={col._status === "removed"}
             onChange={(e) => updateColumn(col._id, { dataType: e.target.value })}
             list="pg-types"
-            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+            className="disabled:opacity-40"
           />
           <div className="flex items-center justify-center">
             <input
@@ -113,7 +116,8 @@ export function ColumnsSection({
               className="h-3.5 w-3.5 rounded border-border accent-primary"
             />
           </div>
-          <input
+          <Input
+            size="sm"
             type="text"
             value={col.defaultValue ?? ""}
             disabled={col._status === "removed"}
@@ -123,7 +127,7 @@ export function ColumnsSection({
               })
             }
             placeholder="NULL"
-            className="h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 placeholder:text-muted-foreground/30 disabled:opacity-40"
+            className="disabled:opacity-40"
           />
           <div className="flex justify-center">
             {col._status === "removed" ? (

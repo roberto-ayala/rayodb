@@ -108,7 +108,8 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           onChange={(e) => setNewChannel(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && subscribe()}
           placeholder="Channel name..."
-          className="h-7 text-xs flex-1 bg-input/50"
+          size="sm"
+          className="flex-1"
           list="known-channels"
         />
         {knownChannels.length > 0 && (
@@ -120,7 +121,7 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
               ))}
           </datalist>
         )}
-        <Button variant="outline" size="sm" onClick={subscribe} className="h-7 text-xs gap-1">
+        <Button variant="outline" size="sm" onClick={subscribe}>
           <Bell className="h-3 w-3" /> Subscribe
         </Button>
       </div>
@@ -208,25 +209,21 @@ export function NotifyPanel({ projectId }: NotifyPanelProps) {
           value={sendChannel}
           onChange={(e) => setSendChannel(e.target.value)}
           placeholder="Channel"
-          className="h-7 text-xs w-[140px] bg-input/50"
+          size="sm"
+          className="w-[140px]"
         />
         <Input
           value={sendPayload}
           onChange={(e) => setSendPayload(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendNotify()}
           placeholder="Payload..."
-          className="h-7 text-xs flex-1 bg-input/50"
+          size="sm"
+          className="flex-1"
         />
-        <Button variant="outline" size="sm" onClick={sendNotify} className="h-7 text-xs gap-1">
+        <Button variant="outline" size="sm" onClick={sendNotify}>
           <Send className="h-3 w-3" /> Send
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setNotifications([])}
-          className="h-7 text-xs"
-          title="Clear"
-        >
+        <Button variant="ghost" size="sm" onClick={() => setNotifications([])} title="Clear">
           <Trash2 className="h-3 w-3" />
         </Button>
       </div>

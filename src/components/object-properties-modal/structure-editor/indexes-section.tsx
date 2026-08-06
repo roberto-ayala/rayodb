@@ -1,4 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import type { DraftIndex, StructureEditorState } from "@/lib/alter-table-sql";
 import { cn } from "@/lib/utils";
 import { uid } from "./initialization";
@@ -29,7 +30,8 @@ export function IndexesSection({
             )}
           >
             <div className="flex items-center gap-2">
-              <input
+              <Input
+                size="sm"
                 type="text"
                 value={idx.indexName}
                 onChange={(e) => {
@@ -40,7 +42,7 @@ export function IndexesSection({
                     ),
                   }));
                 }}
-                className="flex-1 h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+                className="flex-1"
                 placeholder="Index name"
               />
               <label className="flex items-center gap-1.5 text-xs text-muted-foreground">

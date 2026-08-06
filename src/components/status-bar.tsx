@@ -64,7 +64,7 @@ export function StatusBar() {
     : "--";
 
   return (
-    <div className="flex h-7 items-center justify-between border-t border-border bg-[var(--os-window)] px-3 text-xs text-muted-foreground">
+    <div className="flex h-7 items-center justify-between border-t border-border bg-muted px-3 text-xs text-muted-foreground">
       <div className="flex items-center gap-2">
         {projectId && details ? (
           <div

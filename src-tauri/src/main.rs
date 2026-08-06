@@ -1,7 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod os_theme;
 mod app_setup;
 mod common;
 mod dbs;
@@ -45,7 +44,6 @@ fn main() {
         .plugin(tauri_plugin_process::init())
         .setup(app_setup::setup_app)
         .invoke_handler(tauri::generate_handler![
-            os_theme::os_window_background,
             dbs::project::project_db_select,
             dbs::project::project_db_insert,
             dbs::project::project_db_delete,

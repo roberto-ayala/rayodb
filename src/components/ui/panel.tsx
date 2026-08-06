@@ -59,27 +59,32 @@ export function SegmentedTabs<T extends string>({
   tabs,
   value,
   onChange,
+  stretch,
   className,
 }: {
-  tabs: { id: T; label: string; icon?: React.ReactNode; count?: number }[];
+  tabs: { id: T; label: string; icon?: React.ReactNode; count?: number; disabled?: boolean }[];
   value: T;
   onChange: (id: T) => void;
+  /** Fill the available width, as the properties modal header does */
+  stretch?: boolean;
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5",
+        "items-center gap-0.5 rounded-md border border-border bg-background p-0.5",
+        stretch ? "flex" : "inline-flex",
         className,
       )}
     >
-      {tabs.map(({ id, label, icon, count }) => (
+      {tabs.map(({ id, label, icon, count, disabled }) => (
         <button
           key={id}
           type="button"
+          disabled={disabled}
           onClick={() => onChange(id)}
           className={cn(
-            "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium transition-colors",
+            "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-40",
             value === id
               ? "bg-card text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",

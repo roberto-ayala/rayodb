@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { SegmentedTabs } from "@/components/ui/panel";
 import { useUIStore } from "@/stores/ui-store";
 import { hasGeometryColumn } from "../results-map";
 import { ToolbarEdit } from "./toolbar-edit";
@@ -76,29 +76,19 @@ export function ResultsToolbar(props: ToolbarProps) {
   return (
     <div className="flex items-center justify-between border-b border-border bg-muted px-3 py-1.5 flex-shrink-0">
       <div className="flex items-center gap-3">
-        {/* Panel tabs — segmented control */}
-        <div className="inline-flex items-center gap-0.5 rounded-md border border-border bg-background p-0.5">
-          {views.map(({ id, label, icon: Icon, disabled }) => (
-            <button
-              key={id}
-              type="button"
-              disabled={disabled}
-              onClick={() => {
-                setPanelView(id);
-                if (id === "grid" || id === "record") setViewMode(id);
-              }}
-              className={cn(
-                "flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs transition-colors duration-150 disabled:pointer-events-none disabled:opacity-40",
-                panelView === id
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <Icon className="h-3 w-3" />
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentedTabs
+          tabs={views.map((v) => ({
+            id: v.id,
+            label: v.label,
+            icon: <v.icon className="h-3 w-3" />,
+            disabled: v.disabled,
+          }))}
+          value={panelView}
+          onChange={(id) => {
+            setPanelView(id);
+            if (id === "grid" || id === "record") setViewMode(id);
+          }}
+        />
 
         {/* Result stats */}
         {panelView !== "history" && result && (

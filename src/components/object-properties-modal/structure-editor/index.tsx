@@ -2,11 +2,11 @@ import { AlertTriangle, Copy, FileCode, Loader2, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { SegmentedTabs } from "@/components/ui/panel";
 import { SqlCode } from "@/components/ui/sql-code";
 import type { StructureEditorState } from "@/lib/alter-table-sql";
 import { countChanges, generateAlterTableSQL } from "@/lib/alter-table-sql";
 import type { DriverFactory } from "@/lib/database-driver";
-import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 import { LoadingPlaceholder } from "../shared";
 import type { FKInfo } from "../types";
@@ -112,23 +112,12 @@ export function StructureEditorContent({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 pt-2">
-      <div className="mb-2 flex shrink-0 gap-0.5 rounded-md border border-border bg-muted p-0.5">
-        {subTabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setSubTab(t.key)}
-            className={cn(
-              "rounded-sm px-2.5 py-1 text-xs font-medium transition-colors",
-              subTab === t.key
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        className="mb-2 shrink-0"
+        tabs={subTabs.map((t) => ({ id: t.key, label: t.label }))}
+        value={subTab}
+        onChange={setSubTab}
+      />
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         {subTab === "columns" && <ColumnsSection draft={draft} setDraft={setDraft} />}

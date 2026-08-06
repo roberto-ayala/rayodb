@@ -14,7 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { SegmentedTabs } from "@/components/ui/panel";
 import type { ObjectType, Tab } from "./types";
 
 const objectIcon: Record<ObjectType, React.ReactNode> = {
@@ -103,25 +103,13 @@ export function ModalHeader({
         </div>
       </DialogHeader>
 
-      {/* Tab switcher - pill style */}
-      <div className="mt-3 flex gap-0.5 rounded-md border border-border bg-muted p-0.5">
-        {availableTabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-xs font-medium transition-colors",
-              activeTab === tab.key
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tabIcons[tab.key]}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        stretch
+        className="mt-3"
+        tabs={availableTabs.map((t) => ({ id: t.key, label: t.label, icon: tabIcons[t.key] }))}
+        value={activeTab}
+        onChange={setActiveTab}
+      />
     </div>
   );
 }

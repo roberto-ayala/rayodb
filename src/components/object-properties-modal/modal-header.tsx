@@ -67,7 +67,7 @@ export function ModalHeader({
   setActiveTab: (tab: Tab) => void;
 }) {
   return (
-    <div className="border-b border-border bg-muted/60 px-5 pt-5 pb-3">
+    <div className="border-b border-border bg-muted px-5 pt-5 pb-3">
       <DialogHeader>
         <div className="flex items-stretch gap-2.5">
           {/* Square, sized by the two text rows next to it */}

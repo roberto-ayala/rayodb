@@ -1,4 +1,4 @@
-import { PanelSection, tableClasses } from "@/components/ui/panel";
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { TableStatRow } from "./types";
 
@@ -12,7 +12,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
       <p className="text-3xs text-muted-foreground px-1">
         Cumulative stats since server start or last pg_stat_reset(). Source: pg_stat_user_tables
       </p>
-      <PanelSection>
+      <PanelCard>
         <div className={tableClasses.wrapper}>
           <table className={tableClasses.table}>
             <thead>
@@ -101,7 +101,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
             </tbody>
           </table>
         </div>
-      </PanelSection>
+      </PanelCard>
     </div>
   );
 }

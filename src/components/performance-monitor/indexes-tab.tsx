@@ -1,4 +1,4 @@
-import { PanelSection, tableClasses } from "@/components/ui/panel";
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { IndexUsageRow } from "./types";
 
@@ -18,7 +18,7 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
           </span>
         </div>
       )}
-      <PanelSection>
+      <PanelCard>
         <div className={tableClasses.wrapper}>
           <table className={tableClasses.table}>
             <thead>
@@ -77,7 +77,7 @@ export function IndexesTab({ indexUsage, unusedIndexCount }: IndexesTabProps) {
             </tbody>
           </table>
         </div>
-      </PanelSection>
+      </PanelCard>
     </div>
   );
 }

@@ -108,7 +108,7 @@ export function SegmentedTabs<T extends string>({
   );
 }
 
-/** Titled container for a group of rows, stats or a table */
+/** Titled group: icon chip, label and a rule running to the edge */
 export function PanelSection({
   title,
   icon,
@@ -123,18 +123,38 @@ export function PanelSection({
   className?: string;
 }) {
   return (
-    <section className={cn("overflow-hidden rounded-lg border border-border bg-card", className)}>
+    <section className={cn("space-y-2", className)}>
       {title && (
-        <header className="flex h-8 items-center justify-between border-b border-border bg-muted/50 px-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            {icon}
-            <span className="text-3xs font-semibold uppercase tracking-widest">{title}</span>
-          </div>
+        <div className="flex items-center gap-2">
+          {icon && (
+            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-muted text-muted-foreground">
+              {icon}
+            </div>
+          )}
+          <span className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
+            {title}
+          </span>
+          <div className="h-px flex-1 bg-border" />
           {actions}
-        </header>
+        </div>
       )}
       {children}
     </section>
+  );
+}
+
+/** Bordered container for a table or a list of rows */
+export function PanelCard({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("overflow-hidden rounded-lg border border-border bg-card", className)}>
+      {children}
+    </div>
   );
 }
 
@@ -160,15 +180,23 @@ export function StatTile({
   }[tone];
 
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2.5">
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        {icon}
-        <span className="text-3xs font-semibold uppercase tracking-widest">{label}</span>
+    <div className="rounded-lg border border-border bg-muted/40 px-3 py-2.5 transition-colors hover:border-border hover:bg-muted/60">
+      <div className="flex items-center gap-2">
+        {icon && (
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground">
+            {icon}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="text-3xs font-medium uppercase tracking-widest text-muted-foreground">
+            {label}
+          </div>
+          <div className={cn("mt-0.5 truncate text-sm font-semibold leading-tight", toneClass)}>
+            {value}
+          </div>
+          {hint && <div className="mt-0.5 text-3xs text-muted-foreground">{hint}</div>}
+        </div>
       </div>
-      <div className={cn("mt-1 text-lg font-semibold tabular-nums leading-tight", toneClass)}>
-        {value}
-      </div>
-      {hint && <div className="mt-0.5 text-3xs text-muted-foreground">{hint}</div>}
     </div>
   );
 }
@@ -182,6 +210,15 @@ export const tableClasses = {
   row: "border-t border-border/60 transition-colors hover:bg-hover",
   td: "px-3 py-1.5 align-middle",
 };
+
+export function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between border-b border-border/60 py-1.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-right text-xs font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
 
 export function PanelEmpty({ icon, message }: { icon?: React.ReactNode; message: string }) {
   return (

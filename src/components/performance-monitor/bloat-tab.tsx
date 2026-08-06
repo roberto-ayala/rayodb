@@ -1,4 +1,4 @@
-import { PanelSection, tableClasses } from "@/components/ui/panel";
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { BloatRow } from "./types";
 
@@ -18,7 +18,7 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
           </span>
         </div>
       )}
-      <PanelSection>
+      <PanelCard>
         <div className={tableClasses.wrapper}>
           <table className={tableClasses.table}>
             <thead>
@@ -101,7 +101,7 @@ export function BloatTab({ bloat, tablesNeedingVacuum }: BloatTabProps) {
             </tbody>
           </table>
         </div>
-      </PanelSection>
+      </PanelCard>
     </div>
   );
 }

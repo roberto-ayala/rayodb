@@ -9,7 +9,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { PanelHeader, PanelSection, PanelToolbar, SegmentedTabs } from "@/components/ui/panel";
+import {
+  PanelCard,
+  PanelHeader,
+  PanelSection,
+  PanelToolbar,
+  SegmentedTabs,
+} from "@/components/ui/panel";
 import { DriverFactory } from "@/lib/database-driver";
 import { useProjectStore } from "@/stores/project-store";
 
@@ -177,99 +183,113 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
 
       <div className="flex-1 overflow-auto p-4">
         {tab === "installed" && (
-          <PanelSection title={`Installed (${filteredInstalled.length})`}>
-            {filteredInstalled.map((ext) => (
-              <div
-                key={ext.name}
-                className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
-              >
-                <div className="flex items-center gap-2">
-                  <Check className="h-3.5 w-3.5 text-green-500" />
-                  <span className="text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-3xs text-primary">
-                    {ext.installedVersion}
-                  </span>
-                  {ext.defaultVersion && ext.defaultVersion !== ext.installedVersion && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
-                      onClick={() => updateExt(ext.name)}
-                      disabled={busy === ext.name}
-                    >
-                      {busy === ext.name ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <ArrowUpCircle className="h-3 w-3" />
-                      )}
-                      Update to {ext.defaultVersion}
-                    </Button>
+          <PanelSection
+            title={`Installed (${filteredInstalled.length})`}
+            icon={<Package className="h-3 w-3" />}
+          >
+            <PanelCard>
+              {filteredInstalled.map((ext) => (
+                <div
+                  key={ext.name}
+                  className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
+                >
+                  <div className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-green-500" />
+                    <span className="text-sm font-medium">{ext.name}</span>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-3xs text-primary">
+                      {ext.installedVersion}
+                    </span>
+                    {ext.defaultVersion && ext.defaultVersion !== ext.installedVersion && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+                        onClick={() => updateExt(ext.name)}
+                        disabled={busy === ext.name}
+                      >
+                        {busy === ext.name ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <ArrowUpCircle className="h-3 w-3" />
+                        )}
+                        Update to {ext.defaultVersion}
+                      </Button>
+                    )}
+                    <span className="ml-auto flex items-center gap-2">
+                      <span className="text-3xs text-muted-foreground">{ext.schema}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                        onClick={() => dropExt(ext.name)}
+                        disabled={busy === ext.name}
+                        title={`DROP EXTENSION "${ext.name}"`}
+                      >
+                        {busy === ext.name ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </span>
+                  </div>
+                  {ext.comment && (
+                    <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>
                   )}
-                  <span className="ml-auto flex items-center gap-2">
-                    <span className="text-3xs text-muted-foreground">{ext.schema}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                      onClick={() => dropExt(ext.name)}
-                      disabled={busy === ext.name}
-                      title={`DROP EXTENSION "${ext.name}"`}
-                    >
-                      {busy === ext.name ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </span>
                 </div>
-                {ext.comment && <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>}
-              </div>
-            ))}
-            {filteredInstalled.length === 0 && (
-              <div className="py-8 text-center text-xs text-muted-foreground">
-                {filter ? "No matching extensions" : "No extensions installed"}
-              </div>
-            )}
+              ))}
+              {filteredInstalled.length === 0 && (
+                <div className="py-8 text-center text-xs text-muted-foreground">
+                  {filter ? "No matching extensions" : "No extensions installed"}
+                </div>
+              )}
+            </PanelCard>
           </PanelSection>
         )}
 
         {tab === "available" && (
-          <PanelSection title={`Available (${filteredAvailable.length})`}>
-            {filteredAvailable.map((ext) => (
-              <div
-                key={ext.name}
-                className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
-              >
-                <div className="flex items-center gap-2">
-                  <Download className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-sm font-medium">{ext.name}</span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 text-3xs text-muted-foreground">
-                    {ext.version}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto"
-                    onClick={() => installExt(ext.name)}
-                    disabled={busy === ext.name}
-                  >
-                    {busy === ext.name ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Download className="h-3 w-3" />
-                    )}
-                    Install
-                  </Button>
+          <PanelSection
+            title={`Available (${filteredAvailable.length})`}
+            icon={<Package className="h-3 w-3" />}
+          >
+            <PanelCard>
+              {filteredAvailable.map((ext) => (
+                <div
+                  key={ext.name}
+                  className="border-b border-border/60 px-3 py-2.5 transition-colors last:border-b-0 hover:bg-hover"
+                >
+                  <div className="flex items-center gap-2">
+                    <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-sm font-medium">{ext.name}</span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-3xs text-muted-foreground">
+                      {ext.version}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-auto"
+                      onClick={() => installExt(ext.name)}
+                      disabled={busy === ext.name}
+                    >
+                      {busy === ext.name ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Download className="h-3 w-3" />
+                      )}
+                      Install
+                    </Button>
+                  </div>
+                  {ext.comment && (
+                    <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>
+                  )}
                 </div>
-                {ext.comment && <p className="mt-1 text-xs text-muted-foreground">{ext.comment}</p>}
-              </div>
-            ))}
-            {filteredAvailable.length === 0 && (
-              <div className="py-8 text-center text-xs text-muted-foreground">
-                {filter ? "No matching extensions" : "No available extensions"}
-              </div>
-            )}
+              ))}
+              {filteredAvailable.length === 0 && (
+                <div className="py-8 text-center text-xs text-muted-foreground">
+                  {filter ? "No matching extensions" : "No available extensions"}
+                </div>
+              )}
+            </PanelCard>
           </PanelSection>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { PanelSection, tableClasses } from "@/components/ui/panel";
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { ActivityRow } from "./types";
 
@@ -8,7 +8,7 @@ interface ActivityTabProps {
 
 export function ActivityTab({ activity }: ActivityTabProps) {
   return (
-    <PanelSection>
+    <PanelCard>
       <div className={tableClasses.wrapper}>
         <table className={tableClasses.table}>
           <thead>
@@ -66,6 +66,6 @@ export function ActivityTab({ activity }: ActivityTabProps) {
           </tbody>
         </table>
       </div>
-    </PanelSection>
+    </PanelCard>
   );
 }

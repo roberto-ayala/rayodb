@@ -1,4 +1,4 @@
-import { PanelSection, tableClasses } from "@/components/ui/panel";
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { LockRow } from "./types";
 
@@ -17,7 +17,7 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
           </span>
         </div>
       )}
-      <PanelSection>
+      <PanelCard>
         <div className={tableClasses.wrapper}>
           <table className={tableClasses.table}>
             <thead>
@@ -87,7 +87,7 @@ export function LocksTab({ locks, waitingLocks }: LocksTabProps) {
             </tbody>
           </table>
         </div>
-      </PanelSection>
+      </PanelCard>
     </div>
   );
 }

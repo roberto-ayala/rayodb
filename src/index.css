@@ -24,6 +24,10 @@
   --input: oklch(0.96 0.005 260);
   --ring: oklch(0.5 0.2 280);
   --hover: oklch(0.15 0.01 260 / 0.05);
+  /* Single size for every code surface — editor, terminal, grid, SQL previews.
+     Kept equal to text-xs so a keyword in the editor matches a toolbar label.
+     JS surfaces read it through codeFontSize(); change it here only. */
+  --text-code: 0.75rem;
   /* Radius scale: controls use md, containers lg, only status pills are full */
   --radius: 0.5rem;
   --shadow-popover: 0 8px 24px -8px oklch(0.15 0.01 260 / 0.18);
@@ -107,6 +111,7 @@
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
     /* Dense UI type scale: metadata, dense rows, body, headings */
+    --text-code: var(--text-code);
     --text-3xs: 0.625rem;
     --text-3xs--line-height: 0.875rem;
     --text-2xs: 0.6875rem;

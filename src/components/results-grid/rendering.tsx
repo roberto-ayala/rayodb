@@ -5,6 +5,7 @@ import {
   type Item,
   type Theme,
 } from "@glideapps/glide-data-grid";
+import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 import * as virtualCache from "@/lib/virtual-cache";
 import type { VirtualQuery } from "@/types";
 
@@ -152,9 +153,9 @@ export function buildGridTheme(theme: string): Partial<Theme> {
       bgHeaderHovered: "hsl(250, 15%, 20%)",
       borderColor: "hsl(250, 12%, 22%)",
       drilldownBorder: "hsl(250, 12%, 30%)",
-      fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-      headerFontStyle: "bold 12px",
-      baseFontStyle: "12px",
+      fontFamily: CODE_FONT_FAMILY,
+      headerFontStyle: `bold ${codeFontSize()}px`,
+      baseFontStyle: `${codeFontSize()}px`,
       textDark: "hsl(250, 15%, 85%)",
       textMedium: "hsl(250, 10%, 60%)",
       textLight: "hsl(250, 10%, 45%)",
@@ -174,9 +175,9 @@ export function buildGridTheme(theme: string): Partial<Theme> {
     bgHeaderHasFocus: "#eeeef2",
     bgHeaderHovered: "#f0f0f4",
     borderColor: "#e2e2e8",
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-    headerFontStyle: "bold 12px",
-    baseFontStyle: "12px",
+    fontFamily: CODE_FONT_FAMILY,
+    headerFontStyle: `bold ${codeFontSize()}px`,
+    baseFontStyle: `${codeFontSize()}px`,
     textDark: "#1a1a2e",
     textMedium: "#666680",
     textLight: "#9999a8",

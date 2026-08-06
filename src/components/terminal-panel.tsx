@@ -5,6 +5,7 @@ import { Terminal } from "@xterm/xterm";
 import { useCallback, useEffect, useRef } from "react";
 import { useUIStore } from "@/stores/ui-store";
 import "@xterm/xterm/css/xterm.css";
+import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 
 interface TerminalPanelProps {
   terminalId: string;
@@ -72,8 +73,8 @@ export function TerminalPanel({ terminalId }: TerminalPanelProps) {
     if (!containerRef.current) return;
 
     const term = new Terminal({
-      fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-      fontSize: 13,
+      fontFamily: CODE_FONT_FAMILY,
+      fontSize: codeFontSize(),
       lineHeight: 1.3,
       theme: getTermTheme(),
       cursorBlink: true,

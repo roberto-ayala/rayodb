@@ -1,6 +1,7 @@
 import Editor from "@monaco-editor/react";
 import type * as Monaco from "monaco-editor";
 import { useCallback, useRef } from "react";
+import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 import { useUIStore } from "@/stores/ui-store";
 
 interface QueryEditorProps {
@@ -55,9 +56,9 @@ export function QueryEditor({ value, onChange, onExecute, onExplain }: QueryEdit
             automaticLayout: true,
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
-            fontSize: 13,
+            fontSize: codeFontSize(),
             lineNumbers: "on",
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+            fontFamily: CODE_FONT_FAMILY,
             fontLigatures: false,
             renderLineHighlight: "all",
             padding: { top: 8, bottom: 8 },

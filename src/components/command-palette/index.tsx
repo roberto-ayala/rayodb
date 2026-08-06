@@ -44,7 +44,7 @@ export function CommandPalette({
   const activeTab = useActiveTab();
 
   const theme = useUIStore((s) => s.theme);
-  const toggleTheme = useUIStore((s) => s.toggleTheme);
+  const setThemeMode = useUIStore((s) => s.setThemeMode);
   const setConnectionModalOpen = useUIStore((s) => s.setConnectionModalOpen);
   const pinnedResult = useUIStore((s) => s.pinnedResult);
   const clearPinnedResult = useUIStore((s) => s.clearPinnedResult);
@@ -247,7 +247,7 @@ export function CommandPalette({
                   formatQuery={formatQuery}
                   setPage={setPage}
                   theme={theme}
-                  toggleTheme={toggleTheme}
+                  toggleTheme={() => setThemeMode(theme === "dark" ? "light" : "dark")}
                   onCheckUpdates={onCheckUpdates}
                   pinnedResult={pinnedResult}
                   clearPinnedResult={clearPinnedResult}

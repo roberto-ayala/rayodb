@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
 import { ConnectionModal } from "@/components/connection-modal";
@@ -30,6 +30,13 @@ import type { ProjectDetails } from "@/types";
 import "@/monaco/setup";
 
 export default function App() {
+  const syncSystemTheme = useUIStore((s) => s.syncSystemTheme);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    media.addEventListener("change", syncSystemTheme);
+    return () => media.removeEventListener("change", syncSystemTheme);
+  }, [syncSystemTheme]);
+
   const sidebarWidth = useUIStore((s) => s.sidebarWidth);
   const editorHeight = useUIStore((s) => s.editorHeight);
   const connectionModalOpen = useUIStore((s) => s.connectionModalOpen);

@@ -14,11 +14,12 @@ interface QueryEditorProps {
 
 export function QueryEditor({ value, onChange, onExecute, onExplain }: QueryEditorProps) {
   const theme = useUIStore((s) => s.theme);
+  const accentHue = useUIStore((s) => s.accentHue);
 
   // Token values change with the theme, so the editor themes are rebuilt
   useEffect(() => {
     defineEditorThemes();
-  }, [theme]);
+  }, [theme, accentHue]);
   const onExecuteRef = useRef(onExecute);
   onExecuteRef.current = onExecute;
   const onExplainRef = useRef(onExplain);

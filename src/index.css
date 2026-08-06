@@ -10,7 +10,9 @@
   --card-foreground: oklch(0.15 0.01 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.01 260);
-  --primary: oklch(0.5 0.2 265);
+  /* Accent: only the hue is user-selectable, lightness and chroma stay tuned */
+  --accent-hue: 265;
+  --primary: oklch(0.5 0.2 var(--accent-hue));
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.92 0.005 260);
   --secondary-foreground: oklch(0.15 0.01 260);
@@ -29,7 +31,7 @@
   /* Segmented control: trough and the selected segment on top of it */
   --segment: oklch(0.955 0.005 260);
   --segment-active: oklch(1 0 0);
-  --ring: oklch(0.5 0.2 280);
+  --ring: oklch(0.5 0.2 var(--accent-hue));
   --hover: oklch(0.15 0.01 260 / 0.05);
   /* Single size for every code surface — editor, terminal, grid, SQL previews.
      Kept equal to text-xs so a keyword in the editor matches a toolbar label.
@@ -40,12 +42,12 @@
   --shadow-popover: 0 8px 24px -8px oklch(0.15 0.01 260 / 0.18);
   --sidebar: oklch(0.945 0.006 260);
   --sidebar-foreground: oklch(0.2 0.01 260);
-  --sidebar-primary: oklch(0.5 0.2 265);
+  --sidebar-primary: oklch(0.5 0.2 var(--accent-hue));
   --sidebar-primary-foreground: oklch(0.98 0 0);
   --sidebar-accent: oklch(0.9 0.006 260);
   --sidebar-accent-foreground: oklch(0.15 0.01 260);
   --sidebar-border: oklch(0.865 0.01 260);
-  --sidebar-ring: oklch(0.5 0.2 280);
+  --sidebar-ring: oklch(0.5 0.2 var(--accent-hue));
   --success: oklch(0.52 0.18 150);
   --warning: oklch(0.6 0.18 85);
   --editor-bg: #fefefe;
@@ -59,7 +61,7 @@
   --card-foreground: oklch(0.94 0.008 260);
   --popover: oklch(0.27 0.012 260);
   --popover-foreground: oklch(0.94 0.008 260);
-  --primary: oklch(0.68 0.17 265);
+  --primary: oklch(0.68 0.17 var(--accent-hue));
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.29 0.014 260);
   --secondary-foreground: oklch(0.94 0.008 260);
@@ -75,17 +77,17 @@
   --window-chrome: color(srgb 0.0915 0.105 0.1266);
   --segment: oklch(0.24 0.012 260);
   --segment-active: oklch(0.38 0.014 260);
-  --ring: oklch(0.68 0.17 280);
+  --ring: oklch(0.68 0.17 var(--accent-hue));
   --hover: oklch(1 0 0 / 0.06);
   --shadow-popover: 0 8px 24px -8px oklch(0.08 0.01 260 / 0.6);
   --sidebar: oklch(0.2 0.012 260);
   --sidebar-foreground: oklch(0.88 0.008 260);
-  --sidebar-primary: oklch(0.68 0.17 265);
+  --sidebar-primary: oklch(0.68 0.17 var(--accent-hue));
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.28 0.014 260);
   --sidebar-accent-foreground: oklch(0.96 0.008 260);
   --sidebar-border: oklch(0.31 0.012 260);
-  --sidebar-ring: oklch(0.68 0.17 280);
+  --sidebar-ring: oklch(0.68 0.17 var(--accent-hue));
   --success: oklch(0.7 0.16 150);
   --warning: oklch(0.78 0.16 85);
   --editor-bg: oklch(0.24 0.012 260);

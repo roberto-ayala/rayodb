@@ -1,9 +1,9 @@
-import { Database, Download, Moon, Search, Sun } from "lucide-react";
+import { Database, Download, Search } from "lucide-react";
+import { AppearanceMenu } from "@/components/appearance-menu";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
-import { useUIStore } from "@/stores/ui-store";
 import { ProjectConnectionStatus } from "@/types";
 
 export function TopBar({
@@ -13,8 +13,6 @@ export function TopBar({
   onCheckUpdates: () => void;
   onOpenCommandPalette: () => void;
 }) {
-  const theme = useUIStore((s) => s.theme);
-  const toggleTheme = useUIStore((s) => s.toggleTheme);
   const projects = useProjectStore((s) => s.projects);
   const status = useProjectStore((s) => s.status);
   const selectedTabIndex = useTabStore((s) => s.selectedTabIndex);
@@ -90,9 +88,7 @@ export function TopBar({
           <Download className="h-4 w-4" />
           <span className="text-xs">Updates</span>
         </Button>
-        <Button variant="ghost" size="icon-sm" onClick={toggleTheme}>
-          {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-        </Button>
+        <AppearanceMenu />
       </div>
     </div>
   );

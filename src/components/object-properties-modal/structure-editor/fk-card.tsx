@@ -1,5 +1,6 @@
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Select } from "@/components/ui/select";
 import type { DraftForeignKey } from "@/lib/alter-table-sql";
 import { FK_ACTIONS } from "@/lib/alter-table-sql";
 import type { DriverFactory } from "@/lib/database-driver";
@@ -80,7 +81,7 @@ export function FKCard({
           <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             Target Schema
           </div>
-          <select
+          <Select
             value={fk.targetSchema}
             onChange={(e) =>
               onChange({
@@ -89,23 +90,23 @@ export function FKCard({
                 targetColumns: [],
               })
             }
-            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            size="sm"
           >
             {availableSchemas.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div>
           <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             Target Table
           </div>
-          <select
+          <Select
             value={fk.targetTable}
             onChange={(e) => onChange({ targetTable: e.target.value, targetColumns: [] })}
-            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            size="sm"
           >
             <option value="">Select table...</option>
             {targetTableNames.map((t) => (
@@ -113,7 +114,7 @@ export function FKCard({
                 {t}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -132,14 +133,14 @@ export function FKCard({
           </div>
           {fk.sourceColumns.map((srcCol, idx) => (
             <div key={idx} className="grid grid-cols-[1fr_20px_1fr_28px] gap-1.5 items-center">
-              <select
+              <Select
                 value={srcCol}
                 onChange={(e) => {
                   const newSrc = [...fk.sourceColumns];
                   newSrc[idx] = e.target.value;
                   onChange({ sourceColumns: newSrc });
                 }}
-                className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+                size="sm"
               >
                 <option value="">Select...</option>
                 {activeColNames.map((c) => (
@@ -147,9 +148,9 @@ export function FKCard({
                     {c}
                   </option>
                 ))}
-              </select>
+              </Select>
               <ArrowRight className="h-3 w-3 text-muted-foreground/40 mx-auto" />
-              <select
+              <Select
                 value={fk.targetColumns[idx] ?? ""}
                 onChange={(e) => {
                   const newTgt = [...fk.targetColumns];
@@ -157,7 +158,7 @@ export function FKCard({
                   onChange({ targetColumns: newTgt });
                 }}
                 disabled={!fk.targetTable || targetCols.length === 0}
-                className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50 disabled:opacity-40"
+                size="sm"
               >
                 <option value="">Select...</option>
                 {targetCols.map((c) => (
@@ -165,7 +166,7 @@ export function FKCard({
                     {c}
                   </option>
                 ))}
-              </select>
+              </Select>
               <button
                 type="button"
                 onClick={() => {
@@ -199,33 +200,33 @@ export function FKCard({
           <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             On Update
           </div>
-          <select
+          <Select
             value={fk.onUpdate}
             onChange={(e) => onChange({ onUpdate: e.target.value })}
-            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            size="sm"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div>
           <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold mb-1">
             On Delete
           </div>
-          <select
+          <Select
             value={fk.onDelete}
             onChange={(e) => onChange({ onDelete: e.target.value })}
-            className="w-full h-7 px-2 text-xs bg-background border border-border/60 rounded-md outline-none focus:border-primary/50"
+            size="sm"
           >
             {FK_ACTIONS.map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
     </div>

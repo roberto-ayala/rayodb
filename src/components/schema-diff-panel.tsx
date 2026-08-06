@@ -10,6 +10,7 @@ import {
   Table,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -158,10 +159,11 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
       {/* Config bar */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border/60">
         <GitCompare className="h-4 w-4 text-primary shrink-0" />
-        <select
+        <Select
           value={leftSchema}
           onChange={(e) => setLeftSchema(e.target.value)}
-          className="bg-input/80 border border-border rounded-md px-2 py-1.5 text-xs text-foreground min-w-[140px]"
+          size="sm"
+          className="min-w-[140px]"
         >
           <option value="">Left schema...</option>
           {schemas.map((s) => (
@@ -169,12 +171,13 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {s}
             </option>
           ))}
-        </select>
+        </Select>
         <ArrowLeftRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-        <select
+        <Select
           value={rightSchema}
           onChange={(e) => setRightSchema(e.target.value)}
-          className="bg-input/80 border border-border rounded-md px-2 py-1.5 text-xs text-foreground min-w-[140px]"
+          size="sm"
+          className="min-w-[140px]"
         >
           <option value="">Right schema...</option>
           {schemas.map((s) => (
@@ -182,7 +185,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {s}
             </option>
           ))}
-        </select>
+        </Select>
         <Button
           variant="default"
           size="sm"

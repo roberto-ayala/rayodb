@@ -2,6 +2,7 @@ import { Loader2, RefreshCw, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -132,10 +133,11 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           placeholder="Search settings..."
           className="h-7 text-xs w-56 bg-input/50"
         />
-        <select
+        <Select
           value={categoryFilter ?? ""}
           onChange={(e) => setCategoryFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 text-xs text-foreground"
+          size="sm"
+          className="w-auto"
         >
           <option value="">All categories</option>
           {categories.map((c) => (
@@ -143,11 +145,12 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               {c}
             </option>
           ))}
-        </select>
-        <select
+        </Select>
+        <Select
           value={contextFilter ?? ""}
           onChange={(e) => setContextFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 text-xs text-foreground"
+          size="sm"
+          className="w-auto"
         >
           <option value="">All contexts</option>
           <option value="user">user (SET)</option>
@@ -155,7 +158,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           <option value="sighup">sighup (reload)</option>
           <option value="postmaster">postmaster (restart)</option>
           <option value="internal">internal</option>
-        </select>
+        </Select>
         {(categoryFilter || contextFilter || filter) && (
           <button
             type="button"

@@ -1,6 +1,7 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { AlertCircle, ArrowRight, Check, FileUp, Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -180,10 +181,11 @@ export function CSVImportModal({
                       {h}
                     </span>
                     <ArrowRight className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-                    <select
+                    <Select
                       value={mapping[i] ?? ""}
                       onChange={(e) => setMapping((m) => ({ ...m, [i]: e.target.value }))}
-                      className="flex-1 bg-input/80 border border-border rounded-md px-2 py-1 text-xs text-foreground"
+                      size="sm"
+                      className="flex-1"
                     >
                       <option value="">-- skip --</option>
                       {tableColumns.map((col) => (
@@ -191,7 +193,7 @@ export function CSVImportModal({
                           {col}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                 ))}
               </div>

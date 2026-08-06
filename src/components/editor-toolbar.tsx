@@ -9,7 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { SqlCode } from "@/components/ui/sql-code";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
@@ -116,10 +118,11 @@ export function EditorToolbar({
 
         <div className="flex items-center gap-1">
           <Timer className="h-3 w-3 text-muted-foreground" />
-          <select
+          <Select
+            size="sm"
             value={activeTab.queryTimeout ?? 0}
             onChange={(e) => setQueryTimeout(selectedTabIndex, Number(e.target.value))}
-            className="h-7 cursor-pointer rounded-md border border-border bg-transparent px-1.5 text-xs text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-auto text-muted-foreground"
             title="Query timeout"
           >
             {TIMEOUT_OPTIONS.map((opt) => (
@@ -127,7 +130,7 @@ export function EditorToolbar({
                 {opt.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="mx-1.5 h-4 w-px bg-border" />
@@ -176,10 +179,7 @@ export function EditorToolbar({
             }}
             className="space-y-4 mt-2"
           >
-            <div className="space-y-2">
-              <label htmlFor="save-query-title" className="text-xs text-muted-foreground">
-                Query Name
-              </label>
+            <Field label="Query Name" htmlFor="save-query-title">
               <Input
                 id="save-query-title"
                 ref={saveInputRef}
@@ -188,7 +188,7 @@ export function EditorToolbar({
                 placeholder="e.g. Active users report"
                 required
               />
-            </div>
+            </Field>
             <div className="rounded-md bg-muted/50 p-2 max-h-24 overflow-auto">
               <SqlCode
                 code={`${activeTab?.editorValue?.slice(0, 300) ?? ""}${

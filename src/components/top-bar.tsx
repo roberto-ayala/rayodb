@@ -1,5 +1,6 @@
 import { Database, Download, Moon, Search, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
 import { useUIStore } from "@/stores/ui-store";
@@ -44,8 +45,9 @@ export function TopBar({
         ) : (
           <div className="flex items-center gap-2">
             {Object.keys(projects).length > 0 ? (
-              <select
-                className="h-7 rounded-md border border-border bg-input px-2 text-xs text-foreground"
+              <Select
+                size="sm"
+                className="w-auto"
                 value={activeProject ?? ""}
                 onChange={(e) => {
                   if (e.target.value) {
@@ -60,7 +62,7 @@ export function TopBar({
                     {status[id] === ProjectConnectionStatus.Connected ? "" : " \u2022 disconnected"}
                   </option>
                 ))}
-              </select>
+              </Select>
             ) : (
               <span className="text-xs text-muted-foreground">No connection</span>
             )}

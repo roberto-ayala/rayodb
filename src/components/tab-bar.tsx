@@ -76,7 +76,7 @@ export function TabBar() {
 
   return (
     <div className="relative flex min-h-[38px] items-center border-b border-border bg-muted/40">
-      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none pl-1.5 pr-[74px] pt-1">
+      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none pl-1.5 pr-[84px] pt-1">
         {tabs.map((tab, idx) => {
           if (!tab) return null;
           const projectName = tab.projectId;
@@ -192,7 +192,7 @@ export function TabBar() {
         })}
       </div>
       {/* Floats over the strip so tabs scroll under it */}
-      <div className="absolute inset-y-0 right-0 z-20 -mb-px flex items-end gap-1 bg-muted/50 px-2 pt-1 backdrop-blur-sm">
+      <div className="absolute inset-y-0 right-0 z-20 -mb-px flex items-end gap-1 bg-muted/25 px-2 pt-1 backdrop-blur-md">
         <Button variant="outline" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>

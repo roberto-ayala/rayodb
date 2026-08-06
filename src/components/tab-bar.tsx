@@ -123,7 +123,7 @@ export function TabBar() {
               className={cn(
                 // The active tab carries the surface of the bar right below it
                 // and covers the divider, so the two read as one region
-                "group relative z-10 flex shrink-0 items-center gap-2 h-7 rounded-t-md border border-b-0 px-3 transition-colors duration-150 cursor-pointer select-none -mb-px",
+                "group relative z-10 flex shrink-0 items-center gap-2 h-8 rounded-t-md border border-b-0 px-3 transition-colors duration-150 cursor-pointer select-none -mb-px",
                 isActive
                   ? "border-border bg-muted text-foreground"
                   : // Hovering an inactive tab outlines it rather than filling it: a

@@ -1,4 +1,5 @@
 import { ArrowRight, Check, Columns3, Copy, FileCode, RefreshCw } from "lucide-react";
+import { SqlCode } from "@/components/ui/sql-code";
 import { InfoRow, LoadingPlaceholder, PropertySection, StatCard } from "./shared";
 import type { FunctionMeta } from "./types";
 
@@ -64,9 +65,10 @@ export function FunctionOverview({
               <Copy className="h-3.5 w-3.5" />
             )}
           </button>
-          <pre className="font-mono rounded-lg bg-[hsl(var(--background))] border border-border/60 p-4 text-2xs text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[250px] selection:bg-primary/20">
-            {functionMeta.source}
-          </pre>
+          <SqlCode
+            code={functionMeta.source}
+            className="max-h-[250px] overflow-auto rounded-lg border border-border bg-background p-4"
+          />
         </div>
       </PropertySection>
     </div>

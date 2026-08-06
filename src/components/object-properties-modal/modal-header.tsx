@@ -18,11 +18,11 @@ import { cn } from "@/lib/utils";
 import type { ObjectType, Tab } from "./types";
 
 const objectIcon: Record<ObjectType, React.ReactNode> = {
-  table: <Table className="h-4 w-4 text-primary" />,
-  view: <Eye className="h-4 w-4 text-blue-500" />,
-  matview: <Layers className="h-4 w-4 text-purple-500" />,
-  function: <FileCode className="h-4 w-4 text-amber-500" />,
-  "trigger-function": <Zap className="h-4 w-4 text-orange-500" />,
+  table: <Table className="h-5 w-5 text-primary" />,
+  view: <Eye className="h-5 w-5 text-blue-500" />,
+  matview: <Layers className="h-5 w-5 text-purple-500" />,
+  function: <FileCode className="h-5 w-5 text-amber-500" />,
+  "trigger-function": <Zap className="h-5 w-5 text-orange-500" />,
 };
 
 const objectLabel: Record<ObjectType, string> = {
@@ -70,7 +70,7 @@ export function ModalHeader({
     <div className="border-b border-border bg-muted/40 px-5 pt-5 pb-3">
       <DialogHeader>
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background">
             {objectIcon[objectType]}
           </div>
           <div className="min-w-0 flex-1">

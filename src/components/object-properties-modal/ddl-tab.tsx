@@ -1,5 +1,6 @@
 import { AlertTriangle, Check, Copy, FileCode, Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SqlCode } from "@/components/ui/sql-code";
 import { LoadingPlaceholder } from "./shared";
 
 export function DDLContent({
@@ -87,9 +88,7 @@ export function DDLContent({
             </Button>
           </div>
         </div>
-        <pre className="font-mono p-4 text-2xs text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed selection:bg-primary/20 flex-1 min-h-0">
-          {ddl}
-        </pre>
+        <SqlCode code={ddl} className="min-h-0 flex-1 overflow-y-auto p-4" />
       </div>
     </div>
   );

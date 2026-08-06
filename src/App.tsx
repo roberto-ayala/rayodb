@@ -28,6 +28,7 @@ import { useActiveTab, useTabStore } from "@/stores/tab-store";
 import { SIDEBAR_MIN_WIDTH, useUIStore } from "@/stores/ui-store";
 import type { ProjectDetails } from "@/types";
 import "@/monaco/setup";
+import { EmptyWorkspace } from "@/components/empty-workspace";
 
 export default function App() {
   const syncSystemTheme = useUIStore((s) => s.syncSystemTheme);
@@ -146,19 +147,7 @@ export default function App() {
         <div className="flex flex-1 flex-col overflow-hidden">
           <TabBar />
           {!activeTab ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <div className="text-muted-foreground/40 text-6xl font-bold select-none">RSQL</div>
-                <p className="text-muted-foreground/60 text-sm">No tabs open</p>
-                <button
-                  type="button"
-                  onClick={() => useTabStore.getState().openTab()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
-                >
-                  <span className="text-lg leading-none">+</span> New Query
-                </button>
-              </div>
-            </div>
+            <EmptyWorkspace onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
           ) : activeTab?.type === "monitor" && activeTab.projectId ? (
             <div className="flex-1 min-h-0 overflow-hidden">
               <PerformanceMonitor projectId={activeTab.projectId} />

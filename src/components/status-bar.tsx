@@ -130,7 +130,10 @@ function Metric({
   return (
     <span className="flex items-center gap-1" title={note}>
       {label && <span className="text-3xs font-semibold uppercase tracking-widest">{label}</span>}
-      <span className="whitespace-nowrap font-mono tabular-nums text-foreground/80" style={{ width }}>
+      <span
+        className="whitespace-nowrap font-mono tabular-nums text-foreground/80"
+        style={{ width }}
+      >
         {value}
       </span>
       <span

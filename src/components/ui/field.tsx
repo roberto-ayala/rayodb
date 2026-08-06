@@ -1,5 +1,6 @@
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "./checkbox";
 import { Label } from "./label";
 
 /**
@@ -44,13 +45,7 @@ export function CheckboxField({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id={id}
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 cursor-pointer rounded-sm border-border bg-input accent-primary"
-      />
+      <Checkbox id={id} checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <Label htmlFor={id} className="cursor-pointer">
         {label}
       </Label>

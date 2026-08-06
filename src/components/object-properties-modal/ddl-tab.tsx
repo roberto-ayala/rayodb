@@ -64,7 +64,7 @@ export function DDLContent({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
               onClick={onOpenInTab}
             >
               <Play className="h-2.5 w-2.5" />
@@ -73,7 +73,7 @@ export function DDLContent({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
               onClick={onCopy}
             >
               {copied === "ddl" ? (

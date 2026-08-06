@@ -186,7 +186,7 @@ export function StructureEditorContent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   openTab(projectId, sqlPreview);
                   onOpenChange(false);
@@ -197,7 +197,7 @@ export function StructureEditorContent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => navigator.clipboard.writeText(sqlPreview)}
               >
                 <Copy className="h-2.5 w-2.5" /> Copy

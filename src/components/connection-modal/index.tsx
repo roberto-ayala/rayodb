@@ -168,7 +168,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border rounded-lg sm:max-w-[500px] flex flex-col overflow-hidden p-0">
+      <DialogContent className="rounded-lg bg-card sm:max-w-[500px] flex flex-col overflow-hidden p-0">
         <DialogHeader className="shrink-0 px-6 pt-6 pb-0">
           <DialogTitle className="text-foreground">
             {isEditing ? "Edit Connection" : "New Connection"}
@@ -255,7 +255,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             )}
           </div>
 
-          <div className="flex shrink-0 justify-between border-border border-t px-6 py-4">
+          <div className="flex shrink-0 justify-between bg-muted/40 px-6 py-4">
             <Button
               type="button"
               variant="outline"

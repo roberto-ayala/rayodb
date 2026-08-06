@@ -1,4 +1,5 @@
 import { Key } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { StructureEditorState } from "@/lib/alter-table-sql";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +31,7 @@ export function PkSection({
                 isInPK ? "bg-primary/5 border-primary/20" : "hover:bg-muted/20",
               )}
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={!!isInPK}
                 onChange={() => {
                   setDraft((prev) => {
@@ -75,7 +75,6 @@ export function PkSection({
                     };
                   });
                 }}
-                className="h-3.5 w-3.5 rounded border-border accent-primary"
               />
               <span className="text-xs">{colName}</span>
               {isInPK && <Key className="h-3 w-3 text-primary ml-auto" />}

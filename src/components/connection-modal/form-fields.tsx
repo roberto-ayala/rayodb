@@ -47,7 +47,7 @@ export function DriverDisplay({ driver }: DriverDisplayProps) {
       {/* Only one driver ships today, so this reads as a field but is static */}
       <div
         id="driver"
-        className="flex h-9 w-full items-center rounded-md border border-border bg-input px-3 text-sm text-foreground"
+        className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
       >
         {DRIVER_CONFIGS[driver].name}
       </div>

@@ -67,13 +67,7 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
             size="sm"
             className="w-48"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => void refresh()}
-            disabled={isLoading}
-          >
+          <Button variant="ghost" size="icon" onClick={() => void refresh()} disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (

@@ -110,13 +110,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           <span className="text-3xs text-muted-foreground">
             {filtered.length}/{settings.length}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => void refresh()}
-            disabled={isLoading}
-          >
+          <Button variant="ghost" size="icon" onClick={() => void refresh()} disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (

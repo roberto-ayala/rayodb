@@ -1,4 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import type { DraftIndex, StructureEditorState } from "@/lib/alter-table-sql";
 import { cn } from "@/lib/utils";
@@ -46,8 +47,7 @@ export function IndexesSection({
                 placeholder="Index name"
               />
               <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={idx.isUnique}
                   onChange={(e) => {
                     setDraft((prev) => ({

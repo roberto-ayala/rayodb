@@ -143,13 +143,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           <span className="text-sm font-semibold">Extensions</span>
           <span className="text-xs text-muted-foreground">{details?.database ?? projectId}</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => void refresh()}
-          disabled={isLoading}
-        >
+        <Button variant="ghost" size="icon" onClick={() => void refresh()} disabled={isLoading}>
           {isLoading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
@@ -218,7 +212,7 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 gap-1 text-xs text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
+                      className="text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/30"
                       onClick={() => updateExt(ext.name)}
                       disabled={busy === ext.name}
                     >

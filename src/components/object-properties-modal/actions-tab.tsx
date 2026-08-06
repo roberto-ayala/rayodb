@@ -154,7 +154,7 @@ export function ActionsContent({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT * FROM ${qualified} LIMIT 100;`);
                 onOpenChange(false);
@@ -165,7 +165,7 @@ export function ActionsContent({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT COUNT(*) FROM ${qualified};`);
                 onOpenChange(false);
@@ -176,7 +176,7 @@ export function ActionsContent({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT * FROM ${qualified} ORDER BY 1 DESC LIMIT 10;`);
                 onOpenChange(false);
@@ -244,7 +244,7 @@ export function ActionsContent({
                   variant={action.destructive ? "ghost" : "outline"}
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-xs shrink-0",
+                    "shrink-0",
                     action.destructive && "text-destructive hover:bg-destructive/10",
                   )}
                   disabled={actionLoading}
@@ -279,7 +279,7 @@ export function ActionsContent({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-xs font-medium",
+                    "font-medium",
                     action.destructive
                       ? "text-destructive hover:bg-destructive/10"
                       : "text-foreground hover:bg-muted/50",
@@ -292,7 +292,7 @@ export function ActionsContent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 text-xs text-muted-foreground"
+                  className="text-muted-foreground"
                   onClick={() => setConfirmAction(null)}
                 >
                   Cancel

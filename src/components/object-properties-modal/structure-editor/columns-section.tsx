@@ -1,4 +1,5 @@
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import type { DraftColumn, StructureEditorState } from "@/lib/alter-table-sql";
 import { PG_COMMON_TYPES } from "@/lib/alter-table-sql";
@@ -108,12 +109,10 @@ export function ColumnsSection({
             className="disabled:opacity-40"
           />
           <div className="flex items-center justify-center">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={col.nullable}
               disabled={col._status === "removed"}
               onChange={(e) => updateColumn(col._id, { nullable: e.target.checked })}
-              className="h-3.5 w-3.5 rounded border-border accent-primary"
             />
           </div>
           <Input

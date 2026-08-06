@@ -343,7 +343,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         }}
                       >
                         <FileCode className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                        <span className="text-2xs text-foreground">
+                        <span className="text-xs text-foreground">
                           {fn.name}({fn.arguments ? "..." : ""})
                         </span>
                         <span className="text-3xs text-muted-foreground">{fn.returnType}</span>
@@ -402,7 +402,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         }}
                       >
                         <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                        <span className="text-2xs text-foreground">{fn.name}()</span>
+                        <span className="text-xs text-foreground">{fn.name}()</span>
                         <span className="text-3xs text-muted-foreground">trigger</span>
                       </div>
                     );

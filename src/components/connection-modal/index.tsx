@@ -255,7 +255,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             )}
           </div>
 
-          <div className="flex shrink-0 justify-between bg-muted/40 px-6 py-4">
+          <div className="flex shrink-0 justify-between border-border border-t px-6 py-4">
             <Button
               type="button"
               variant="outline"

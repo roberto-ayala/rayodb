@@ -5,6 +5,8 @@ import {
   type Item,
   type Theme,
 } from "@glideapps/glide-data-grid";
+import { themeColor } from "@/lib/theme-color";
+import { CODE_FONT_FAMILY, codeFontSize } from "@/lib/typography";
 import * as virtualCache from "@/lib/virtual-cache";
 import type { VirtualQuery } from "@/types";
 
@@ -140,46 +142,33 @@ export function buildCellContent(cell: Item, ctx: CellContentContext): GridCell 
   return baseCell;
 }
 
-export function buildGridTheme(theme: string): Partial<Theme> {
-  if (theme === "dark") {
-    return {
-      accentColor: "hsl(260, 70%, 60%)",
-      accentLight: "hsla(260, 70%, 60%, 0.15)",
-      bgCell: "hsl(250, 15%, 13%)",
-      bgCellMedium: "hsl(250, 15%, 15%)",
-      bgHeader: "hsl(250, 15%, 18%)",
-      bgHeaderHasFocus: "hsl(250, 15%, 22%)",
-      bgHeaderHovered: "hsl(250, 15%, 20%)",
-      borderColor: "hsl(250, 12%, 22%)",
-      drilldownBorder: "hsl(250, 12%, 30%)",
-      fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-      headerFontStyle: "bold 12px",
-      baseFontStyle: "12px",
-      textDark: "hsl(250, 15%, 85%)",
-      textMedium: "hsl(250, 10%, 60%)",
-      textLight: "hsl(250, 10%, 45%)",
-      textHeader: "hsl(250, 15%, 75%)",
-      textHeaderSelected: "hsl(260, 70%, 75%)",
-      bgBubble: "hsl(250, 15%, 20%)",
-      bgBubbleSelected: "hsl(260, 70%, 60%)",
-      textBubble: "hsl(250, 15%, 85%)",
-    };
-  }
+/**
+ * Resolve a theme token to a concrete color. The grid paints on canvas, which
+ * cannot read CSS variables, so values are read from the document and
+ * normalised through a 2d context — the tokens are oklch, which the grid's own
+ * colour maths does not parse.
+ */
+export function buildGridTheme(_theme: string): Partial<Theme> {
   return {
-    accentColor: "hsl(260, 70%, 55%)",
-    accentLight: "hsla(260, 70%, 55%, 0.1)",
-    bgCell: "#ffffff",
-    bgCellMedium: "#fafafa",
-    bgHeader: "#f5f5f8",
-    bgHeaderHasFocus: "#eeeef2",
-    bgHeaderHovered: "#f0f0f4",
-    borderColor: "#e2e2e8",
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-    headerFontStyle: "bold 12px",
-    baseFontStyle: "12px",
-    textDark: "#1a1a2e",
-    textMedium: "#666680",
-    textLight: "#9999a8",
-    textHeader: "#333340",
+    accentColor: themeColor("--primary"),
+    accentLight: themeColor("--primary", 0.12),
+    bgCell: themeColor("--card"),
+    bgCellMedium: themeColor("--muted", 0.35),
+    bgHeader: themeColor("--table-header"),
+    bgHeaderHasFocus: themeColor("--accent"),
+    bgHeaderHovered: themeColor("--accent", 0.7),
+    borderColor: themeColor("--border"),
+    drilldownBorder: themeColor("--border"),
+    fontFamily: CODE_FONT_FAMILY,
+    headerFontStyle: `600 ${codeFontSize()}px`,
+    baseFontStyle: `${codeFontSize()}px`,
+    textDark: themeColor("--foreground"),
+    textMedium: themeColor("--muted-foreground"),
+    textLight: themeColor("--muted-foreground", 0.7),
+    textHeader: themeColor("--foreground"),
+    textHeaderSelected: themeColor("--primary"),
+    bgBubble: themeColor("--muted"),
+    bgBubbleSelected: themeColor("--primary"),
+    textBubble: themeColor("--foreground"),
   };
 }

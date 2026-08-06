@@ -1,8 +1,9 @@
-import { Database, Download, Moon, Search, Sun } from "lucide-react";
+import { Database, Download, Search } from "lucide-react";
+import { AppearanceMenu } from "@/components/appearance-menu";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
-import { useUIStore } from "@/stores/ui-store";
 import { ProjectConnectionStatus } from "@/types";
 
 export function TopBar({
@@ -12,8 +13,6 @@ export function TopBar({
   onCheckUpdates: () => void;
   onOpenCommandPalette: () => void;
 }) {
-  const theme = useUIStore((s) => s.theme);
-  const toggleTheme = useUIStore((s) => s.toggleTheme);
   const projects = useProjectStore((s) => s.projects);
   const status = useProjectStore((s) => s.status);
   const selectedTabIndex = useTabStore((s) => s.selectedTabIndex);
@@ -23,19 +22,19 @@ export function TopBar({
   const activeProjectDetails = activeProject ? projects[activeProject] : undefined;
 
   return (
-    <div className="flex h-11 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-4">
+    <div className="flex h-11 items-center justify-between border-b border-border bg-window-chrome px-4">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">RSQL</span>
+          <span className="text-sm font-semibold">RSQL</span>
         </div>
-        <div className="h-4 w-px bg-border/50" />
+        <div className="h-4 w-px bg-border" />
         {activeProject &&
         activeProjectDetails &&
         status[activeProject] === ProjectConnectionStatus.Connected ? (
-          <div className="flex items-center gap-1.5 bg-accent rounded-full px-2.5 py-0.5 text-xs text-muted-foreground">
-            <div className="h-2 w-2 rounded-full bg-success shadow-[0_0_6px_oklch(0.65_0.18_150)]" />
-            <span className="font-mono">{activeProject}</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/60 px-2.5 py-1 text-xs text-muted-foreground">
+            <div className="h-2 w-2 rounded-full bg-success" />
+            <span className="">{activeProject}</span>
             <span className="text-muted-foreground/50">&bull;</span>
             <span>
               {activeProjectDetails.host}:{activeProjectDetails.port}
@@ -44,8 +43,9 @@ export function TopBar({
         ) : (
           <div className="flex items-center gap-2">
             {Object.keys(projects).length > 0 ? (
-              <select
-                className="bg-input border border-border/50 text-foreground font-mono text-xs rounded-lg px-2 py-1"
+              <Select
+                size="sm"
+                className="w-auto"
                 value={activeProject ?? ""}
                 onChange={(e) => {
                   if (e.target.value) {
@@ -60,7 +60,7 @@ export function TopBar({
                     {status[id] === ProjectConnectionStatus.Connected ? "" : " \u2022 disconnected"}
                   </option>
                 ))}
-              </select>
+              </Select>
             ) : (
               <span className="text-xs text-muted-foreground">No connection</span>
             )}
@@ -73,29 +73,22 @@ export function TopBar({
         <button
           type="button"
           onClick={onOpenCommandPalette}
-          className="flex items-center gap-2 h-7 px-3 rounded-lg border border-border/50 bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          className="flex h-7 items-center gap-2 rounded-md border border-border bg-muted/60 px-3 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <Search className="h-3 w-3" />
-          <span className="text-xs font-mono">Search...</span>
-          <kbd className="hidden sm:inline-flex h-5 items-center gap-0.5 rounded border border-border/60 bg-muted px-1.5 font-mono text-[10px] text-muted-foreground/70">
+          <span className="text-xs">Search...</span>
+          <kbd className="font-mono hidden sm:inline-flex h-5 items-center gap-0.5 rounded border border-border bg-background px-1.5 text-3xs text-muted-foreground">
             {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}K
           </kbd>
         </button>
 
-        <div className="h-4 w-px bg-border/50" />
+        <div className="h-4 w-px bg-border" />
 
-        <Button variant="ghost" size="sm" className="h-8 gap-2" onClick={onCheckUpdates}>
+        <Button variant="ghost" size="sm" onClick={onCheckUpdates}>
           <Download className="h-4 w-4" />
           <span className="text-xs">Updates</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 hover:rotate-12 transition-all duration-200"
-          onClick={toggleTheme}
-        >
-          {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-        </Button>
+        <AppearanceMenu />
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ export function ResultsRecord({ columns, rows }: ResultsRecordProps) {
           >
             Prev
           </Button>
-          <span className="text-sm text-muted-foreground font-mono">
+          <span className="text-xs text-muted-foreground">
             Row {safeIndex + 1} of {rows.length.toLocaleString()}
           </span>
           <Button

@@ -1,7 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::AppState;
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError};
 use crate::drivers::pgsql::execute_virtual;
 
 use tokio::time::{Duration, sleep};

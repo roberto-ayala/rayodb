@@ -2,10 +2,11 @@ import { AlertTriangle, Copy, FileCode, Loader2, Play } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { SegmentedTabs } from "@/components/ui/panel";
+import { SqlCode } from "@/components/ui/sql-code";
 import type { StructureEditorState } from "@/lib/alter-table-sql";
 import { countChanges, generateAlterTableSQL } from "@/lib/alter-table-sql";
 import type { DriverFactory } from "@/lib/database-driver";
-import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 import { LoadingPlaceholder } from "../shared";
 import type { FKInfo } from "../types";
@@ -111,23 +112,12 @@ export function StructureEditorContent({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 pt-2">
-      <div className="flex gap-0.5 bg-background/30 rounded-lg p-0.5 border border-border/20 shrink-0 mb-2">
-        {subTabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setSubTab(t.key)}
-            className={cn(
-              "px-2.5 py-1 text-[10px] font-medium rounded-md transition-all",
-              subTab === t.key
-                ? "bg-background text-foreground shadow-sm shadow-black/10"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        className="mb-2 shrink-0"
+        tabs={subTabs.map((t) => ({ id: t.key, label: t.label }))}
+        value={subTab}
+        onChange={setSubTab}
+      />
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         {subTab === "columns" && <ColumnsSection draft={draft} setDraft={setDraft} />}
@@ -176,14 +166,16 @@ export function StructureEditorContent({
       </div>
 
       {showSql && sqlStatements.length > 0 && (
-        <div className="shrink-0 mt-2 rounded-xl border border-border/40 overflow-hidden bg-[hsl(var(--background))]">
-          <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/30">
-            <span className="text-[10px] font-mono text-muted-foreground/60">SQL Preview</span>
+        <div className="shrink-0 mt-2 rounded-lg border border-border overflow-hidden bg-[hsl(var(--background))]">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-muted/30 border-b border-border/60">
+            <span className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+              SQL Preview
+            </span>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   openTab(projectId, sqlPreview);
                   onOpenChange(false);
@@ -194,36 +186,34 @@ export function StructureEditorContent({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 gap-1 text-[10px] px-2 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => navigator.clipboard.writeText(sqlPreview)}
               >
                 <Copy className="h-2.5 w-2.5" /> Copy
               </Button>
             </div>
           </div>
-          <pre className="p-3 text-[11px] font-mono text-foreground/90 overflow-y-auto whitespace-pre-wrap leading-relaxed max-h-[150px] selection:bg-primary/20">
-            {sqlPreview}
-          </pre>
+          <SqlCode code={sqlPreview} className="max-h-[150px] overflow-y-auto p-3" />
         </div>
       )}
 
       {error && (
-        <div className="shrink-0 mt-2 flex items-center gap-2 px-3 py-2 rounded-md bg-destructive/10 text-destructive text-xs font-mono">
+        <div className="shrink-0 mt-2 flex items-center gap-2 px-3 py-2 rounded-md bg-destructive/10 text-destructive text-xs">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
           <span className="break-all">{error}</span>
         </div>
       )}
 
       {changes > 0 && (
-        <div className="shrink-0 mt-2 flex items-center gap-2 pt-2 border-t border-border/20">
-          <span className="text-[10px] font-medium text-muted-foreground">
+        <div className="shrink-0 mt-2 flex items-center gap-2 pt-2 border-t border-border/60">
+          <span className="text-xs font-medium text-muted-foreground">
             {changes} change{changes !== 1 ? "s" : ""}
           </span>
           <div className="flex-1" />
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-[11px] text-muted-foreground"
+            className="text-muted-foreground"
             onClick={() => {
               setDraft(initialState);
               setError(null);
@@ -232,18 +222,12 @@ export function StructureEditorContent({
           >
             Discard
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 text-[11px]"
-            onClick={() => setShowSql((v) => !v)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowSql((v) => !v)}>
             <FileCode className="h-3 w-3 mr-1" />
             {showSql ? "Hide SQL" : "Review SQL"}
           </Button>
           <Button
             size="sm"
-            className="h-7 px-3 text-[11px]"
             disabled={applying || sqlStatements.length === 0}
             onClick={() => void applyChanges()}
           >

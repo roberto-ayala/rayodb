@@ -9,7 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { SqlCode } from "@/components/ui/sql-code";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
@@ -87,31 +90,23 @@ export function EditorToolbar({
 
   return (
     <>
-      <div className="flex items-center gap-1 border-b border-border/40 bg-card/40 backdrop-blur-sm px-2 py-1 flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center gap-1.5 border-b border-border bg-muted px-3 py-1.5">
         <Button
-          variant="ghost"
+          variant="subtle"
           size="sm"
-          className="h-7 gap-1.5 text-xs px-2"
           onClick={() => setSaveDialogOpen(true)}
           disabled={!activeProject || !hasContent}
         >
           <Save className="h-3.5 w-3.5" />
           Save
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 gap-1.5 text-xs px-2"
-          onClick={formatQuery}
-          disabled={!hasContent}
-        >
+        <Button variant="subtle" size="sm" onClick={formatQuery} disabled={!hasContent}>
           <AlignLeft className="h-3.5 w-3.5" />
           Format
         </Button>
         <Button
-          variant={activeTab?.isSplit ? "outline" : "ghost"}
+          variant={activeTab?.isSplit ? "outline" : "subtle"}
           size="sm"
-          className="h-7 gap-1.5 text-xs px-2"
           onClick={() => toggleSplit(selectedTabIndex)}
           title="Toggle split editor"
         >
@@ -119,14 +114,15 @@ export function EditorToolbar({
           Split
         </Button>
 
-        <div className="h-4 w-px bg-border/40 mx-1" />
+        <div className="mx-1.5 h-4 w-px bg-border" />
 
         <div className="flex items-center gap-1">
           <Timer className="h-3 w-3 text-muted-foreground" />
-          <select
+          <Select
+            size="sm"
             value={activeTab.queryTimeout ?? 0}
             onChange={(e) => setQueryTimeout(selectedTabIndex, Number(e.target.value))}
-            className="h-7 bg-transparent border border-border/40 rounded text-xs font-mono text-muted-foreground px-1.5 outline-none focus:border-border cursor-pointer"
+            className="w-auto text-muted-foreground"
             title="Query timeout"
           >
             {TIMEOUT_OPTIONS.map((opt) => (
@@ -134,48 +130,36 @@ export function EditorToolbar({
                 {opt.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
-        <div className="h-4 w-px bg-border/40 mx-1" />
+        <div className="mx-1.5 h-4 w-px bg-border" />
 
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 text-xs px-2"
           onClick={onExplain}
           disabled={!activeProject || activeTab.isExecuting}
         >
           <GitBranch className="h-3.5 w-3.5" />
           Explain
-          <kbd className="hidden sm:inline-flex ml-0.5 text-[10px] text-muted-foreground/60">
+          <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs text-muted-foreground/60">
             {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+Shift+Enter
           </kbd>
         </Button>
         {activeTab.isExecuting ? (
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1.5 text-xs px-2.5 border-destructive/50 text-destructive hover:bg-destructive/10"
-            onClick={onCancel}
-          >
+          <Button variant="destructive" size="sm" onClick={onCancel}>
             <Square className="h-3 w-3" />
             Stop
-            <kbd className="hidden sm:inline-flex ml-0.5 text-[10px] opacity-60">
+            <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs opacity-60">
               {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+.
             </kbd>
           </Button>
         ) : (
-          <Button
-            variant="gradient"
-            size="sm"
-            className="h-7 gap-1.5 text-xs px-2.5"
-            onClick={onExecute}
-            disabled={!activeProject}
-          >
+          <Button variant="default" size="sm" onClick={onExecute} disabled={!activeProject}>
             <Play className="h-3.5 w-3.5" />
             Execute
-            <kbd className="hidden sm:inline-flex ml-0.5 text-[10px] text-white/60">
+            <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs text-primary-foreground/70">
               {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+Enter
             </kbd>
           </Button>
@@ -193,12 +177,9 @@ export function EditorToolbar({
               e.preventDefault();
               void handleSaveSubmit();
             }}
-            className="space-y-4 mt-2"
+            className="mt-2 space-y-3"
           >
-            <div className="space-y-2">
-              <label htmlFor="save-query-title" className="font-mono text-xs text-muted-foreground">
-                Query Name
-              </label>
+            <Field label="Query Name" htmlFor="save-query-title">
               <Input
                 id="save-query-title"
                 ref={saveInputRef}
@@ -207,12 +188,13 @@ export function EditorToolbar({
                 placeholder="e.g. Active users report"
                 required
               />
-            </div>
-            <div className="rounded-lg bg-muted/50 p-2 max-h-24 overflow-auto">
-              <pre className="font-mono text-[11px] text-muted-foreground whitespace-pre-wrap">
-                {activeTab?.editorValue?.slice(0, 300)}
-                {(activeTab?.editorValue?.length ?? 0) > 300 ? "..." : ""}
-              </pre>
+            </Field>
+            <div className="rounded-md bg-muted/50 p-2 max-h-24 overflow-auto">
+              <SqlCode
+                code={`${activeTab?.editorValue?.slice(0, 300) ?? ""}${
+                  (activeTab?.editorValue?.length ?? 0) > 300 ? "..." : ""
+                }`}
+              />
             </div>
             <div className="flex justify-end gap-2">
               <Button
@@ -225,7 +207,7 @@ export function EditorToolbar({
               </Button>
               <Button
                 type="submit"
-                variant="gradient"
+                variant="default"
                 className="text-xs"
                 disabled={!saveTitle.trim()}
               >

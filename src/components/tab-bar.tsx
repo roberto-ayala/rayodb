@@ -75,8 +75,8 @@ export function TabBar() {
   const projects = useProjectStore((s) => s.projects);
 
   return (
-    <div className="flex items-center bg-card/40 backdrop-blur-md min-h-[40px] border-b border-border/40">
-      <div className="flex flex-1 items-center overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none gap-0.5 px-1.5 py-1">
+    <div className="relative flex min-h-[38px] items-center border-b border-border bg-muted/40">
+      <div className="flex flex-1 items-end self-stretch overflow-x-auto overflow-y-hidden whitespace-nowrap scrollbar-none pl-1.5 pr-[84px] pt-1">
         {tabs.map((tab, idx) => {
           if (!tab) return null;
           const projectName = tab.projectId;
@@ -121,13 +121,17 @@ export function TabBar() {
                 ])
               }
               className={cn(
-                "group flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-150 cursor-pointer select-none",
+                // The active tab carries the surface of the bar right below it
+                // and covers the divider, so the two read as one region
+                "group relative z-10 flex shrink-0 items-center gap-2 h-8 rounded-t-md border border-b-0 px-3 transition-colors duration-150 cursor-pointer select-none -mb-px",
                 isActive
-                  ? "bg-accent/80 text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent/40 hover:text-foreground",
+                  ? "border-border bg-muted text-foreground"
+                  : // Hovering an inactive tab outlines it rather than filling it: a
+                    // fill would land on the active tab's own surface
+                    "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
               )}
             >
-              <div className="flex items-center gap-1.5 font-mono text-xs">
+              <div className="flex items-center gap-1.5 text-xs">
                 {tab.type === "terminal" ? (
                   <Terminal
                     className={cn("h-3 w-3", isActive ? "text-primary" : "text-muted-foreground")}
@@ -179,7 +183,7 @@ export function TabBar() {
                   e.stopPropagation();
                   handleCloseTab(idx);
                 }}
-                className="opacity-0 transition-all hover:bg-destructive/20 hover:text-destructive rounded-md p-0.5 group-hover:opacity-100"
+                className="rounded-sm p-0.5 opacity-0 transition-opacity hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -187,21 +191,15 @@ export function TabBar() {
           );
         })}
       </div>
-      <div className="flex items-center gap-0.5 pr-1.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => openTab()}
-          className="h-7 w-7 shrink-0 rounded-lg"
-          title="New query tab"
-        >
+      {/* Floats over the strip so tabs scroll under it */}
+      <div className="absolute inset-y-0 right-0 z-20 flex items-center gap-1 border-l border-border bg-muted/25 px-2 backdrop-blur-md">
+        <Button variant="outline" size="icon-sm" onClick={() => openTab()} title="New query tab">
           <Plus className="h-3.5 w-3.5" />
         </Button>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
           onClick={openTerminalTab}
-          className="h-7 w-7 shrink-0 rounded-lg"
           title="Open terminal (Cmd+`)"
         >
           <Terminal className="h-3.5 w-3.5" />

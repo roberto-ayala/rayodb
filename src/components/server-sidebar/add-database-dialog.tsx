@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { ProjectDetails } from "@/types";
 
 export function AddDatabaseDialog({
@@ -45,19 +45,16 @@ export function AddDatabaseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
-          <DialogTitle className="font-mono">Add Database</DialogTitle>
+          <DialogTitle className="">Add Database</DialogTitle>
           <DialogDescription>
             Add a database to{" "}
-            <span className="font-mono font-semibold text-foreground">
+            <span className="font-semibold text-foreground">
               {source?.host}:{source?.port}
             </span>
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-3 mt-2">
-          <div className="space-y-1">
-            <Label htmlFor="addDbName" className="font-mono text-xs">
-              Database Name
-            </Label>
+        <form onSubmit={handleSubmit} className="mt-2 space-y-3">
+          <Field label="Database Name" htmlFor="addDbName">
             <Input
               id="addDbName"
               value={dbName}
@@ -67,21 +64,16 @@ export function AddDatabaseDialog({
               }}
               placeholder="analytics_db"
               autoFocus
-              className="font-mono text-sm h-8"
             />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="addConnName" className="font-mono text-xs text-muted-foreground">
-              Connection Name
-            </Label>
+          </Field>
+          <Field label="Connection Name" htmlFor="addConnName">
             <Input
               id="addConnName"
               value={connName}
               onChange={(e) => setConnName(e.target.value)}
               placeholder={dbName || "optional"}
-              className="font-mono text-sm h-8"
             />
-          </div>
+          </Field>
           <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
@@ -91,7 +83,7 @@ export function AddDatabaseDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" variant="gradient" className="text-xs" disabled={!dbName.trim()}>
+            <Button type="submit" variant="default" className="text-xs" disabled={!dbName.trim()}>
               Add
             </Button>
           </div>

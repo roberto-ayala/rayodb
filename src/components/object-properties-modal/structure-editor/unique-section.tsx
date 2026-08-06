@@ -1,4 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import type { DraftUniqueConstraint, StructureEditorState } from "@/lib/alter-table-sql";
 import { cn } from "@/lib/utils";
 import { uid } from "./initialization";
@@ -22,14 +23,15 @@ export function UniqueSection({
           <div
             key={uc._id}
             className={cn(
-              "rounded-xl border px-3.5 py-3 space-y-2",
+              "rounded-lg border px-3.5 py-3 space-y-2",
               uc._status === "added"
                 ? "border-green-500/20 bg-green-500/5"
-                : "border-border/25 bg-muted/10",
+                : "border-border/60 bg-muted/10",
             )}
           >
             <div className="flex items-center gap-2">
-              <input
+              <Input
+                size="sm"
                 type="text"
                 value={uc.constraintName}
                 onChange={(e) => {
@@ -40,7 +42,7 @@ export function UniqueSection({
                     ),
                   }));
                 }}
-                className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/30 rounded-md outline-none focus:border-primary/50"
+                className="flex-1"
                 placeholder="Constraint name"
               />
               <button
@@ -64,7 +66,7 @@ export function UniqueSection({
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
-            <div className="text-[9px] text-muted-foreground/60 uppercase tracking-wider font-semibold">
+            <div className="text-3xs text-muted-foreground/60 uppercase tracking-wider font-semibold">
               Columns
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -87,10 +89,10 @@ export function UniqueSection({
                       }));
                     }}
                     className={cn(
-                      "px-2 py-0.5 text-[10px] font-mono rounded-md border transition-all",
+                      "px-2 py-0.5 text-3xs rounded-md border transition-all",
                       selected
                         ? "bg-primary/10 border-primary/30 text-foreground"
-                        : "border-border/20 text-muted-foreground hover:border-border/40",
+                        : "border-border/60 text-muted-foreground hover:border-border",
                     )}
                   >
                     {colName}
@@ -105,9 +107,9 @@ export function UniqueSection({
         .map((uc) => (
           <div
             key={uc._id}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/5 opacity-60"
+            className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500/20 bg-red-500/5 opacity-60"
           >
-            <span className="text-xs font-mono line-through flex-1">{uc.constraintName}</span>
+            <span className="text-xs line-through flex-1">{uc.constraintName}</span>
             <button
               type="button"
               onClick={() =>
@@ -118,7 +120,7 @@ export function UniqueSection({
                   ),
                 }))
               }
-              className="text-[10px] text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground"
             >
               Restore
             </button>
@@ -140,7 +142,7 @@ export function UniqueSection({
             ],
           }));
         }}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors w-full"
+        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-md transition-colors w-full"
       >
         <Plus className="h-3.5 w-3.5" /> Add Unique Constraint
       </button>

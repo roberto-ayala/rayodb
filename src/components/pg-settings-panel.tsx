@@ -2,6 +2,8 @@ import { Loader2, RefreshCw, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PanelHeader, PanelToolbar } from "@/components/ui/panel";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -99,45 +101,36 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Settings className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">PostgreSQL Settings</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] text-muted-foreground">
-            {filtered.length}/{settings.length}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => void refresh()}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </div>
-      </div>
+      <PanelHeader
+        icon={<Settings className="h-3.5 w-3.5" />}
+        title="PostgreSQL Settings"
+        subtitle={details?.database ?? projectId}
+      >
+        <span className="text-3xs text-muted-foreground">
+          {filtered.length}/{settings.length}
+        </span>
+        <Button variant="ghost" size="icon-sm" onClick={() => void refresh()} disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+        </Button>
+      </PanelHeader>
 
-      <div className="flex items-center gap-2 border-b px-4 py-2 flex-wrap">
+      <PanelToolbar className="flex-wrap">
         <Input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search settings..."
-          className="h-7 text-xs font-mono w-56 bg-input/50"
+          size="sm"
+          className="w-56"
         />
-        <select
+        <Select
           value={categoryFilter ?? ""}
           onChange={(e) => setCategoryFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 font-mono text-xs text-foreground"
+          size="sm"
+          className="w-auto"
         >
           <option value="">All categories</option>
           {categories.map((c) => (
@@ -145,11 +138,12 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               {c}
             </option>
           ))}
-        </select>
-        <select
+        </Select>
+        <Select
           value={contextFilter ?? ""}
           onChange={(e) => setContextFilter(e.target.value || null)}
-          className="h-7 rounded-md border bg-input/50 px-2 font-mono text-xs text-foreground"
+          size="sm"
+          className="w-auto"
         >
           <option value="">All contexts</option>
           <option value="user">user (SET)</option>
@@ -157,7 +151,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           <option value="sighup">sighup (reload)</option>
           <option value="postmaster">postmaster (restart)</option>
           <option value="internal">internal</option>
-        </select>
+        </Select>
         {(categoryFilter || contextFilter || filter) && (
           <button
             type="button"
@@ -166,69 +160,65 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
               setCategoryFilter(null);
               setContextFilter(null);
             }}
-            className="font-mono text-[10px] text-primary hover:underline"
+            className="text-xs text-primary hover:underline"
           >
             Clear filters
           </button>
         )}
-      </div>
+      </PanelToolbar>
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-card">
         {Array.from(grouped.entries()).map(([category, items]) => (
           <div key={category}>
-            <div className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm px-4 py-1.5 border-b border-border/30">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-muted/60 px-3 backdrop-blur">
+              <span className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {category}
               </span>
             </div>
-            <div className="divide-y divide-border/20">
+            <div className="divide-y divide-border/60">
               {items.map((s) => {
                 const isModified = s.setting !== s.bootVal;
                 return (
                   <div
                     key={s.name}
                     className={cn(
-                      "px-4 py-2 hover:bg-muted/30 transition-colors",
+                      "px-3 py-2 transition-colors hover:bg-hover",
                       isModified && "bg-primary/[0.02]",
                     )}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-medium">{s.name}</span>
+                      <span className="text-xs font-medium">{s.name}</span>
                       <span
                         className={cn(
-                          "rounded-full px-1.5 py-0.5 font-mono text-[9px]",
+                          "rounded-full px-1.5 py-0.5 text-3xs",
                           contextColor(s.context),
                         )}
                       >
                         {s.context}
                       </span>
                       {isModified && (
-                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] text-primary">
+                        <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-3xs text-primary">
                           modified
                         </span>
                       )}
                       {s.source && s.source !== "default" && (
-                        <span className="font-mono text-[9px] text-muted-foreground">
-                          via {s.source}
-                        </span>
+                        <span className="text-3xs text-muted-foreground">via {s.source}</span>
                       )}
                     </div>
                     <div className="mt-1 flex items-center gap-3">
-                      <span className="font-mono text-sm font-bold text-foreground">
+                      <span className="text-xs font-semibold tabular-nums text-foreground">
                         {s.setting}
                         {s.unit ? ` ${s.unit}` : ""}
                       </span>
                       {isModified && (
-                        <span className="font-mono text-[10px] text-muted-foreground">
+                        <span className="text-3xs text-muted-foreground">
                           default: {s.bootVal}
                           {s.unit ? ` ${s.unit}` : ""}
                         </span>
                       )}
                     </div>
                     {s.description && (
-                      <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
-                        {s.description}
-                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{s.description}</p>
                     )}
                   </div>
                 );
@@ -237,7 +227,7 @@ export function PgSettingsPanel({ projectId }: { projectId: string }) {
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             {filter || categoryFilter || contextFilter
               ? "No matching settings"
               : "No settings loaded"}

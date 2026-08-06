@@ -47,7 +47,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground text-sm font-mono">
+      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
         Loading roles...
       </div>
     );
@@ -58,8 +58,8 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
   return (
     <div className="flex h-full">
       {/* Role list */}
-      <div className="w-[240px] border-r border-border/30 overflow-y-auto">
-        <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+      <div className="w-[240px] border-r border-border/60 overflow-y-auto">
+        <div className="px-3 py-2 text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
           Roles ({roles.length})
         </div>
         {roles.map((role) => (
@@ -68,7 +68,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             type="button"
             onClick={() => selectRole(role.name)}
             className={cn(
-              "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs font-mono transition-colors",
+              "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs transition-colors",
               selectedRole === role.name
                 ? "bg-primary/10 text-primary"
                 : "text-foreground hover:bg-muted/30",
@@ -83,7 +83,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             )}
             <span className="truncate">{role.name}</span>
             {role.superuser && (
-              <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500">
+              <span className="ml-auto text-3xs px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500">
                 SUPER
               </span>
             )}
@@ -94,7 +94,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       {/* Detail panel */}
       <div className="flex-1 overflow-y-auto p-4">
         {!selected ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+          <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
             Select a role
           </div>
         ) : (
@@ -103,7 +103,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  "h-10 w-10 rounded-xl flex items-center justify-center",
+                  "h-10 w-10 rounded-lg flex items-center justify-center",
                   selected.superuser ? "bg-amber-500/10" : "bg-primary/10",
                 )}
               >
@@ -114,7 +114,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                 )}
               </div>
               <div>
-                <div className="font-mono font-semibold text-lg">{selected.name}</div>
+                <div className="font-semibold text-lg">{selected.name}</div>
                 <div className="text-xs text-muted-foreground">
                   {selected.login ? "Login role" : "Group role"}
                   {selected.conn_limit >= 0 && ` (max ${selected.conn_limit} connections)`}
@@ -124,7 +124,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
 
             {/* Attributes */}
             <div>
-              <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                 Attributes
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -141,10 +141,10 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   <span
                     key={label}
                     className={cn(
-                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono",
+                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs",
                       active
                         ? "bg-primary/10 text-primary border border-primary/20"
-                        : "bg-muted/30 text-muted-foreground/40 border border-border/20",
+                        : "bg-muted/30 text-muted-foreground/40 border border-border/60",
                     )}
                   >
                     {active ? (
@@ -161,7 +161,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             {/* Member of */}
             {selected.member_of.length > 0 && (
               <div>
-                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Member of
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -170,7 +170,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                       key={g}
                       type="button"
                       onClick={() => selectRole(g)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/50 text-xs font-mono hover:bg-accent transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/50 text-xs hover:bg-accent transition-colors"
                     >
                       <Users className="h-2.5 w-2.5" /> {g}
                     </button>
@@ -182,11 +182,11 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             {/* Database grants */}
             {dbGrants.length > 0 && (
               <div>
-                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Database Privileges
                 </div>
-                <div className="rounded-xl border border-border/30 overflow-hidden">
-                  <table className="w-full text-xs font-mono">
+                <div className="rounded-lg border border-border/60 overflow-hidden">
+                  <table className="w-full text-xs">
                     <thead>
                       <tr className="bg-muted/20">
                         <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
@@ -199,7 +199,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                     </thead>
                     <tbody>
                       {dbGrants.map((g, i) => (
-                        <tr key={i} className="border-t border-border/15">
+                        <tr key={i} className="border-t border-border/60">
                           <td className="px-3 py-1">
                             <Database className="h-3 w-3 inline mr-1.5 text-muted-foreground/50" />
                             {g.database}
@@ -216,12 +216,12 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             {/* Table grants */}
             {tableGrants.length > 0 && (
               <div>
-                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Table Privileges ({tableGrants.length})
                 </div>
-                <div className="rounded-xl border border-border/30 overflow-hidden max-h-[300px] overflow-y-auto">
-                  <table className="w-full text-xs font-mono">
-                    <thead className="sticky top-0 bg-muted/40 backdrop-blur-sm">
+                <div className="rounded-lg border border-border/60 overflow-hidden max-h-[300px] overflow-y-auto">
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0 bg-muted/40">
                       <tr>
                         <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
                           Schema
@@ -236,7 +236,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                     </thead>
                     <tbody>
                       {tableGrants.map((g, i) => (
-                        <tr key={i} className="border-t border-border/15">
+                        <tr key={i} className="border-t border-border/60">
                           <td className="px-3 py-1 text-muted-foreground">{g.schema}</td>
                           <td className="px-3 py-1">{g.table}</td>
                           <td className="px-3 py-1">
@@ -244,7 +244,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                               {g.privileges.map((p) => (
                                 <span
                                   key={p}
-                                  className="px-1.5 py-0.5 rounded bg-primary/5 text-[10px]"
+                                  className="px-1.5 py-0.5 rounded bg-primary/5 text-3xs"
                                 >
                                   {p}
                                 </span>
@@ -260,7 +260,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
             )}
 
             {selected.valid_until && (
-              <div className="text-xs text-muted-foreground font-mono">
+              <div className="text-xs text-muted-foreground">
                 <Key className="h-3 w-3 inline mr-1" />
                 Password valid until: {selected.valid_until}
               </div>

@@ -1,4 +1,4 @@
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 
 pub async fn parse_csv_preview(
     file_path: &str,
@@ -68,7 +68,7 @@ pub async fn import_csv_to_table(
     client
         .execute("BEGIN", &[])
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let mut imported = 0usize;
     for result in rdr.records() {

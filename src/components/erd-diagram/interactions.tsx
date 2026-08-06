@@ -57,7 +57,7 @@ interface ERDStatusBarProps {
 
 export function ERDStatusBar({ boxCount, fkCount, zoom }: ERDStatusBarProps) {
   return (
-    <div className="absolute bottom-3 right-3 z-20 text-xs text-muted-foreground bg-card/80 border border-border rounded px-2 py-0.5 font-mono flex gap-2">
+    <div className="absolute bottom-3 right-3 z-20 text-xs text-muted-foreground bg-card/80 border border-border rounded px-2 py-0.5 flex gap-2">
       <span>{boxCount} tables</span>
       <span>{fkCount} FKs</span>
       <span>{Math.round(zoom * 100)}%</span>

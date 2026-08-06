@@ -1,7 +1,7 @@
 import { DRIVER_CONFIGS } from "@/lib/database-driver";
 import type { DriverType } from "@/types";
+import { CheckboxField, Field } from "../ui/field";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 
 interface ConnStringFieldProps {
   value: string;
@@ -11,25 +11,25 @@ interface ConnStringFieldProps {
 
 export function ConnStringField({ value, onChange, error }: ConnStringFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="connString" className="font-mono text-xs text-foreground">
-        Connection URL
-      </Label>
-      <Input
-        id="connString"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="postgresql://user:password@host:5432/database"
-        className={`bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg ${error ? "border-destructive" : ""}`}
-      />
-      {error && (
-        <p className="text-destructive text-[11px] font-mono">Invalid connection URL format</p>
-      )}
+    <div className="space-y-4">
+      <Field
+        label="Connection URL"
+        htmlFor="connString"
+        error={error ? "Invalid connection URL format" : undefined}
+      >
+        <Input
+          id="connString"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="postgresql://user:password@host:5432/database"
+          className={error ? "border-destructive" : undefined}
+        />
+      </Field>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border/30" />
+          <span className="w-full border-t border-border" />
         </div>
-        <div className="relative flex justify-center text-[10px]">
+        <div className="relative flex justify-center text-3xs">
           <span className="bg-card px-2 text-muted-foreground">or fill in manually</span>
         </div>
       </div>
@@ -43,14 +43,15 @@ interface DriverDisplayProps {
 
 export function DriverDisplay({ driver }: DriverDisplayProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="driver" className="font-mono text-xs text-foreground">
-        Database Type
-      </Label>
-      <div className="w-full bg-input/80 border border-border/50 text-foreground font-mono text-sm rounded-lg px-3 py-2">
+    <Field label="Database Type" htmlFor="driver">
+      {/* Only one driver ships today, so this reads as a field but is static */}
+      <div
+        id="driver"
+        className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
+      >
         {DRIVER_CONFIGS[driver].name}
       </div>
-    </div>
+    </Field>
   );
 }
 
@@ -62,10 +63,7 @@ interface NameFieldProps {
 
 export function NameField({ value, onChange, disabled }: NameFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="name" className="font-mono text-xs text-foreground">
-        Connection Name
-      </Label>
+    <Field label="Connection Name" htmlFor="name">
       <Input
         id="name"
         value={value}
@@ -73,9 +71,8 @@ export function NameField({ value, onChange, disabled }: NameFieldProps) {
         placeholder="production-db"
         required
         disabled={disabled}
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
       />
-    </div>
+    </Field>
   );
 }
 
@@ -88,33 +85,25 @@ interface HostPortFieldsProps {
 
 export function HostPortFields({ host, port, onHostChange, onPortChange }: HostPortFieldsProps) {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="host" className="font-mono text-xs text-foreground">
-          Host
-        </Label>
+    <div className="grid grid-cols-[1fr_8rem] gap-4">
+      <Field label="Host" htmlFor="host">
         <Input
           id="host"
           value={host}
           onChange={(e) => onHostChange(e.target.value)}
           placeholder="localhost"
           required
-          className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="port" className="font-mono text-xs text-foreground">
-          Port
-        </Label>
+      </Field>
+      <Field label="Port" htmlFor="port">
         <Input
           id="port"
           value={port}
           onChange={(e) => onPortChange(e.target.value)}
           placeholder="5432"
           required
-          className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
         />
-      </div>
+      </Field>
     </div>
   );
 }
@@ -126,19 +115,15 @@ interface DatabaseFieldProps {
 
 export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="database" className="font-mono text-xs text-foreground">
-        Database
-      </Label>
+    <Field label="Database" htmlFor="database">
       <Input
         id="database"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="mydb"
         required
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
       />
-    </div>
+    </Field>
   );
 }
 
@@ -149,19 +134,15 @@ interface UsernameFieldProps {
 
 export function UsernameField({ value, onChange }: UsernameFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="username" className="font-mono text-xs text-foreground">
-        Username
-      </Label>
+    <Field label="Username" htmlFor="username">
       <Input
         id="username"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="postgres"
         required
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
       />
-    </div>
+    </Field>
   );
 }
 
@@ -172,19 +153,15 @@ interface PasswordFieldProps {
 
 export function PasswordField({ value, onChange }: PasswordFieldProps) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor="password" className="font-mono text-xs text-foreground">
-        Password
-      </Label>
+    <Field label="Password" htmlFor="password">
       <Input
         id="password"
         type="password"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="••••••••"
-        className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg"
       />
-    </div>
+    </Field>
   );
 }
 
@@ -194,18 +171,5 @@ interface SslCheckboxProps {
 }
 
 export function SslCheckbox({ checked, onChange }: SslCheckboxProps) {
-  return (
-    <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id="ssl"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border-border bg-input"
-      />
-      <Label htmlFor="ssl" className="font-mono text-xs text-foreground cursor-pointer">
-        Use SSL
-      </Label>
-    </div>
-  );
+  return <CheckboxField id="ssl" label="Use SSL" checked={checked} onChange={onChange} />;
 }

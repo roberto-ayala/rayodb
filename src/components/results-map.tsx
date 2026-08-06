@@ -266,7 +266,7 @@ export function ResultsMap({ columns, rows }: ResultsMapProps) {
   return (
     <div className="flex-1 min-h-0 relative">
       <div ref={mapRef} className="absolute inset-0" />
-      <div className="absolute bottom-3 left-3 z-[1000] bg-card/90 border border-border rounded px-2 py-1 text-xs font-mono text-muted-foreground">
+      <div className="absolute bottom-3 left-3 z-[1000] bg-card/90 border border-border rounded px-2 py-1 text-xs text-muted-foreground">
         {geometries.length} geometries from "{columns[geomCol]}"
       </div>
     </div>

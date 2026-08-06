@@ -66,11 +66,9 @@ export function renderTableDetails(
             ) : (
               <Columns3 className="h-3 w-3 shrink-0 text-muted-foreground/50" />
             )}
-            <span className="font-mono text-[11px] text-foreground">{c.name}</span>
-            <span className="font-mono text-[10px] text-muted-foreground">{c.dataType}</span>
-            {c.nullable && (
-              <span className="font-mono text-[9px] text-muted-foreground/40">NULL</span>
-            )}
+            <span className="text-xs text-foreground">{c.name}</span>
+            <span className="text-3xs text-muted-foreground">{c.dataType}</span>
+            {c.nullable && <span className="text-3xs text-muted-foreground/40">NULL</span>}
           </div>
         ))}
 
@@ -101,13 +99,11 @@ export function renderTableDetails(
                   ) : (
                     <Key className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                   )}
-                  <span className="font-mono text-[11px] text-foreground">{name}</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">
+                  <span className="text-xs text-foreground">{name}</span>
+                  <span className="text-3xs text-muted-foreground">
                     ({idxEntries.map((e) => e.columnName).join(", ")})
                   </span>
-                  {f.isUnique && (
-                    <span className="font-mono text-[9px] text-blue-500/60">UNIQUE</span>
-                  )}
+                  {f.isUnique && <span className="text-3xs text-blue-500/60">UNIQUE</span>}
                 </div>
               );
             })}
@@ -134,10 +130,8 @@ export function renderTableDetails(
                   style={{ paddingLeft: `${I.item}px` }}
                 >
                   <Link2 className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                  <span className="font-mono text-[11px] text-foreground">{name}</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">
-                    {f.constraintType}
-                  </span>
+                  <span className="text-xs text-foreground">{name}</span>
+                  <span className="text-3xs text-muted-foreground">{f.constraintType}</span>
                 </div>
               );
             })}
@@ -162,8 +156,8 @@ export function renderTableDetails(
                 style={{ paddingLeft: `${I.item}px` }}
               >
                 <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                <span className="font-mono text-[11px] text-foreground">{t.triggerName}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="text-xs text-foreground">{t.triggerName}</span>
+                <span className="text-3xs text-muted-foreground">
                   {t.timing} {t.event}
                 </span>
               </div>
@@ -189,8 +183,8 @@ export function renderTableDetails(
                 style={{ paddingLeft: `${I.item}px` }}
               >
                 <ScrollText className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                <span className="font-mono text-[11px] text-foreground">{r.ruleName}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">{r.event}</span>
+                <span className="text-xs text-foreground">{r.ruleName}</span>
+                <span className="text-3xs text-muted-foreground">{r.event}</span>
               </div>
             ))}
         </>
@@ -214,8 +208,8 @@ export function renderTableDetails(
                 style={{ paddingLeft: `${I.item}px` }}
               >
                 <Lock className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                <span className="font-mono text-[11px] text-foreground">{p.policyName}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="text-xs text-foreground">{p.policyName}</span>
+                <span className="text-3xs text-muted-foreground">
                   {p.permissive} {p.command}
                 </span>
               </div>

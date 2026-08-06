@@ -1,5 +1,6 @@
 import { AlertTriangle, Check, Key, Loader2, Play, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { ObjectType } from "./types";
 
@@ -146,14 +147,14 @@ export function ActionsContent({
       {/* Quick open in tab */}
       {objectType === "table" && (
         <div className="space-y-2">
-          <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+          <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
             Quick Queries
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT * FROM ${qualified} LIMIT 100;`);
                 onOpenChange(false);
@@ -164,7 +165,7 @@ export function ActionsContent({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT COUNT(*) FROM ${qualified};`);
                 onOpenChange(false);
@@ -175,7 +176,7 @@ export function ActionsContent({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 text-xs gap-1.5"
+              className="gap-1.5"
               onClick={() => {
                 openTab(projectId, `SELECT * FROM ${qualified} ORDER BY 1 DESC LIMIT 10;`);
                 onOpenChange(false);
@@ -191,7 +192,7 @@ export function ActionsContent({
       {actionResult && (
         <div
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-md text-xs font-mono",
+            "flex items-center gap-2 px-3 py-2 rounded-md text-xs",
             actionResult.type === "success"
               ? "bg-success/10 text-success"
               : "bg-destructive/10 text-destructive",
@@ -207,7 +208,7 @@ export function ActionsContent({
       )}
 
       {/* Action buttons */}
-      <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+      <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
         Maintenance & Operations
       </div>
       <div className="space-y-2">
@@ -215,10 +216,10 @@ export function ActionsContent({
           <div
             key={action.label}
             className={cn(
-              "rounded-xl border bg-muted/10 transition-all",
+              "rounded-lg border bg-muted/10 transition-all",
               confirmAction === action.label
-                ? "border-border/40 bg-muted/20"
-                : "border-border/25 hover:border-border/40 hover:bg-muted/20",
+                ? "border-border bg-muted/20"
+                : "border-border/60 hover:border-border hover:bg-muted/20",
             )}
           >
             <div className="flex items-center gap-3 px-3.5 py-3">
@@ -232,21 +233,18 @@ export function ActionsContent({
               </span>
               <div className="flex-1 min-w-0">
                 <div
-                  className={cn(
-                    "text-xs font-mono font-medium",
-                    action.destructive && "text-destructive",
-                  )}
+                  className={cn("text-xs font-medium", action.destructive && "text-destructive")}
                 >
                   {action.label}
                 </div>
-                <div className="text-[11px] text-muted-foreground">{action.description}</div>
+                <div className="text-xs text-muted-foreground">{action.description}</div>
               </div>
               {confirmAction !== action.label && (
                 <Button
                   variant={action.destructive ? "ghost" : "outline"}
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-xs shrink-0",
+                    "shrink-0",
                     action.destructive && "text-destructive hover:bg-destructive/10",
                   )}
                   disabled={actionLoading}
@@ -265,23 +263,23 @@ export function ActionsContent({
             {confirmAction === action.label && (
               <div className="px-3.5 pb-3 flex items-center gap-2">
                 <div className="flex-1 flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    Type <span className="font-mono font-semibold text-foreground">{name}</span> to
-                    confirm
+                  <span className="text-3xs text-muted-foreground whitespace-nowrap">
+                    Type <span className="font-semibold text-foreground">{name}</span> to confirm
                   </span>
-                  <input
+                  <Input
+                    size="sm"
                     type="text"
                     value={confirmInput}
                     onChange={(e) => setConfirmInput(e.target.value)}
                     placeholder={name}
-                    className="flex-1 h-7 px-2 text-xs font-mono bg-background border border-border/40 rounded-md outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/30"
+                    className="flex-1"
                   />
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-7 px-3 text-[11px] font-medium",
+                    "font-medium",
                     action.destructive
                       ? "text-destructive hover:bg-destructive/10"
                       : "text-foreground hover:bg-muted/50",
@@ -294,7 +292,7 @@ export function ActionsContent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 text-[11px] text-muted-foreground"
+                  className="text-muted-foreground"
                   onClick={() => setConfirmAction(null)}
                 >
                   Cancel

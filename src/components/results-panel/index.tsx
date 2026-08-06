@@ -10,6 +10,7 @@ import { ResultsGrid } from "../results-grid";
 import { ResultsMap } from "../results-map";
 import { ResultsRecord } from "../results-record";
 import { DiffView } from "./diff-view";
+import { QueryErrorState } from "./query-error-state";
 import { ResultsToolbar } from "./toolbar";
 import type { PanelView } from "./types";
 import { useEditMode } from "./use-edit-mode";
@@ -35,6 +36,7 @@ export function ResultsPanel() {
   }, [searchTerm]);
 
   const result = activeTab?.result;
+  const queryError = activeTab?.queryError;
   const isExecuting = activeTab?.isExecuting;
   const vq = activeTab?.virtualQuery;
 
@@ -132,7 +134,7 @@ export function ResultsPanel() {
 
   if (panelView !== "history" && isExecuting && !result) {
     return (
-      <div className="flex h-full flex-col">
+      <div className="flex h-full flex-col border-t border-border bg-card">
         <ResultsToolbar
           {...toolbarProps}
           result={null}
@@ -142,7 +144,7 @@ export function ResultsPanel() {
         />
         <div className="flex flex-1 items-center justify-center text-muted-foreground gap-2">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span className="text-sm">Executing query...</span>
+          <span className="text-xs">Executing query...</span>
         </div>
       </div>
     );
@@ -198,9 +200,9 @@ export function ResultsPanel() {
     );
   }
 
-  if (!result) {
+  if (queryError) {
     return (
-      <div className="flex h-full flex-col">
+      <div className="flex h-full flex-col border-t border-border bg-card">
         <ResultsToolbar
           {...toolbarProps}
           result={null}
@@ -208,7 +210,22 @@ export function ResultsPanel() {
           filteredRows={[]}
           filteredCount={0}
         />
-        <div className="flex flex-1 items-center justify-center text-muted-foreground">
+        <QueryErrorState error={queryError} />
+      </div>
+    );
+  }
+
+  if (!result) {
+    return (
+      <div className="flex h-full flex-col border-t border-border bg-card">
+        <ResultsToolbar
+          {...toolbarProps}
+          result={null}
+          columns={[]}
+          filteredRows={[]}
+          filteredCount={0}
+        />
+        <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
           No data to display
         </div>
       </div>

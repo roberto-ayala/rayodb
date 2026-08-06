@@ -1,6 +1,7 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { AlertCircle, ArrowRight, Check, FileUp, Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -113,7 +114,7 @@ export function CSVImportModal({
           </DialogTitle>
           <DialogDescription>
             Import data into{" "}
-            <span className="font-mono text-foreground">
+            <span className="text-foreground">
               {schema}.{table}
             </span>
           </DialogDescription>
@@ -125,7 +126,7 @@ export function CSVImportModal({
             variant="outline"
             onClick={pickFile}
             disabled={importing}
-            className="w-full justify-center gap-2 font-mono text-xs"
+            className="w-full justify-center gap-2 text-xs"
           >
             <FileUp className="h-3.5 w-3.5" />
             {filePath ? filePath.split("/").pop() : "Choose CSV file..."}
@@ -133,9 +134,9 @@ export function CSVImportModal({
 
           {/* Preview */}
           {csvHeaders.length > 0 && (
-            <div className="rounded-xl border border-border/40 overflow-hidden">
+            <div className="rounded-lg border border-border overflow-hidden">
               <div className="overflow-x-auto max-h-[200px]">
-                <table className="w-full text-xs font-mono">
+                <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-muted/30">
                       {csvHeaders.map((h, i) => (
@@ -150,7 +151,7 @@ export function CSVImportModal({
                   </thead>
                   <tbody>
                     {previewRows.map((row, ri) => (
-                      <tr key={ri} className="border-t border-border/20">
+                      <tr key={ri} className="border-t border-border/60">
                         {row.map((cell, ci) => (
                           <td
                             key={ci}
@@ -175,15 +176,16 @@ export function CSVImportModal({
               </div>
               <div className="grid gap-1.5 max-h-[200px] overflow-y-auto">
                 {csvHeaders.map((h, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs font-mono">
+                  <div key={i} className="flex items-center gap-2 text-xs">
                     <span className="w-[140px] truncate text-muted-foreground" title={h}>
                       {h}
                     </span>
                     <ArrowRight className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-                    <select
+                    <Select
                       value={mapping[i] ?? ""}
                       onChange={(e) => setMapping((m) => ({ ...m, [i]: e.target.value }))}
-                      className="flex-1 bg-input/80 border border-border/50 rounded-lg px-2 py-1 text-xs font-mono text-foreground"
+                      size="sm"
+                      className="flex-1"
                     >
                       <option value="">-- skip --</option>
                       {tableColumns.map((col) => (
@@ -191,7 +193,7 @@ export function CSVImportModal({
                           {col}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                 ))}
               </div>
@@ -202,7 +204,7 @@ export function CSVImportModal({
           {result && (
             <div
               className={cn(
-                "flex items-center gap-2 text-xs font-mono px-3 py-2 rounded-lg",
+                "flex items-center gap-2 text-xs px-3 py-2 rounded-md",
                 result.success
                   ? "bg-success/10 text-success"
                   : "bg-destructive/10 text-destructive",
@@ -223,16 +225,16 @@ export function CSVImportModal({
               variant="ghost"
               onClick={() => handleClose(false)}
               disabled={importing}
-              className="font-mono text-xs"
+              className="text-xs"
             >
               {result?.success ? "Done" : "Cancel"}
             </Button>
             {!result?.success && (
               <Button
-                variant="gradient"
+                variant="default"
                 onClick={handleImport}
                 disabled={importing || !filePath || csvHeaders.length === 0}
-                className="font-mono text-xs gap-2"
+                className="text-xs gap-2"
               >
                 {importing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Import

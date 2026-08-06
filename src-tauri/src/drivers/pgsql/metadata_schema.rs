@@ -2,7 +2,7 @@ use deadpool_postgres::Pool;
 use tokio::time as tokio_time;
 use tokio_postgres::Client;
 
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 
 use super::{ColumnDetail, ConstraintDetail, IndexDetail, PolicyDetail, RuleDetail, TriggerDetail};
@@ -14,7 +14,7 @@ pub async fn load_schemas(client: &Client, query_sql: &str) -> Result<PgsqlLoadS
     )
     .await
     .map_err(|_| AppError::QueryTimeout)?
-    .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+    .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows.iter().map(|r| r.get(0)).collect())
 }
@@ -30,7 +30,7 @@ pub async fn load_databases(pool: &Pool) -> Result<Vec<String>, AppError> {
             &[],
         )
         .await
-        .map_err(|e| AppError::DatabaseError(e.to_string()))?;
+        .map_err(|e| AppError::DatabaseError(pg_error_message(&e)))?;
     Ok(rows.iter().map(|r| r.get::<_, String>(0)).collect())
 }
 
@@ -47,7 +47,7 @@ pub async fn load_tablespaces(pool: &Pool) -> Result<Vec<(String, String, String
             &[],
         )
         .await
-        .map_err(|e| AppError::DatabaseError(e.to_string()))?;
+        .map_err(|e| AppError::DatabaseError(pg_error_message(&e)))?;
     Ok(rows
         .iter()
         .map(|r| {
@@ -68,7 +68,7 @@ pub async fn load_tables(
     let rows = client
         .query(query_sql, &[&schema])
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
 }
@@ -87,7 +87,7 @@ pub async fn load_columns(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows.iter().map(|r| r.get::<_, String>(0)).collect())
 }
@@ -106,7 +106,7 @@ pub async fn load_column_details(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()
@@ -142,7 +142,7 @@ pub async fn load_indexes(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()
@@ -170,7 +170,7 @@ pub async fn load_triggers(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()
@@ -197,7 +197,7 @@ pub async fn load_rules(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()
@@ -234,7 +234,7 @@ pub async fn load_policies(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()
@@ -268,7 +268,7 @@ pub async fn load_constraints(
             &[&schema, &table],
         )
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows
         .iter()

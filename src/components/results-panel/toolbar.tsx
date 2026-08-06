@@ -6,16 +6,22 @@ import {
   GitBranch,
   History,
   Loader2,
+  Map as MapIcon,
   Pin,
+  Rows3,
   Search,
   Square,
+  Table2,
   X,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SegmentedTabs } from "@/components/ui/panel";
 import { useUIStore } from "@/stores/ui-store";
 import { hasGeometryColumn } from "../results-map";
 import { ToolbarEdit } from "./toolbar-edit";
 import { ToolbarExport } from "./toolbar-export";
-import type { ToolbarProps } from "./types";
+import type { PanelView, ToolbarProps } from "./types";
 
 export function ResultsToolbar(props: ToolbarProps) {
   const {
@@ -28,7 +34,6 @@ export function ResultsToolbar(props: ToolbarProps) {
     setSearchTerm,
     filteredCount,
     setViewMode,
-    viewMode,
     hasExplain,
     isExecuting,
     isEditing,
@@ -51,80 +56,39 @@ export function ResultsToolbar(props: ToolbarProps) {
   const pinResult = useUIStore((s) => s.pinResult);
   const clearPinnedResult = useUIStore((s) => s.clearPinnedResult);
 
+  // panelView is the single source of truth for which view is on screen;
+  // viewMode only remembers which of grid/record to return to.
+  const views: { id: PanelView; label: string; icon: typeof Table2; disabled?: boolean }[] = [
+    { id: "grid", label: "Grid", icon: Table2 },
+    {
+      id: "record",
+      label: "Record",
+      icon: Rows3,
+      disabled: !result?.rows.length || !!virtualQuery,
+    },
+    ...(hasExplain ? [{ id: "explain" as const, label: "Explain", icon: GitBranch }] : []),
+    { id: "history", label: "History", icon: History },
+    ...(result && hasGeometryColumn(columns, filteredRows)
+      ? [{ id: "map" as const, label: "Map", icon: MapIcon }]
+      : []),
+  ];
+
   return (
-    <div className="flex items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur px-4 py-2 flex-shrink-0">
+    <div className="flex items-center justify-between border-b border-border bg-muted px-3 py-1.5 flex-shrink-0">
       <div className="flex items-center gap-3">
-        {/* Panel tabs — segment control */}
-        <div className="inline-flex rounded-lg bg-muted p-0.5">
-          <button
-            type="button"
-            onClick={() => {
-              setPanelView("grid");
-              setViewMode("grid");
-            }}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 ${
-              panelView !== "history" && viewMode === "grid"
-                ? "bg-accent text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Grid
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPanelView("record");
-              setViewMode("record");
-            }}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 ${
-              panelView !== "history" && viewMode === "record"
-                ? "bg-accent text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-            disabled={!result?.rows.length || !!virtualQuery}
-          >
-            Record
-          </button>
-          {hasExplain && (
-            <button
-              type="button"
-              onClick={() => setPanelView("explain")}
-              className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
-                panelView === "explain"
-                  ? "bg-accent text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <GitBranch className="h-3 w-3" />
-              Explain
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setPanelView("history")}
-            className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
-              panelView === "history"
-                ? "bg-accent text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <History className="h-3 w-3" />
-            History
-          </button>
-          {result && hasGeometryColumn(columns, filteredRows) && (
-            <button
-              type="button"
-              onClick={() => setPanelView("map")}
-              className={`px-2 py-0.5 rounded-md text-xs font-mono transition-all duration-150 flex items-center gap-1 ${
-                panelView === "map"
-                  ? "bg-accent text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Map
-            </button>
-          )}
-        </div>
+        <SegmentedTabs
+          tabs={views.map((v) => ({
+            id: v.id,
+            label: v.label,
+            icon: <v.icon className="h-3 w-3" />,
+            disabled: v.disabled,
+          }))}
+          value={panelView}
+          onChange={(id) => {
+            setPanelView(id);
+            if (id === "grid" || id === "record") setViewMode(id);
+          }}
+        />
 
         {/* Result stats */}
         {panelView !== "history" && result && (
@@ -168,14 +132,10 @@ export function ResultsToolbar(props: ToolbarProps) {
 
         {/* Stop button — visible while executing */}
         {isExecuting && onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors"
-          >
+          <Button variant="destructive" size="sm" onClick={onCancel} className="">
             <Square className="h-3 w-3" />
             Stop
-          </button>
+          </Button>
         )}
       </div>
 
@@ -197,22 +157,23 @@ export function ResultsToolbar(props: ToolbarProps) {
           <>
             {/* Edit button */}
             {panelView !== "history" && editableTable && result && result.rows.length > 0 && (
-              <button
-                type="button"
+              <Button
+                variant="subtle"
+                size="sm"
                 onClick={onEnterEdit}
-                className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className=""
                 title="Edit table data inline"
               >
                 <Edit3 className="h-3 w-3" />
                 Edit
-              </button>
+              </Button>
             )}
 
             {/* Pin / Diff */}
             {panelView !== "history" && result && result.rows.length > 0 && !virtualQuery && (
               <>
                 {pinnedResult ? (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono bg-primary/10 text-primary border border-primary/20">
+                  <div className="flex h-7 items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 text-xs text-primary">
                     <Pin className="h-3 w-3" />
                     <span>Pinned: {pinnedResult.label}</span>
                     <button
@@ -225,34 +186,32 @@ export function ResultsToolbar(props: ToolbarProps) {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    type="button"
+                  <Button
+                    variant="subtle"
+                    size="sm"
                     onClick={() =>
                       pinResult(
                         { columns, rows: filteredRows, time: result.time },
                         `${filteredRows.length} rows`,
                       )
                     }
-                    className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    className=""
                     title="Pin current results for later diff comparison"
                   >
                     <Pin className="h-3 w-3" />
                     Pin
-                  </button>
+                  </Button>
                 )}
                 {pinnedResult && (
-                  <button
-                    type="button"
+                  <Button
+                    variant={panelView === "diff" ? "default" : "subtle"}
+                    size="sm"
                     onClick={() => setPanelView(panelView === "diff" ? "grid" : "diff")}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono transition-colors ${
-                      panelView === "diff"
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`}
+                    className=""
                   >
                     <Diff className="h-3 w-3" />
                     Diff
-                  </button>
+                  </Button>
                 )}
               </>
             )}
@@ -266,12 +225,13 @@ export function ResultsToolbar(props: ToolbarProps) {
             {panelView !== "history" && result && !virtualQuery && (
               <div className="relative flex items-center">
                 <Search className="absolute left-2 h-3 w-3 text-muted-foreground pointer-events-none" />
-                <input
+                <Input
+                  size="sm"
                   type="text"
                   placeholder="Search results..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-7 w-48 rounded border border-border bg-input pl-7 pr-7 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-48 pl-7 pr-7"
                 />
                 {searchTerm && (
                   <button

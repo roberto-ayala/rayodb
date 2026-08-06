@@ -242,7 +242,12 @@ export function ResultsGrid({
     [isEditing, virtualQuery, fkColIndices, onFKNavigate, columns, rows],
   );
 
-  const gridTheme = useMemo((): Partial<Theme> => buildGridTheme(theme), [theme]);
+  const accentHue = useUIStore((s) => s.accentHue);
+  const gridTheme = useMemo(
+    (): Partial<Theme> => buildGridTheme(theme),
+    // biome-ignore lint/correctness/useExhaustiveDependencies: colors are read from the document
+    [theme, accentHue],
+  );
 
   const rowMarkers = isEditing ? ("checkbox-visible" as const) : ("none" as const);
   const [selection, setSelection] = useState<GridSelection>({

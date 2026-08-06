@@ -1,6 +1,6 @@
 use tokio_postgres::{Client, SimpleQueryMessage};
 
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 
 pub async fn generate_full_ddl(
     client: &Client,
@@ -47,7 +47,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let col_result = client
         .simple_query(&sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     let mut col_defs = String::new();
     for msg in &col_result {
         if let SimpleQueryMessage::Row(row) = msg {
@@ -82,7 +82,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let con_result = client
         .simple_query(&con_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&con_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -101,7 +101,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let idx_result = client
         .simple_query(&idx_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&idx_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -119,7 +119,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let trig_result = client
         .simple_query(&trig_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&trig_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -135,7 +135,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let rls_result = client
         .simple_query(&rls_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&rls_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -157,7 +157,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let pol_result = client
         .simple_query(&pol_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&pol_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -174,7 +174,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let cmt_result = client
         .simple_query(&cmt_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&cmt_result) {
         ddl.push('\n');
         ddl.push_str(&line);
@@ -193,7 +193,7 @@ SELECT string_agg(col_def, E',\n' ORDER BY ordinal_position) FROM col_ddl"#
     let col_cmt_result = client
         .simple_query(&col_cmt_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for line in collect_lines(&col_cmt_result) {
         ddl.push_str(&line);
         ddl.push('\n');
@@ -209,7 +209,7 @@ async fn generate_view_ddl(client: &Client, schema: &str, view: &str) -> Result<
     let result = client
         .simple_query(&sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for msg in &result {
         if let SimpleQueryMessage::Row(row) = msg {
             return Ok(row.get(0).unwrap_or("").to_string());
@@ -231,7 +231,7 @@ async fn generate_matview_ddl(
     let result = client
         .simple_query(&sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let mut ddl = String::new();
     for msg in &result {
@@ -250,7 +250,7 @@ async fn generate_matview_ddl(
     let idx_result = client
         .simple_query(&idx_sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for msg in &idx_result {
         if let SimpleQueryMessage::Row(row) = msg {
             if let Some(line) = row.get(0) {
@@ -278,7 +278,7 @@ async fn generate_function_ddl(
     let result = client
         .simple_query(&sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
     for msg in &result {
         if let SimpleQueryMessage::Row(row) = msg {
             return Ok(row.get(0).unwrap_or("").to_string());

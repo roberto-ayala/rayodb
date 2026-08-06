@@ -55,16 +55,12 @@ export function StatusBar() {
   const conn = resources
     ? `${resources.db_connections_in_use}/${resources.db_connections_open}`
     : "--";
-  const connWaiting =
-    resources && resources.db_connections_waiting > 0
-      ? ` (${resources.db_connections_waiting} wait)`
-      : "";
-  const net = resources
-    ? `↓ ${formatMbps(resources.network_rx_mbps)} ↑ ${formatMbps(resources.network_tx_mbps)}`
-    : "--";
+  const rx = resources ? formatMbps(resources.network_rx_mbps) : "--";
+  const tx = resources ? formatMbps(resources.network_tx_mbps) : "--";
+  const waiting = resources?.db_connections_waiting ?? 0;
 
   return (
-    <div className="flex h-7 items-center justify-between bg-card/60 backdrop-blur-sm px-3 text-[11px] font-mono text-muted-foreground">
+    <div className="grid h-7 grid-cols-[1fr_auto_1fr] items-center border-t border-border bg-window-chrome px-3 pb-px text-xs text-muted-foreground">
       <div className="flex items-center gap-2">
         {projectId && details ? (
           <div
@@ -94,24 +90,55 @@ export function StatusBar() {
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        <span>APP CPU {cpu}</span>
-        <span className="opacity-40">&bull;</span>
-        <span>RSS {rss}</span>
-        <span className="opacity-40">&bull;</span>
-        <span>PROC {proc}</span>
-        <span className="opacity-40">&bull;</span>
-        <span>
-          CONN {conn}
-          {connWaiting}
-        </span>
-        <span className="opacity-40">&bull;</span>
-        <span>NET {net}</span>
+      <div className="flex items-center gap-6 justify-self-center">
+        <Metric label="CPU" value={cpu} width="6ch" />
+        <Metric label="RSS" value={rss} width="8ch" />
+        <Metric label="PROC" value={proc} width="3ch" />
+        <Metric
+          label="CONN"
+          value={conn}
+          width="6ch"
+          note={waiting > 0 ? `${waiting} waiting` : undefined}
+        />
+        <Metric label="NET" value={`↓ ${rx} ↑ ${tx}`} width="27ch" />
       </div>
 
-      <div className="flex items-center gap-2">
-        <span>{historyCount} queries in history</span>
+      <div className="flex items-center justify-self-end gap-2">
+        <span className="font-mono tabular-nums">{historyCount}</span>
+        <span>queries in history</span>
       </div>
     </div>
+  );
+}
+
+/**
+ * Metrics tick every second, so each value gets a fixed slot in mono: the row
+ * keeps its width whatever the numbers do, and the grid keeps it centred
+ * regardless of what the sides show.
+ */
+function Metric({
+  label,
+  value,
+  width,
+  note,
+}: {
+  label: string;
+  value: string;
+  width: string;
+  note?: string;
+}) {
+  return (
+    <span className="flex items-center gap-1" title={note}>
+      {label && <span className="text-3xs font-semibold uppercase tracking-widest">{label}</span>}
+      <span
+        className="whitespace-nowrap font-mono tabular-nums text-foreground/80"
+        style={{ width }}
+      >
+        {value}
+      </span>
+      <span
+        className={cn("h-1.5 w-1.5 shrink-0 rounded-full", note ? "bg-warning" : "bg-transparent")}
+      />
+    </span>
   );
 }

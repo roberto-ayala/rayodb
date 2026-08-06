@@ -14,15 +14,15 @@ import {
   Zap,
 } from "lucide-react";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { SegmentedTabs } from "@/components/ui/panel";
 import type { ObjectType, Tab } from "./types";
 
 const objectIcon: Record<ObjectType, React.ReactNode> = {
-  table: <Table className="h-4 w-4 text-primary" />,
-  view: <Eye className="h-4 w-4 text-blue-500" />,
-  matview: <Layers className="h-4 w-4 text-purple-500" />,
-  function: <FileCode className="h-4 w-4 text-amber-500" />,
-  "trigger-function": <Zap className="h-4 w-4 text-orange-500" />,
+  table: <Table className="h-5 w-5 text-primary" />,
+  view: <Eye className="h-5 w-5 text-blue-500" />,
+  matview: <Layers className="h-5 w-5 text-purple-500" />,
+  function: <FileCode className="h-5 w-5 text-amber-500" />,
+  "trigger-function": <Zap className="h-5 w-5 text-orange-500" />,
 };
 
 const objectLabel: Record<ObjectType, string> = {
@@ -31,14 +31,6 @@ const objectLabel: Record<ObjectType, string> = {
   matview: "Materialized View",
   function: "Function",
   "trigger-function": "Trigger Function",
-};
-
-export const typeColor: Record<ObjectType, string> = {
-  table: "from-primary/20 to-primary/5",
-  view: "from-blue-500/20 to-blue-500/5",
-  matview: "from-purple-500/20 to-purple-500/5",
-  function: "from-amber-500/20 to-amber-500/5",
-  "trigger-function": "from-orange-500/20 to-orange-500/5",
 };
 
 const tabIcons: Partial<Record<Tab, React.ReactNode>> = {
@@ -75,11 +67,11 @@ export function ModalHeader({
   setActiveTab: (tab: Tab) => void;
 }) {
   return (
-    <div className={cn("relative px-5 pt-5 pb-3 bg-gradient-to-b", typeColor[objectType])}>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.03),transparent_70%)]" />
-      <DialogHeader className="relative">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-background/60 backdrop-blur-sm border border-border/30">
+    <div className="border-b border-border bg-muted px-5 pt-5 pb-3">
+      <DialogHeader>
+        <div className="flex items-stretch gap-2.5">
+          {/* Square, sized by the two text rows next to it */}
+          <div className="flex w-11 shrink-0 items-center justify-center rounded-md border border-border bg-background">
             {objectIcon[objectType]}
           </div>
           <div className="min-w-0 flex-1">
@@ -98,38 +90,26 @@ export function ModalHeader({
                 )}
               </button>
             </DialogTitle>
-            <DialogDescription className="flex items-center gap-1.5 mt-0.5">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-background/40 text-[10px] font-medium uppercase tracking-wider">
+            <DialogDescription className="mt-0.5 flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-3xs font-medium uppercase tracking-wider">
                 {objectLabel[objectType]}
               </span>
-              <span className="font-mono text-[11px]">{schema}</span>
+              <span className="text-xs">{schema}</span>
               <span className="text-muted-foreground/30">|</span>
-              <span className="font-mono text-[11px] text-muted-foreground/60">{projectId}</span>
+              <span className="text-xs text-muted-foreground/60">{projectId}</span>
               {loading && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
             </DialogDescription>
           </div>
         </div>
       </DialogHeader>
 
-      {/* Tab switcher - pill style */}
-      <div className="relative flex gap-0.5 mt-3 bg-background/30 backdrop-blur-sm rounded-lg p-0.5 border border-border/20">
-        {availableTabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium whitespace-nowrap rounded-md transition-all",
-              activeTab === tab.key
-                ? "bg-background text-foreground shadow-sm shadow-black/10"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tabIcons[tab.key]}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        stretch
+        className="mt-3"
+        tabs={availableTabs.map((t) => ({ id: t.key, label: t.label, icon: tabIcons[t.key] }))}
+        value={activeTab}
+        onChange={setActiveTab}
+      />
     </div>
   );
 }

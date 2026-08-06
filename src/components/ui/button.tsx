@@ -3,22 +3,24 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent",
-        outline:
-          "border border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
+        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/90",
+        outline: "border-border bg-transparent text-foreground hover:bg-hover",
+        /** Toolbar actions: readable as a control at rest, quiet enough to repeat */
+        subtle: "border-border bg-background text-foreground hover:bg-muted",
         ghost:
-          "bg-transparent text-foreground hover:bg-white/[0.06] dark:hover:bg-white/[0.06] hover:bg-black/[0.04] hover:text-accent-foreground",
-        gradient:
-          "gradient-accent text-white border-0 hover:shadow-[0_0_20px_rgba(120,80,220,0.3)] hover:brightness-110",
+          "border-transparent bg-transparent text-muted-foreground hover:bg-hover hover:text-foreground",
+        destructive:
+          "border-destructive/40 bg-transparent text-destructive hover:bg-destructive/10",
       },
       size: {
-        default: "h-9 px-3 py-2",
-        sm: "h-8 px-2 py-1",
-        icon: "h-9 w-9",
+        default: "h-8 px-3",
+        sm: "h-7 px-2.5 font-normal",
+        icon: "h-8 w-8",
+        "icon-sm": "h-7 w-7",
       },
     },
     defaultVariants: {

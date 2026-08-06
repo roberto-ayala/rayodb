@@ -1,4 +1,5 @@
 import { Check, Database, Eye, FileCode, HardDrive, Shield } from "lucide-react";
+import { SqlCode } from "@/components/ui/sql-code";
 import { LoadingPlaceholder, PropertySection, StatCard } from "./shared";
 import type { MatViewStats, ViewInfo } from "./types";
 
@@ -26,9 +27,10 @@ export function ViewOverview({
           />
         </div>
         <PropertySection title="View Definition" icon={<FileCode className="h-3.5 w-3.5" />}>
-          <pre className="rounded-xl bg-[hsl(var(--background))] border border-border/30 p-4 text-[11px] font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
-            {viewInfo.definition}
-          </pre>
+          <SqlCode
+            code={viewInfo.definition}
+            className="max-h-[200px] overflow-auto rounded-lg border border-border bg-background p-4"
+          />
         </PropertySection>
       </div>
     );
@@ -56,9 +58,10 @@ export function ViewOverview({
           />
         </div>
         <PropertySection title="Definition" icon={<FileCode className="h-3.5 w-3.5" />}>
-          <pre className="rounded-xl bg-[hsl(var(--background))] border border-border/30 p-4 text-[11px] font-mono text-foreground/90 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[200px] selection:bg-primary/20">
-            {matViewStats.definition}
-          </pre>
+          <SqlCode
+            code={matViewStats.definition}
+            className="max-h-[200px] overflow-auto rounded-lg border border-border bg-background p-4"
+          />
         </PropertySection>
       </div>
     );

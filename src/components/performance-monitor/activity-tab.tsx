@@ -1,3 +1,4 @@
+import { PanelCard, tableClasses } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 import type { ActivityRow } from "./types";
 
@@ -7,32 +8,29 @@ interface ActivityTabProps {
 
 export function ActivityTab({ activity }: ActivityTabProps) {
   return (
-    <div className="rounded-md border">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+    <PanelCard>
+      <div className={tableClasses.wrapper}>
+        <table className={tableClasses.table}>
           <thead>
-            <tr className="border-b bg-muted/50">
+            <tr className={tableClasses.head}>
               {["PID", "User", "State", "Duration", "Wait", "Backend", "Client", "Query"].map(
                 (h) => (
-                  <th
-                    key={h}
-                    className="px-2 py-1.5 text-left font-mono text-[10px] font-semibold text-muted-foreground"
-                  >
+                  <th key={h} className={tableClasses.th}>
                     {h}
                   </th>
                 ),
               )}
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody>
             {activity.map((row) => (
-              <tr key={row.pid} className="hover:bg-muted/30">
-                <td className="px-2 py-1 font-mono text-[11px]">{row.pid}</td>
-                <td className="px-2 py-1 font-mono text-[11px]">{row.user}</td>
+              <tr key={row.pid} className={tableClasses.row}>
+                <td className={tableClasses.td}>{row.pid}</td>
+                <td className={tableClasses.td}>{row.user}</td>
                 <td className="px-2 py-1">
                   <span
                     className={cn(
-                      "inline-block rounded px-1.5 py-0.5 font-mono text-[10px]",
+                      "inline-block rounded px-1.5 py-0.5 text-3xs",
                       row.state === "active" &&
                         "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
                       row.state === "idle" &&
@@ -44,20 +42,14 @@ export function ActivityTab({ activity }: ActivityTabProps) {
                     {row.state}
                   </span>
                 </td>
-                <td className="px-2 py-1 font-mono text-[11px]">
-                  {parseFloat(row.durationSec).toFixed(1)}s
-                </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
+                <td className={tableClasses.td}>{parseFloat(row.durationSec).toFixed(1)}s</td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>
                   {row.waitEvent || "-"}
                 </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
-                  {row.backendType}
-                </td>
-                <td className="px-2 py-1 font-mono text-[10px] text-muted-foreground">
-                  {row.clientAddr}
-                </td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.backendType}</td>
+                <td className={cn(tableClasses.td, "text-muted-foreground")}>{row.clientAddr}</td>
                 <td
-                  className="max-w-[300px] truncate px-2 py-1 font-mono text-[10px] text-muted-foreground"
+                  className="max-w-[300px] truncate px-2 py-1 text-3xs text-muted-foreground"
                   title={row.query}
                 >
                   {row.query}
@@ -66,10 +58,7 @@ export function ActivityTab({ activity }: ActivityTabProps) {
             ))}
             {activity.length === 0 && (
               <tr>
-                <td
-                  colSpan={8}
-                  className="py-6 text-center font-mono text-xs text-muted-foreground"
-                >
+                <td colSpan={8} className="py-6 text-center text-xs text-muted-foreground">
                   No active connections
                 </td>
               </tr>
@@ -77,6 +66,6 @@ export function ActivityTab({ activity }: ActivityTabProps) {
           </tbody>
         </table>
       </div>
-    </div>
+    </PanelCard>
   );
 }

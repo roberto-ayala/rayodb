@@ -2,6 +2,7 @@ import { List, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PanelCard, PanelHeader, PanelSection } from "@/components/ui/panel";
 import { DriverFactory } from "@/lib/database-driver";
 import { useProjectStore } from "@/stores/project-store";
 
@@ -53,70 +54,67 @@ export function EnumsPanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          <List className="h-4 w-4 text-primary" />
-          <span className="font-mono text-sm font-semibold">Enum Types</span>
-          <span className="font-mono text-xs text-muted-foreground">
-            {details?.database ?? projectId}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Input
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            placeholder="Filter..."
-            className="h-7 text-xs font-mono w-48 bg-input/50"
-          />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => void refresh()}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
-        </div>
-      </div>
+      <PanelHeader
+        icon={<List className="h-3.5 w-3.5" />}
+        title="Enum Types"
+        subtitle={details?.database ?? projectId}
+      >
+        <Input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter..."
+          size="sm"
+          className="w-48"
+        />
+        <Button variant="ghost" size="icon-sm" onClick={() => void refresh()} disabled={isLoading}>
+          {isLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+        </Button>
+      </PanelHeader>
 
       <div className="flex-1 overflow-auto p-4">
         {Array.from(grouped.entries()).map(([schema, types]) => (
-          <div key={schema} className="mb-4">
-            <div className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              {schema}
-            </div>
-            <div className="space-y-2">
-              {types.map((e) => (
-                <div key={`${e.schema}.${e.name}`} className="rounded-md border p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <List className="h-3.5 w-3.5 text-primary/60" />
-                    <span className="font-mono text-sm font-medium">{e.name}</span>
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {e.labels.split(", ").length} values
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {e.labels.split(", ").map((label) => (
-                      <span
-                        key={label}
-                        className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[11px] text-primary"
-                      >
-                        {label}
+          <PanelSection
+            key={schema}
+            title={schema}
+            icon={<List className="h-3 w-3" />}
+            className="mb-3"
+          >
+            <PanelCard>
+              <div>
+                {types.map((e) => (
+                  <div
+                    key={`${e.schema}.${e.name}`}
+                    className="border-b border-border/60 px-3 py-2.5 last:border-b-0 hover:bg-hover"
+                  >
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <List className="h-3.5 w-3.5 text-primary/60" />
+                      <span className="text-xs font-medium">{e.name}</span>
+                      <span className="text-3xs text-muted-foreground">
+                        {e.labels.split(", ").length} values
                       </span>
-                    ))}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {e.labels.split(", ").map((label) => (
+                        <span
+                          key={label}
+                          className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-3xs text-primary"
+                        >
+                          {label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                ))}
+              </div>
+            </PanelCard>
+          </PanelSection>
         ))}
         {filtered.length === 0 && (
-          <div className="py-8 text-center font-mono text-xs text-muted-foreground">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             {filter ? "No matching enum types" : "No enum types found"}
           </div>
         )}

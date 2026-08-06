@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
 import { ConnectionModal } from "@/components/connection-modal";
@@ -25,11 +25,19 @@ import { useQueryLifecycle } from "@/hooks/use-query-lifecycle";
 import { checkForUpdates } from "@/lib/updater";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
-import { useUIStore } from "@/stores/ui-store";
+import { SIDEBAR_MIN_WIDTH, useUIStore } from "@/stores/ui-store";
 import type { ProjectDetails } from "@/types";
 import "@/monaco/setup";
+import { EmptyWorkspace } from "@/components/empty-workspace";
 
 export default function App() {
+  const syncSystemTheme = useUIStore((s) => s.syncSystemTheme);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    media.addEventListener("change", syncSystemTheme);
+    return () => media.removeEventListener("change", syncSystemTheme);
+  }, [syncSystemTheme]);
+
   const sidebarWidth = useUIStore((s) => s.sidebarWidth);
   const editorHeight = useUIStore((s) => s.editorHeight);
   const connectionModalOpen = useUIStore((s) => s.connectionModalOpen);
@@ -129,7 +137,7 @@ export default function App() {
 
       <div className="flex flex-1 overflow-hidden">
         <div
-          style={{ width: `${sidebarWidth}px`, minWidth: "180px" }}
+          style={{ width: `${sidebarWidth}px`, minWidth: `${SIDEBAR_MIN_WIDTH}px` }}
           className="flex-shrink-0 overflow-hidden"
         >
           <ServerSidebar onEditConnection={handleEditConnection} />
@@ -139,21 +147,7 @@ export default function App() {
         <div className="flex flex-1 flex-col overflow-hidden">
           <TabBar />
           {!activeTab ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <div className="text-muted-foreground/40 text-6xl font-mono font-bold select-none">
-                  RSQL
-                </div>
-                <p className="text-muted-foreground/60 text-sm">No tabs open</p>
-                <button
-                  type="button"
-                  onClick={() => useTabStore.getState().openTab()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
-                >
-                  <span className="text-lg leading-none">+</span> New Query
-                </button>
-              </div>
-            </div>
+            <EmptyWorkspace onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
           ) : activeTab?.type === "monitor" && activeTab.projectId ? (
             <div className="flex-1 min-h-0 overflow-hidden">
               <PerformanceMonitor projectId={activeTab.projectId} />
@@ -199,7 +193,7 @@ export default function App() {
               />
               <div className="flex flex-1 min-h-0 overflow-hidden">
                 {/* Left pane */}
-                <div className="flex flex-1 flex-col overflow-hidden border-r border-border/30">
+                <div className="flex flex-1 flex-col overflow-hidden border-r border-border/60">
                   <div
                     style={{ height: `${editorHeight}%` }}
                     className="flex flex-col overflow-hidden"
@@ -238,7 +232,7 @@ export default function App() {
                       </div>
                     ) : activeTab.splitResult ? (
                       <div className="flex-1 flex flex-col overflow-hidden">
-                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/30 text-xs font-mono text-muted-foreground">
+                        <div className="flex items-center gap-2 px-3 py-1 border-b border-border/60 text-xs text-muted-foreground">
                           <span>{activeTab.splitResult.rows.length} rows</span>
                           {activeTab.splitResult.time > 0 && (
                             <span>· {activeTab.splitResult.time.toFixed(1)}ms</span>
@@ -252,7 +246,7 @@ export default function App() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center text-muted-foreground/40 text-sm font-mono">
+                      <div className="flex-1 flex items-center justify-center text-muted-foreground/40 text-sm">
                         Run a query to see results
                       </div>
                     )}

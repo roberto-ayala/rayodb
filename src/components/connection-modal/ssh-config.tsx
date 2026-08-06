@@ -1,5 +1,5 @@
+import { CheckboxField, Field } from "../ui/field";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 
 interface SshConfigProps {
   enabled: boolean;
@@ -32,83 +32,57 @@ export function SshConfig({
 }: SshConfigProps) {
   return (
     <div className="space-y-2 pt-2">
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="sshEnabled"
-          checked={enabled}
-          onChange={(e) => onEnabledChange(e.target.checked)}
-          className="h-4 w-4 rounded border-border bg-input"
-        />
-        <Label htmlFor="sshEnabled" className="font-mono text-xs text-foreground cursor-pointer">
-          SSH Tunnel
-        </Label>
-      </div>
+      <CheckboxField
+        id="sshEnabled"
+        label="SSH Tunnel"
+        checked={enabled}
+        onChange={onEnabledChange}
+      />
       {enabled && (
-        <div className="space-y-3 rounded-lg border border-border/50 p-3 bg-muted/20">
+        <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="sshHost" className="font-mono text-[11px] text-muted-foreground">
-                SSH Host
-              </Label>
+            <Field label="SSH Host" htmlFor="sshHost">
               <Input
                 id="sshHost"
                 value={sshHost}
                 onChange={(e) => onSshHostChange(e.target.value)}
                 placeholder="bastion.example.com"
-                className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
               />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="sshPort" className="font-mono text-[11px] text-muted-foreground">
-                SSH Port
-              </Label>
+            </Field>
+            <Field label="SSH Port" htmlFor="sshPort">
               <Input
                 id="sshPort"
                 value={sshPort}
                 onChange={(e) => onSshPortChange(e.target.value)}
                 placeholder="22"
-                className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
               />
-            </div>
+            </Field>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="sshUser" className="font-mono text-[11px] text-muted-foreground">
-              SSH User
-            </Label>
+          <Field label="SSH User" htmlFor="sshUser">
             <Input
               id="sshUser"
               value={sshUser}
               onChange={(e) => onSshUserChange(e.target.value)}
               placeholder="ubuntu"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
             />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="sshPassword" className="font-mono text-[11px] text-muted-foreground">
-              SSH Password
-            </Label>
+          </Field>
+          <Field label="SSH Password" htmlFor="sshPassword">
             <Input
               id="sshPassword"
               type="password"
               value={sshPassword}
               onChange={(e) => onSshPasswordChange(e.target.value)}
               placeholder="••••••••"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
             />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="sshKeyPath" className="font-mono text-[11px] text-muted-foreground">
-              Private Key Path
-            </Label>
+          </Field>
+          <Field label="Private Key Path" htmlFor="sshKeyPath">
             <Input
               id="sshKeyPath"
               value={sshKeyPath}
               onChange={(e) => onSshKeyPathChange(e.target.value)}
               placeholder="~/.ssh/id_rsa"
-              className="bg-input/80 border-border/50 text-foreground font-mono text-sm rounded-lg h-8"
             />
-          </div>
+          </Field>
         </div>
       )}
     </div>

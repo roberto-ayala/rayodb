@@ -2,7 +2,7 @@ use rayon::prelude::*;
 use std::time::Instant;
 use tokio_postgres::Client;
 
-use crate::common::enums::AppError;
+use crate::common::enums::{AppError, pg_error_message};
 
 use super::super::{CELL_SEP, CachedQuery, ROW_SEP, VirtualCache};
 use super::helpers::{join_sep, pack_rows_vec, process_simple_messages};
@@ -24,7 +24,7 @@ pub async fn execute_virtual(
     let messages = client
         .simple_query(sql)
         .await
-        .map_err(|e| AppError::QueryFailed(e.to_string()))?;
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     let (columns, all_rows) = process_simple_messages(messages);
 

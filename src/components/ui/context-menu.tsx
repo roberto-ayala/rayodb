@@ -68,7 +68,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
   return createPortal(
     <div
       ref={ref}
-      className="fixed z-[9999] min-w-[200px] rounded-xl border border-border/80 bg-popover/95 backdrop-blur-xl py-1.5 shadow-xl shadow-black/20 animate-in fade-in-0 zoom-in-95 duration-100"
+      className="fixed z-[9999] min-w-[200px] max-h-[70vh] overflow-y-auto rounded-lg border border-border bg-popover py-1.5 shadow-[var(--shadow-popover)] animate-in fade-in-0 zoom-in-95 duration-100"
       style={{ left: adjustedX, top: adjustedY }}
     >
       {items.map((entry, i) => {
@@ -79,7 +79,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           return (
             <div
               key={i}
-              className="px-3 pt-1.5 pb-0.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider"
+              className="px-3 pt-1.5 pb-0.5 text-3xs font-semibold text-muted-foreground/60 uppercase tracking-wider"
             >
               {entry.header}
             </div>
@@ -95,7 +95,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
             }}
             disabled={entry.disabled}
             className={cn(
-              "flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[12px] font-mono transition-colors rounded-md mx-1 first:mt-0",
+              "flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-xs transition-colors rounded-md mx-1 first:mt-0",
               "focus:outline-none",
               entry.disabled
                 ? "text-muted-foreground/40 cursor-not-allowed"
@@ -112,7 +112,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
             )}
             <span className="flex-1">{entry.label}</span>
             {entry.shortcut && (
-              <span className="text-[10px] text-muted-foreground/50 font-mono ml-2 shrink-0">
+              <span className="text-3xs text-muted-foreground/50 ml-2 shrink-0">
                 {entry.shortcut}
               </span>
             )}

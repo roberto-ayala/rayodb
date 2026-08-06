@@ -4,34 +4,50 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.97 0.005 260);
+  --background: oklch(0.955 0.005 260);
   --foreground: oklch(0.15 0.01 260);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0.01 260);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.01 260);
-  --primary: oklch(0.5 0.2 265);
+  /* Accent: only the hue is user-selectable, lightness and chroma stay tuned */
+  --accent-hue: 265;
+  --primary: oklch(0.5 0.2 var(--accent-hue));
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.94 0.005 260);
+  --secondary: oklch(0.92 0.005 260);
   --secondary-foreground: oklch(0.15 0.01 260);
-  --muted: oklch(0.93 0.005 260);
+  --muted: oklch(0.915 0.006 260);
   --muted-foreground: oklch(0.45 0.01 260);
-  --accent: oklch(0.95 0.005 260);
+  --accent: oklch(0.925 0.006 260);
   --accent-foreground: oklch(0.15 0.01 260);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.88 0.01 260);
-  --input: oklch(0.96 0.005 260);
-  --ring: oklch(0.5 0.2 280);
+  --border: oklch(0.865 0.01 260);
+  --input: oklch(0.94 0.006 260);
+  /* Header row of data tables: lighter than the chrome bars, darker than cells */
+  --table-header: oklch(0.945 0.005 260);
+  /* Outermost bars: the window chrome tone, per theme */
+  --window-chrome: color(srgb 0.9336 0.9417 0.955);
+  /* Segmented control: trough and the selected segment on top of it */
+  --segment: oklch(0.955 0.005 260);
+  --segment-active: oklch(1 0 0);
+  --ring: oklch(0.5 0.2 var(--accent-hue));
+  --hover: oklch(0.15 0.01 260 / 0.05);
+  /* Single size for every code surface — editor, terminal, grid, SQL previews.
+     Kept equal to text-xs so a keyword in the editor matches a toolbar label.
+     JS surfaces read it through codeFontSize(); change it here only. */
+  --text-code: 0.75rem;
+  /* Radius scale: controls use md, containers lg, only status pills are full */
   --radius: 0.5rem;
-  --sidebar: oklch(0.96 0.005 260);
+  --shadow-popover: 0 8px 24px -8px oklch(0.15 0.01 260 / 0.18);
+  --sidebar: oklch(0.945 0.006 260);
   --sidebar-foreground: oklch(0.2 0.01 260);
-  --sidebar-primary: oklch(0.5 0.2 265);
+  --sidebar-primary: oklch(0.5 0.2 var(--accent-hue));
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.92 0.005 260);
+  --sidebar-accent: oklch(0.9 0.006 260);
   --sidebar-accent-foreground: oklch(0.15 0.01 260);
-  --sidebar-border: oklch(0.88 0.01 260);
-  --sidebar-ring: oklch(0.5 0.2 280);
+  --sidebar-border: oklch(0.865 0.01 260);
+  --sidebar-ring: oklch(0.5 0.2 var(--accent-hue));
   --success: oklch(0.52 0.18 150);
   --warning: oklch(0.6 0.18 85);
   --editor-bg: #fefefe;
@@ -39,42 +55,50 @@
 }
 
 .dark {
-  --background: oklch(0.13 0.015 260);
-  --foreground: oklch(0.93 0.01 260);
-  --card: oklch(0.16 0.015 260);
-  --card-foreground: oklch(0.93 0.01 260);
-  --popover: oklch(0.18 0.015 260);
-  --popover-foreground: oklch(0.93 0.01 260);
-  --primary: oklch(0.65 0.2 265);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.2 0.02 260);
-  --secondary-foreground: oklch(0.93 0.01 260);
-  --muted: oklch(0.22 0.015 260);
-  --muted-foreground: oklch(0.55 0.01 260);
-  --accent: oklch(0.22 0.02 265);
-  --accent-foreground: oklch(0.93 0.01 260);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.93 0.01 260);
-  --border: oklch(0.24 0.015 260);
-  --input: oklch(0.19 0.015 260);
-  --ring: oklch(0.65 0.2 280);
-  --sidebar: oklch(0.11 0.015 260);
-  --sidebar-foreground: oklch(0.85 0.01 260);
-  --sidebar-primary: oklch(0.65 0.2 265);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.18 0.02 260);
-  --sidebar-accent-foreground: oklch(0.93 0.01 260);
-  --sidebar-border: oklch(0.2 0.015 260);
-  --sidebar-ring: oklch(0.65 0.2 280);
-  --success: oklch(0.65 0.18 150);
-  --warning: oklch(0.75 0.18 85);
-  --editor-bg: #1c1a2e;
-  --editor-line: #252340;
+  --background: oklch(0.22 0.012 260);
+  --foreground: oklch(0.94 0.008 260);
+  --card: oklch(0.25 0.012 260);
+  --card-foreground: oklch(0.94 0.008 260);
+  --popover: oklch(0.27 0.012 260);
+  --popover-foreground: oklch(0.94 0.008 260);
+  --primary: oklch(0.68 0.17 var(--accent-hue));
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.29 0.014 260);
+  --secondary-foreground: oklch(0.94 0.008 260);
+  --muted: oklch(0.3 0.012 260);
+  --muted-foreground: oklch(0.68 0.012 260);
+  --accent: oklch(0.32 0.016 265);
+  --accent-foreground: oklch(0.96 0.008 260);
+  --destructive: oklch(0.62 0.19 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.35 0.012 260);
+  --input: oklch(0.28 0.012 260);
+  --table-header: oklch(0.33 0.012 260);
+  --window-chrome: color(srgb 0.0915 0.105 0.1266);
+  --segment: oklch(0.24 0.012 260);
+  --segment-active: oklch(0.38 0.014 260);
+  --ring: oklch(0.68 0.17 var(--accent-hue));
+  --hover: oklch(1 0 0 / 0.06);
+  --shadow-popover: 0 8px 24px -8px oklch(0.08 0.01 260 / 0.6);
+  --sidebar: oklch(0.2 0.012 260);
+  --sidebar-foreground: oklch(0.88 0.008 260);
+  --sidebar-primary: oklch(0.68 0.17 var(--accent-hue));
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.28 0.014 260);
+  --sidebar-accent-foreground: oklch(0.96 0.008 260);
+  --sidebar-border: oklch(0.31 0.012 260);
+  --sidebar-ring: oklch(0.68 0.17 var(--accent-hue));
+  --success: oklch(0.7 0.16 150);
+  --warning: oklch(0.78 0.16 85);
+  --editor-bg: oklch(0.24 0.012 260);
+  --editor-line: oklch(0.28 0.012 260);
 }
 
 @theme inline {
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    /* Geist was never bundled, so both aliases resolved to nothing and every
+       font-mono in the app fell back to sans */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-card: var(--card);
@@ -94,10 +118,21 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+    /* 4px inline marks, 6px controls, 8px containers, 12px overlays */
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
+    /* Type scale: 10px labels, chips and row metadata; 12px body and chrome;
+       14px dialog copy; 18px headings. Nothing sits between 10 and 12. */
+    --text-code: var(--text-code);
+    --text-3xs: 0.625rem;
+    --text-3xs--line-height: 0.875rem;
+    --color-hover: var(--hover);
+    --color-table-header: var(--table-header);
+    --color-window-chrome: var(--window-chrome);
+    --color-segment: var(--segment);
+    --color-segment-active: var(--segment-active);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -126,11 +161,6 @@
     height: 100%;
     overflow: hidden;
   }
-}
-
-/* Gradient accent utility */
-.gradient-accent {
-  background: linear-gradient(135deg, oklch(0.6 0.22 255), oklch(0.55 0.22 290));
 }
 
 /* Hide scrollbar utility */
@@ -167,12 +197,14 @@
   border-radius: 6px;
 }
 
-/* cmdk command palette */
+/* cmdk command palette. cmdk styles its parts through attributes, so these
+   rules stay CSS — but every value comes from the same utilities and tokens
+   as the rest of the app, not from literals. */
 .cmdk-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.5);
+  @apply bg-black/50;
 }
 .cmdk-content {
   position: fixed;
@@ -180,87 +212,39 @@
   top: 15%;
   z-index: 10000;
   width: 560px;
-  max-width: calc(100vw - 2rem);
   transform: translateX(-50%);
-  border-radius: 0.5rem;
-  border: 1px solid var(--border);
-  background: var(--popover);
-  color: var(--popover-foreground);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  padding: 0;
+  @apply max-h-[70vh] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl bg-popover p-0 text-popover-foreground shadow-[var(--shadow-popover)];
 }
 [cmdk-input] {
-  width: 100%;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  background: transparent;
-  padding: 0.75rem 1rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  color: var(--foreground);
-  outline: none;
-  caret-color: var(--primary);
+  @apply w-full border-0 border-b border-border bg-transparent px-4 py-3 text-sm text-foreground caret-primary outline-none;
 }
 [cmdk-input]::placeholder {
-  color: var(--muted-foreground);
+  @apply text-muted-foreground;
 }
 [cmdk-list] {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 0.25rem 0;
+  @apply max-h-[400px] overflow-y-auto py-1;
 }
 [cmdk-group-heading] {
-  padding: 0.375rem 1rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted-foreground);
-  opacity: 0.7;
+  @apply px-4 py-1.5 text-3xs font-semibold uppercase tracking-widest text-muted-foreground;
 }
 [cmdk-item] {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  color: var(--foreground);
-  transition: background-color 0.1s;
+  @apply flex cursor-pointer items-center gap-3 px-4 py-2 text-xs text-foreground transition-colors;
 }
-[cmdk-item][data-selected="true"] {
-  background: var(--accent);
-}
+[cmdk-item][data-selected="true"],
 [cmdk-item]:hover {
-  background: var(--accent);
-  opacity: 0.8;
+  @apply bg-accent;
 }
 [cmdk-item][data-disabled="true"] {
-  opacity: 0.5;
-  pointer-events: none;
+  @apply pointer-events-none opacity-50;
 }
 [cmdk-empty] {
-  padding: 2rem 1rem;
-  text-align: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  color: var(--muted-foreground);
+  @apply px-4 py-8 text-center text-xs text-muted-foreground;
 }
 .cmdk-meta {
-  margin-left: auto;
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  background: var(--muted);
-  font-size: 0.625rem;
-  color: var(--muted-foreground);
-  flex-shrink: 0;
+  @apply ml-auto shrink-0 rounded-sm bg-muted px-1.5 py-0.5 text-3xs text-muted-foreground;
 }
 .cmdk-detail {
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-  flex-shrink: 0;
+  @apply shrink-0 text-xs text-muted-foreground;
 }
 
 /* Sidebar indent guides */

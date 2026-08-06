@@ -1,5 +1,5 @@
 import { Database, HardDrive, Users, Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { InfoRow, PanelSection, StatTile } from "@/components/ui/panel";
 import type { HistoryEntry } from "@/stores/history-store";
 
 interface OverviewTabProps {
@@ -14,86 +14,52 @@ export function OverviewTab({ dbStats, projectHistory, avgTime, failedQueries }:
 
   return (
     <div className="space-y-4">
-      {/* Stat cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard
+        <StatTile
           icon={<Users className="h-4 w-4" />}
           label="Active Connections"
           value={statValue("Active Connections")}
         />
-        <StatCard
+        <StatTile
           icon={<Database className="h-4 w-4" />}
           label="Database Size"
           value={statValue("Database Size")}
         />
-        <StatCard
+        <StatTile
           icon={<Zap className="h-4 w-4" />}
           label="Cache Hit Ratio"
           value={statValue("Cache Hit Ratio")}
         />
-        <StatCard
+        <StatTile
           icon={<HardDrive className="h-4 w-4" />}
           label="Deadlocks"
           value={statValue("Deadlocks")}
         />
       </div>
 
-      {/* All stats table */}
-      <div className="rounded-md border">
-        <div className="border-b px-3 py-2">
-          <span className="font-mono text-xs font-semibold">Database Statistics</span>
-        </div>
-        <div className="divide-y">
+      <PanelSection title="Database Statistics" icon={<Database className="h-3 w-3" />}>
+        <div className="[&>*:last-child]:border-b-0">
           {dbStats.map(([name, val]) => (
-            <div key={name} className="flex items-center justify-between px-3 py-1.5">
-              <span className="font-mono text-xs text-muted-foreground">{name}</span>
-              <span className="font-mono text-xs font-medium">{val}</span>
-            </div>
+            <InfoRow key={name} label={name} value={val} />
           ))}
           {dbStats.length === 0 && (
-            <div className="px-3 py-4 text-center font-mono text-xs text-muted-foreground">
-              No stats available
-            </div>
+            <div className="py-4 text-center text-xs text-muted-foreground">No stats available</div>
           )}
         </div>
-      </div>
+      </PanelSection>
 
       {/* Session history summary */}
-      <div className="rounded-md border">
-        <div className="border-b px-3 py-2">
-          <span className="font-mono text-xs font-semibold">Session Query Summary</span>
+      <PanelSection title="Session Query Summary" icon={<Zap className="h-3 w-3" />}>
+        <div className="grid grid-cols-3 gap-3">
+          <StatTile label="Total Queries" value={String(projectHistory.length)} />
+          <StatTile label="Avg Execution Time" value={`${avgTime.toFixed(1)}ms`} />
+          <StatTile
+            label="Failed Queries"
+            value={String(failedQueries)}
+            tone={failedQueries > 0 ? "destructive" : "default"}
+          />
         </div>
-        <div className="grid grid-cols-3 divide-x">
-          <div className="p-3 text-center">
-            <div className="font-mono text-lg font-bold">{projectHistory.length}</div>
-            <div className="font-mono text-[10px] text-muted-foreground">Total Queries</div>
-          </div>
-          <div className="p-3 text-center">
-            <div className="font-mono text-lg font-bold">{avgTime.toFixed(1)}ms</div>
-            <div className="font-mono text-[10px] text-muted-foreground">Avg Execution Time</div>
-          </div>
-          <div className="p-3 text-center">
-            <div
-              className={cn("font-mono text-lg font-bold", failedQueries > 0 && "text-destructive")}
-            >
-              {failedQueries}
-            </div>
-            <div className="font-mono text-[10px] text-muted-foreground">Failed Queries</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="rounded-md border p-3">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        {icon}
-        <span className="font-mono text-[10px]">{label}</span>
-      </div>
-      <div className="mt-1 font-mono text-lg font-bold">{value}</div>
+      </PanelSection>
     </div>
   );
 }

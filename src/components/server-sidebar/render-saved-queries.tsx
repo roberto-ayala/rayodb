@@ -13,11 +13,11 @@ export function renderSavedQueries(
   return (
     <div className="border-t border-sidebar-border">
       <div className="flex h-8 items-center justify-between px-3">
-        <span className="tracking-widest uppercase text-[10px] font-semibold text-sidebar-foreground">
+        <span className="tracking-widest uppercase text-3xs font-semibold text-sidebar-foreground">
           SAVED QUERIES
         </span>
         {savedQueries.length > 0 && (
-          <span className="text-[10px] text-muted-foreground">{savedQueries.length}</span>
+          <span className="text-3xs text-muted-foreground">{savedQueries.length}</span>
         )}
       </div>
       {savedQueries.length > 0 ? (
@@ -56,15 +56,13 @@ export function renderSavedQueries(
                 ]);
               }}
               trailing={
-                <span className="font-mono text-[10px] text-muted-foreground shrink-0">
-                  {q.projectId}
-                </span>
+                <span className="text-3xs text-muted-foreground shrink-0">{q.projectId}</span>
               }
             />
           ))}
         </div>
       ) : (
-        <div className="px-3 pb-2 text-[11px] text-muted-foreground/60">
+        <div className="px-3 pb-2 text-xs text-muted-foreground/60">
           No saved queries yet. Use the Save button in the toolbar to save the current query.
         </div>
       )}

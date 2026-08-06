@@ -25,7 +25,7 @@ export function SectionHeader({
     >
       <IndentGuides indent={indent} />
       <span className="shrink-0">{icon}</span>
-      <span className="font-mono text-[11px] font-semibold text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold text-muted-foreground">{label}</span>
       {expanded ? (
         <ChevronDown className="ml-auto mr-1 h-3 w-3 shrink-0 text-muted-foreground" />
       ) : (

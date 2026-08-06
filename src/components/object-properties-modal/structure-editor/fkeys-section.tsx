@@ -76,9 +76,9 @@ export function FkeysSection({
         .map((fk) => (
           <div
             key={fk._id}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/5 opacity-60"
+            className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500/20 bg-red-500/5 opacity-60"
           >
-            <span className="text-xs font-mono line-through flex-1">{fk.constraintName}</span>
+            <span className="text-xs line-through flex-1">{fk.constraintName}</span>
             <button
               type="button"
               onClick={() =>
@@ -89,7 +89,7 @@ export function FkeysSection({
                   ),
                 }))
               }
-              className="text-[10px] text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground"
             >
               Restore
             </button>
@@ -116,7 +116,7 @@ export function FkeysSection({
             ],
           }));
         }}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-lg transition-colors w-full"
+        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 rounded-md transition-colors w-full"
       >
         <Plus className="h-3.5 w-3.5" /> Add Foreign Key
       </button>

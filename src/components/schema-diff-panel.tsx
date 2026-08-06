@@ -10,6 +10,8 @@ import {
   Table,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { PanelHeader, PanelToolbar } from "@/components/ui/panel";
+import { Select } from "@/components/ui/select";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
@@ -155,13 +157,14 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Config bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border/30">
-        <GitCompare className="h-4 w-4 text-primary shrink-0" />
-        <select
+      <PanelHeader icon={<GitCompare className="h-3.5 w-3.5" />} title="Schema Diff" />
+
+      <PanelToolbar>
+        <Select
           value={leftSchema}
           onChange={(e) => setLeftSchema(e.target.value)}
-          className="bg-input/80 border border-border/50 rounded-lg px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
+          size="sm"
+          className="min-w-[140px]"
         >
           <option value="">Left schema...</option>
           {schemas.map((s) => (
@@ -169,12 +172,13 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {s}
             </option>
           ))}
-        </select>
+        </Select>
         <ArrowLeftRight className="h-3.5 w-3.5 text-muted-foreground/50" />
-        <select
+        <Select
           value={rightSchema}
           onChange={(e) => setRightSchema(e.target.value)}
-          className="bg-input/80 border border-border/50 rounded-lg px-2 py-1.5 text-xs font-mono text-foreground min-w-[140px]"
+          size="sm"
+          className="min-w-[140px]"
         >
           <option value="">Right schema...</option>
           {schemas.map((s) => (
@@ -182,13 +186,13 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {s}
             </option>
           ))}
-        </select>
+        </Select>
         <Button
-          variant="gradient"
+          variant="default"
           size="sm"
           onClick={runDiff}
           disabled={!leftSchema || !rightSchema || loading}
-          className="text-xs font-mono gap-1"
+          className="gap-1"
         >
           {loading ? (
             <RefreshCw className="h-3 w-3 animate-spin" />
@@ -197,18 +201,18 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
           )}
           Compare
         </Button>
-      </div>
+      </PanelToolbar>
 
       {/* Summary bar */}
       {counts && (
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/20 text-[11px] font-mono">
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border bg-muted px-3 py-1.5 text-xs">
           <button
             type="button"
             onClick={() => setFilter("all")}
             className={cn(
-              "px-2 py-0.5 rounded-full transition-colors",
+              "rounded-full border border-transparent px-2 py-0.5 transition-colors",
               filter === "all"
-                ? "bg-accent text-foreground"
+                ? "border-border bg-muted text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -218,9 +222,9 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
             type="button"
             onClick={() => setFilter("changes")}
             className={cn(
-              "px-2 py-0.5 rounded-full transition-colors",
+              "rounded-full border border-transparent px-2 py-0.5 transition-colors",
               filter === "changes"
-                ? "bg-accent text-foreground"
+                ? "border-border bg-muted text-foreground"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -231,7 +235,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("modified")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "modified"
                   ? "bg-amber-500/20 text-amber-500"
                   : "text-amber-500/60 hover:text-amber-500",
@@ -245,7 +249,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("only-left")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "only-left"
                   ? "bg-destructive/20 text-destructive"
                   : "text-destructive/60 hover:text-destructive",
@@ -259,7 +263,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               type="button"
               onClick={() => setFilter("only-right")}
               className={cn(
-                "px-2 py-0.5 rounded-full transition-colors",
+                "rounded-full border border-transparent px-2 py-0.5 transition-colors",
                 filter === "only-right"
                   ? "bg-success/20 text-success"
                   : "text-success/60 hover:text-success",
@@ -274,13 +278,13 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
       {/* Content */}
       <div className="flex flex-1 min-h-0">
         {/* List */}
-        <div className="w-[320px] border-r border-border/30 overflow-y-auto">
+        <div className="w-[320px] border-r border-border/60 overflow-y-auto">
           {!diff ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
               Select schemas and compare
             </div>
           ) : filtered && filtered.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
               No differences found
             </div>
           ) : (
@@ -290,7 +294,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
                 type="button"
                 onClick={() => setSelected(entry)}
                 className={cn(
-                  "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs font-mono transition-colors",
+                  "flex items-center gap-2 w-full px-3 py-1.5 text-left text-xs transition-colors",
                   selected === entry ? "bg-accent" : "hover:bg-muted/30",
                 )}
               >
@@ -317,7 +321,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
                 >
                   {entry.name}
                 </span>
-                <span className="ml-auto text-[9px] text-muted-foreground/40">
+                <span className="ml-auto text-3xs text-muted-foreground/40">
                   {entry.objectType}
                 </span>
               </button>
@@ -329,7 +333,7 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
         <div className="flex-1 overflow-auto p-4">
           {selected ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-mono font-semibold">
+              <div className="flex items-center gap-2 text-sm font-semibold">
                 <span
                   className={cn(
                     selected.status === "only-left" && "text-destructive",
@@ -344,30 +348,26 @@ export function SchemaDiffPanel({ projectId }: SchemaDiffPanelProps) {
               {selected.status === "modified" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground mb-1">
-                      {leftSchema}
-                    </div>
-                    <pre className="text-xs font-mono bg-destructive/5 border border-destructive/20 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                    <div className="text-3xs text-muted-foreground mb-1">{leftSchema}</div>
+                    <pre className="font-mono text-xs bg-destructive/5 border border-destructive/20 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                       {selected.leftDef}
                     </pre>
                   </div>
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground mb-1">
-                      {rightSchema}
-                    </div>
-                    <pre className="text-xs font-mono bg-success/5 border border-success/20 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                    <div className="text-3xs text-muted-foreground mb-1">{rightSchema}</div>
+                    <pre className="font-mono text-xs bg-success/5 border border-success/20 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                       {selected.rightDef}
                     </pre>
                   </div>
                 </div>
               ) : (
-                <pre className="text-xs font-mono bg-muted/20 border border-border/30 rounded-xl p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
+                <pre className="font-mono text-xs bg-muted/20 border border-border/60 rounded-lg p-3 overflow-auto max-h-[500px] whitespace-pre-wrap">
                   {selected.leftDef || selected.rightDef || "No definition available"}
                 </pre>
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm font-mono">
+            <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
               Select an object to view details
             </div>
           )}

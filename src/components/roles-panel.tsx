@@ -11,7 +11,7 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RoleEditor } from "@/components/role-editor";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,6 @@ const DB_PRIVILEGES = ["CONNECT", "CREATE", "TEMPORARY"] as const;
 
 /** Shared by the grant header and its rows so the two line up */
 const GRANT_COLUMNS = "grid grid-cols-[8rem_12rem_1fr] items-start";
-
-/** Schema, what the row applies to, then one narrow column per privilege */
-const PRIV_COLUMNS = "grid grid-cols-[1fr_7rem_repeat(7,3.25rem)] items-center";
 
 /** The seven a table can carry, in the order the matrix lays them out */
 const TABLE_PRIVILEGES = [
@@ -534,41 +531,58 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
               <div className="mb-2 text-3xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Table Access
               </div>
-              <div className="overflow-hidden rounded-lg border border-border/60">
-                <div className={cn(PRIV_COLUMNS, "bg-muted text-xs text-muted-foreground")}>
-                  <span className="px-3 py-1.5 font-medium">Schema</span>
-                  <span className="px-3 py-1.5 font-medium">Applies to</span>
+              {/* One grid for header and rows together, so the columns size
+                  themselves to the privilege names and still line up — as two
+                  grids they could only have matched on fixed widths, which is
+                  what forced the names to be abbreviated */}
+              <div className="overflow-x-auto rounded-lg border border-border/60">
+                <div className="grid min-w-max grid-cols-[minmax(8rem,1fr)_auto_repeat(7,auto)] text-xs">
+                  <span className="bg-muted px-3 py-1.5 font-medium text-muted-foreground">
+                    Schema
+                  </span>
+                  <span className="bg-muted px-3 py-1.5 font-medium text-muted-foreground">
+                    Applies to
+                  </span>
                   {TABLE_PRIVILEGES.map((p) => (
-                    <span key={p} className="px-2 py-1.5 text-center font-medium" title={p}>
-                      {p.slice(0, 3)}
+                    <span
+                      key={p}
+                      className="bg-muted px-2.5 py-1.5 text-center text-3xs font-medium uppercase tracking-wider text-muted-foreground"
+                    >
+                      {p}
                     </span>
                   ))}
-                </div>
 
-                {schemaNames.map((schema) => {
-                  const stateOf = (privilege: string) => {
-                    const g = schemaGrants.find(
-                      (x) => x.schema === schema && x.privilege === privilege,
-                    );
-                    if (!g || g.granted === 0) return "none" as const;
-                    return g.granted >= g.total ? ("all" as const) : ("some" as const);
-                  };
-                  const counts = (privilege: string) => {
-                    const g = schemaGrants.find(
-                      (x) => x.schema === schema && x.privilege === privilege,
-                    );
-                    return g ? `${g.granted} of ${g.total} tables` : "no tables";
-                  };
+                  {schemaNames.map((schema) => {
+                    const stateOf = (privilege: string) => {
+                      const g = schemaGrants.find(
+                        (x) => x.schema === schema && x.privilege === privilege,
+                      );
+                      if (!g || g.granted === 0) return "none" as const;
+                      return g.granted >= g.total ? ("all" as const) : ("some" as const);
+                    };
+                    const counts = (privilege: string) => {
+                      const g = schemaGrants.find(
+                        (x) => x.schema === schema && x.privilege === privilege,
+                      );
+                      return g ? `${g.granted} of ${g.total} tables` : "no tables";
+                    };
 
-                  return (
-                    <div key={schema} className="border-t border-border/60">
-                      <div className={cn(PRIV_COLUMNS, "text-xs")}>
-                        <span className="truncate px-3 py-1 font-medium" title={schema}>
+                    return (
+                      <Fragment key={schema}>
+                        <span
+                          className="truncate border-t border-border/60 px-3 py-1 font-medium"
+                          title={schema}
+                        >
                           {schema}
                         </span>
-                        <span className="px-3 py-1 text-muted-foreground">Existing tables</span>
+                        <span className="whitespace-nowrap border-t border-border/60 px-3 py-1 text-muted-foreground">
+                          Existing tables
+                        </span>
                         {TABLE_PRIVILEGES.map((p) => (
-                          <span key={p} className="flex justify-center px-2 py-1">
+                          <span
+                            key={p}
+                            className="flex justify-center border-t border-border/60 px-2.5 py-1"
+                          >
                             <TriStateBox
                               state={stateOf(p)}
                               disabled={savingGrant}
@@ -577,14 +591,15 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                             />
                           </span>
                         ))}
-                      </div>
-                      {/* GRANT reaches what exists; only default privileges
-                          reach what has not been created yet */}
-                      <div className={cn(PRIV_COLUMNS, "text-xs")}>
+
+                        {/* GRANT reaches what exists; only default privileges
+                            reach what has not been created yet */}
                         <span className="px-3 py-1" />
-                        <span className="px-3 py-1 text-muted-foreground">New tables</span>
+                        <span className="whitespace-nowrap px-3 py-1 text-muted-foreground">
+                          New tables
+                        </span>
                         {TABLE_PRIVILEGES.map((p) => (
-                          <span key={p} className="flex justify-center px-2 py-1">
+                          <span key={p} className="flex justify-center px-2.5 py-1">
                             <TriStateBox
                               state={
                                 defaultGrants.find((x) => x.schema === schema && x.privilege === p)
@@ -598,10 +613,10 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                             />
                           </span>
                         ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                      </Fragment>
+                    );
+                  })}
+                </div>
               </div>
               <p className="mt-1.5 text-3xs text-muted-foreground/60">
                 Granting on a schema reaches the tables that exist now — a partial box means new

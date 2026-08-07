@@ -1,14 +1,9 @@
 import { ArrowUpCircle, Check, Download, Loader2, Package, RefreshCw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ModalBanner } from "@/components/ui/modal-banner";
 import {
   PanelCard,
   PanelHeader,
@@ -300,24 +295,25 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           if (!open) setConfirmInstall(null);
         }}
       >
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle className="">Install Extension</DialogTitle>
-            <DialogDescription>
-              Install <span className="font-semibold text-foreground">{confirmInstall}</span> into
-              the current database?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-            CREATE EXTENSION IF NOT EXISTS "{confirmInstall}";
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" className="text-xs" onClick={() => setConfirmInstall(null)}>
-              Cancel
-            </Button>
-            <Button variant="default" className="text-xs" onClick={confirmInstallExt}>
-              Install
-            </Button>
+        <DialogContent className="gap-0 p-0 sm:max-w-[420px]">
+          <ModalBanner
+            icon={<Package className="h-5 w-5 text-primary" />}
+            title="Install Extension"
+            badge="Extension"
+            description={confirmInstall ?? ""}
+          />
+          <div className="space-y-4 px-5 py-4">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 font-mono text-xs text-muted-foreground">
+              CREATE EXTENSION IF NOT EXISTS "{confirmInstall}";
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" className="text-xs" onClick={() => setConfirmInstall(null)}>
+                Cancel
+              </Button>
+              <Button variant="default" className="text-xs" onClick={confirmInstallExt}>
+                Install
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -328,29 +324,28 @@ export function ExtensionsPanel({ projectId }: { projectId: string }) {
           if (!open) setConfirmDrop(null);
         }}
       >
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle className="">Drop Extension</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to drop{" "}
-              <span className="font-semibold text-foreground">{confirmDrop}</span>? This will also
-              drop all objects that depend on it (CASCADE).
-            </DialogDescription>
-          </DialogHeader>
-          <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-            DROP EXTENSION IF EXISTS "{confirmDrop}" CASCADE;
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" className="text-xs" onClick={() => setConfirmDrop(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="outline"
-              className="text-xs text-destructive border-destructive/50 hover:bg-destructive/10"
-              onClick={confirmDropExt}
-            >
-              Drop Extension
-            </Button>
+        <DialogContent className="gap-0 p-0 sm:max-w-[420px]">
+          <ModalBanner
+            icon={<Package className="h-5 w-5 text-destructive" />}
+            title="Drop Extension"
+            badge="Extension"
+            description={confirmDrop ?? ""}
+          />
+          <div className="space-y-4 px-5 py-4">
+            <p className="text-xs text-muted-foreground">
+              Everything that depends on it goes too — the statement runs with CASCADE.
+            </p>
+            <div className="rounded-lg border border-border bg-muted/20 p-3 font-mono text-xs text-muted-foreground">
+              DROP EXTENSION IF EXISTS "{confirmDrop}" CASCADE;
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" className="text-xs" onClick={() => setConfirmDrop(null)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" className="text-xs" onClick={confirmDropExt}>
+                Drop Extension
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

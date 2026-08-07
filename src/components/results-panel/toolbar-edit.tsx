@@ -1,12 +1,7 @@
 import { Loader2, Save, Trash2, X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent } from "../ui/dialog";
+import { ModalBanner } from "../ui/modal-banner";
 import type { EditState } from "./types";
 
 interface ToolbarEditProps {
@@ -63,30 +58,27 @@ export function ToolbarEdit({
           if (!open) onCancelDelete();
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete rows</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to permanently delete {pendingDeleteCount} row
-              {pendingDeleteCount !== 1 ? "s" : ""}? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <button
-              type="button"
-              onClick={onCancelDelete}
-              className="px-3 py-1.5 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={onConfirmDelete}
-              className="px-3 py-1.5 rounded-md text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
-            >
-              Yes, delete {pendingDeleteCount} row{pendingDeleteCount !== 1 ? "s" : ""}
-            </button>
-          </DialogFooter>
+        <DialogContent className="gap-0 p-0 sm:max-w-[420px]">
+          <ModalBanner
+            icon={<Trash2 className="h-5 w-5 text-destructive" />}
+            title="Delete rows"
+            badge="Rows"
+            description={`${pendingDeleteCount} selected`}
+          />
+          <div className="space-y-4 px-5 py-4">
+            <p className="text-xs text-muted-foreground">
+              {pendingDeleteCount} row{pendingDeleteCount !== 1 ? "s" : ""} will be deleted
+              permanently. This cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" className="text-xs" onClick={onCancelDelete}>
+                Cancel
+              </Button>
+              <Button variant="destructive" className="text-xs" onClick={onConfirmDelete}>
+                Delete {pendingDeleteCount} row{pendingDeleteCount !== 1 ? "s" : ""}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       <button

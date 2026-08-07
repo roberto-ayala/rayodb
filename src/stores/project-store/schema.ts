@@ -46,7 +46,7 @@ export const createSchemaSlice: StateCreator<
     if (!d) return;
     const driver = DriverFactory.getDriver(d.driver);
     const rawRows = await driver.loadTables(projectId, schema);
-    const rows: TableInfo[] = rawRows.map(([name, size]) => ({ name, size }));
+    const rows: TableInfo[] = rawRows.map(([name, size, parent]) => ({ name, size, parent }));
     set((s) => {
       s.tables[key] = rows;
     });

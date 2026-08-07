@@ -5,6 +5,7 @@ import {
   FileCode,
   FileUp,
   FolderOpen,
+  Grid2x2,
   Hash,
   Layers,
   Plus,
@@ -16,13 +17,150 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ProjectConnectionStatus } from "@/types";
-import { I } from "./constants";
+import { ProjectConnectionStatus, type TableInfo } from "@/types";
+import { I, INDENT_STEP } from "./constants";
 import { ddlFunctionQuery, ddlTableQuery, ddlViewQuery } from "./ddl-queries";
 import { renderTableDetails } from "./render-table-details";
 import { SectionHeader } from "./section-header";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
+
+/**
+ * A table row, its columns, and — when it is partitioned — its partitions
+ * nested underneath, each rendered the same way so sub-partitions work too.
+ * Every level of nesting is two indent steps: one for the section, one for the
+ * rows under it.
+ */
+function renderTable(
+  ctx: SidebarRenderCtx,
+  pid: string,
+  schema: string,
+  ti: TableInfo,
+  partitionsOf: Map<string, TableInfo[]>,
+  depth: number,
+) {
+  const {
+    loading,
+    selectedItem,
+    setSelectedItem,
+    setCsvImportTarget,
+    openProperties,
+    isOpen,
+    toggle,
+    onExpandTable,
+    onPreviewTableQuery,
+    onOpenTableQuery,
+    onPinPreview,
+    openTab,
+    loadColumns,
+    showMenu,
+    copy,
+  } = ctx;
+
+  const tKey = `table::${pid}::${schema}::${ti.name}`;
+  const isTableOpen = isOpen(tKey);
+  const partitions = partitionsOf.get(ti.name) ?? [];
+  const offset = depth * 2 * INDENT_STEP;
+
+  return (
+    <div key={ti.name}>
+      <TreeRow
+        indent={I.table + offset}
+        icon={
+          partitions.length > 0 ? (
+            <Grid2x2 className="h-3.5 w-3.5 text-muted-foreground" />
+          ) : (
+            <Table className="h-3.5 w-3.5 text-muted-foreground" />
+          )
+        }
+        label={ti.name}
+        expanded={isTableOpen}
+        loading={loading[tKey]}
+        selected={selectedItem === tKey}
+        onClick={() => {
+          setSelectedItem(tKey);
+          onPreviewTableQuery(pid, schema, ti.name);
+        }}
+        onDoubleClick={onPinPreview}
+        onToggle={() => {
+          setSelectedItem(tKey);
+          onExpandTable(pid, schema, ti.name);
+        }}
+        onContextMenu={(e) => {
+          setSelectedItem(tKey);
+          showMenu(e, [
+            { header: "Query" },
+            {
+              label: "SELECT TOP 100",
+              icon: <Table className="h-3 w-3" />,
+              onClick: () => onOpenTableQuery(pid, schema, ti.name),
+            },
+            {
+              label: "SELECT COUNT(*)",
+              icon: <Table className="h-3 w-3" />,
+              onClick: () => openTab(pid, `SELECT COUNT(*) FROM "${schema}"."${ti.name}";`),
+            },
+            { separator: true as const },
+            {
+              label: "Import CSV",
+              icon: <FileUp className="h-3 w-3" />,
+              onClick: () => {
+                void loadColumns(pid, schema, ti.name).then((cols) => {
+                  setCsvImportTarget({
+                    projectId: pid,
+                    schema,
+                    table: ti.name,
+                    columns: cols,
+                  });
+                });
+              },
+            },
+            { separator: true as const },
+            {
+              label: "Properties",
+              icon: <Settings2 className="h-3 w-3" />,
+              onClick: () => openProperties("table", pid, schema, ti.name),
+            },
+            {
+              label: "Show CREATE TABLE",
+              icon: <FileCode className="h-3 w-3" />,
+              onClick: () => openTab(pid, ddlTableQuery(schema, ti.name)),
+            },
+            { separator: true as const },
+            {
+              label: "Copy Name",
+              icon: <Copy className="h-3 w-3" />,
+              onClick: () => copy(`"${schema}"."${ti.name}"`),
+              shortcut: navigator.platform.includes("Mac") ? "\u2318C" : "Ctrl+C",
+            },
+          ]);
+        }}
+        meta={ti.size}
+      />
+      {isTableOpen && (
+        <>
+          {renderTableDetails(ctx, pid, schema, ti.name, offset)}
+          {partitions.length > 0 && (
+            <>
+              <SectionHeader
+                indent={I.section + offset}
+                label={`Partitions (${partitions.length})`}
+                icon={<Grid2x2 className="h-3 w-3" />}
+                sectionKey={`${tKey}::parts`}
+                expanded={isOpen(`${tKey}::parts`, true)}
+                onClick={() => toggle(`${tKey}::parts`, true)}
+              />
+              {isOpen(`${tKey}::parts`, true) &&
+                partitions.map((part) =>
+                  renderTable(ctx, pid, schema, part, partitionsOf, depth + 1),
+                )}
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 /** Render schemas + tables/views/functions for a connected database project */
 export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
@@ -41,18 +179,15 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     loading,
     selectedItem,
     setSelectedItem,
-    setCsvImportTarget,
     openProperties,
     isOpen,
     toggle,
     onExpandSchema,
-    onExpandTable,
     onOpenTableQuery,
     onPreviewTableQuery,
     onPinPreview,
     openTab,
     openERDTab,
-    loadColumns,
     showMenu,
     copy,
   } = ctx;
@@ -72,6 +207,17 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     const schemaProcs = procedures[schemaStoreKey];
     const schemaDataTypes = dataTypes[schemaStoreKey];
     const schemaForeignTables = foreignTables[schemaStoreKey];
+
+    // Partitions are tables too, so the flat listing carries them; group them
+    // under the table they belong to instead of repeating them at top level.
+    const partitionsOf = new Map<string, TableInfo[]>();
+    for (const ti of schemaTables ?? []) {
+      if (!ti.parent) continue;
+      const siblings = partitionsOf.get(ti.parent) ?? [];
+      siblings.push(ti);
+      partitionsOf.set(ti.parent, siblings);
+    }
+    const rootTables = (schemaTables ?? []).filter((ti) => !ti.parent);
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
     const isSchemaOpen = isOpen(sKey);
 
@@ -110,91 +256,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             {/* Tables category */}
             <SectionHeader
               indent={I.schemaObj}
-              label={`Tables${schemaTables ? ` (${schemaTables.length})` : ""}`}
+              label={`Tables${schemaTables ? ` (${rootTables.length})` : ""}`}
               icon={<Table className="h-3 w-3" />}
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
               onClick={() => toggle(`${sKey}::tables`, true)}
             />
             {isOpen(`${sKey}::tables`, true) &&
-              schemaTables?.map((ti) => {
-                const tKey = `table::${pid}::${schema}::${ti.name}`;
-                const isTableOpen = isOpen(tKey);
-
-                return (
-                  <div key={ti.name}>
-                    <TreeRow
-                      indent={I.table}
-                      icon={<Table className="h-3.5 w-3.5 text-muted-foreground" />}
-                      label={ti.name}
-                      expanded={isTableOpen}
-                      loading={loading[tKey]}
-                      selected={selectedItem === tKey}
-                      onClick={() => {
-                        setSelectedItem(tKey);
-                        onPreviewTableQuery(pid, schema, ti.name);
-                      }}
-                      onDoubleClick={onPinPreview}
-                      onToggle={() => {
-                        setSelectedItem(tKey);
-                        onExpandTable(pid, schema, ti.name);
-                      }}
-                      onContextMenu={(e) => {
-                        setSelectedItem(tKey);
-                        showMenu(e, [
-                          { header: "Query" },
-                          {
-                            label: "SELECT TOP 100",
-                            icon: <Table className="h-3 w-3" />,
-                            onClick: () => onOpenTableQuery(pid, schema, ti.name),
-                          },
-                          {
-                            label: "SELECT COUNT(*)",
-                            icon: <Table className="h-3 w-3" />,
-                            onClick: () =>
-                              openTab(pid, `SELECT COUNT(*) FROM "${schema}"."${ti.name}";`),
-                          },
-                          { separator: true as const },
-                          {
-                            label: "Import CSV",
-                            icon: <FileUp className="h-3 w-3" />,
-                            onClick: () => {
-                              void loadColumns(pid, schema, ti.name).then((cols) => {
-                                setCsvImportTarget({
-                                  projectId: pid,
-                                  schema,
-                                  table: ti.name,
-                                  columns: cols,
-                                });
-                              });
-                            },
-                          },
-                          { separator: true as const },
-                          {
-                            label: "Properties",
-                            icon: <Settings2 className="h-3 w-3" />,
-                            onClick: () => openProperties("table", pid, schema, ti.name),
-                          },
-                          {
-                            label: "Show CREATE TABLE",
-                            icon: <FileCode className="h-3 w-3" />,
-                            onClick: () => openTab(pid, ddlTableQuery(schema, ti.name)),
-                          },
-                          { separator: true as const },
-                          {
-                            label: "Copy Name",
-                            icon: <Copy className="h-3 w-3" />,
-                            onClick: () => copy(`"${schema}"."${ti.name}"`),
-                            shortcut: navigator.platform.includes("Mac") ? "⌘C" : "Ctrl+C",
-                          },
-                        ]);
-                      }}
-                      meta={ti.size}
-                    />
-                    {isTableOpen && renderTableDetails(ctx, pid, schema, ti.name)}
-                  </div>
-                );
-              })}
+              rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}
 
             {/* Foreign Tables category */}
             {schemaForeignTables && schemaForeignTables.length > 0 && (

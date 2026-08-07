@@ -13,6 +13,8 @@ export function renderTableDetails(
   pid: string,
   schema: string,
   tableName: string,
+  /** Extra indent when the table is nested as a partition */
+  indentOffset = 0,
 ) {
   const { columnDetails, indexes, showMenu, copy } = ctx;
   const metaKey = `${pid}::${schema}::${tableName}`;
@@ -28,7 +30,7 @@ export function renderTableDetails(
     <div
       key={c.name}
       className="relative flex items-center gap-1.5 py-0.5 hover:bg-sidebar-accent rounded-sm whitespace-nowrap"
-      style={{ paddingLeft: `${I.section}px` }}
+      style={{ paddingLeft: `${I.section + indentOffset}px` }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();

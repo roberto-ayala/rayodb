@@ -101,7 +101,10 @@ pub async fn load_tables(
         .await
         .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
-    Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
+    Ok(rows
+        .iter()
+        .map(|r| (r.get(0), r.get(1), r.get(2)))
+        .collect())
 }
 
 pub async fn load_columns(

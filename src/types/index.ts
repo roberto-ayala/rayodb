@@ -104,6 +104,8 @@ export interface VirtualQuery {
 export interface TableInfo {
   name: string;
   size: string;
+  /** The table this one is a partition of, empty when it stands alone */
+  parent: string;
 }
 
 export interface ColumnDetail {

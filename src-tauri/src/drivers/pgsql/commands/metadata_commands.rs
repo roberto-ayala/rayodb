@@ -70,8 +70,24 @@ pub async fn pgsql_load_tables(
         // reports views and foreign tables, which have their own categories, and
         // sizing by oid avoids quoting the identifier back into a string.
         // 'r' = ordinary table, 'p' = partitioned table.
+        //
+        // A partitioned table stores nothing itself, so its own size reads as 0
+        // however much its partitions hold — hence the sum over the tree. The
+        // parent column is what lets the sidebar nest partitions; old-style
+        // INHERITS children are not partitions and stay at the top level.
         r#"SELECT c.relname,
-                  pg_size_pretty(pg_total_relation_size(c.oid)) AS size
+                  CASE WHEN c.relkind = 'p'
+                       THEN (SELECT pg_size_pretty(SUM(pg_total_relation_size(pt.relid)))
+                             FROM pg_partition_tree(c.oid) pt)
+                       ELSE pg_size_pretty(pg_total_relation_size(c.oid))
+                  END AS size,
+                  CASE WHEN c.relispartition
+                       THEN (SELECT p.relname::text
+                             FROM pg_inherits i
+                             JOIN pg_class p ON p.oid = i.inhparent
+                             WHERE i.inhrelid = c.oid)
+                       ELSE ''
+                  END AS parent
            FROM pg_class c
            JOIN pg_namespace n ON n.oid = c.relnamespace
            WHERE n.nspname = $1

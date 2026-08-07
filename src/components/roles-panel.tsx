@@ -24,6 +24,9 @@ import type { DbGrant, PgRole, RoleSpec, TableGrant } from "@/types";
 /** What one can hold on a database, in the order the table shows them */
 const DB_PRIVILEGES = ["CONNECT", "CREATE", "TEMPORARY"] as const;
 
+/** Shared by the grant header and its rows so the two line up */
+const GRANT_COLUMNS = "grid grid-cols-[8rem_12rem_1fr] items-start";
+
 interface RolesPanelProps {
   projectId: string;
 }
@@ -410,44 +413,35 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                 <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Table Privileges ({tableGrants.length})
                 </div>
-                <div className="rounded-lg border border-border/60 overflow-hidden max-h-[300px] overflow-y-auto">
-                  <table className="w-full text-xs">
-                    {/* Sticky, so it has to be opaque — at 40% the rows slid
-                        visibly underneath it */}
-                    <thead className="sticky top-0 z-10 bg-muted">
-                      <tr>
-                        <th className="whitespace-nowrap px-3 py-1.5 text-left font-medium text-muted-foreground">
-                          Schema
-                        </th>
-                        <th className="whitespace-nowrap px-3 py-1.5 text-left font-medium text-muted-foreground">
-                          Table
-                        </th>
-                        <th className="w-full px-3 py-1.5 text-left font-medium text-muted-foreground">
-                          Privileges
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tableGrants.map((g, i) => (
-                        <tr key={i} className="border-t border-border/60">
-                          <td className="px-3 py-1 text-muted-foreground">{g.schema}</td>
-                          <td className="px-3 py-1">{g.table}</td>
-                          <td className="px-3 py-1">
-                            <div className="flex flex-wrap gap-1">
-                              {g.privileges.map((p) => (
-                                <span
-                                  key={p}
-                                  className="px-1.5 py-0.5 rounded bg-primary/5 text-3xs"
-                                >
-                                  {p}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {/* Header and rows are separate grids sharing one column
+                    template: only the rows scroll, so the header keeps its
+                    place and the scrollbar stops below it. The flexible column
+                    is the last one, so what the scrollbar takes comes off the
+                    right edge rather than shifting the columns out of line */}
+                <div className="overflow-hidden rounded-lg border border-border/60">
+                  <div className={cn(GRANT_COLUMNS, "bg-muted text-xs text-muted-foreground")}>
+                    <span className="px-3 py-1.5 font-medium">Schema</span>
+                    <span className="px-3 py-1.5 font-medium">Table</span>
+                    <span className="px-3 py-1.5 font-medium">Privileges</span>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {tableGrants.map((g) => (
+                      <div
+                        key={`${g.schema}.${g.table}`}
+                        className={cn(GRANT_COLUMNS, "border-t border-border/60 text-xs")}
+                      >
+                        <span className="truncate px-3 py-1 text-muted-foreground">{g.schema}</span>
+                        <span className="truncate px-3 py-1">{g.table}</span>
+                        <div className="flex flex-wrap gap-1 px-3 py-1">
+                          {g.privileges.map((p) => (
+                            <span key={p} className="rounded bg-primary/5 px-1.5 py-0.5 text-3xs">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

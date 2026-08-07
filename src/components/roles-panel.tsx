@@ -335,14 +335,17 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
               <div className="overflow-hidden rounded-lg border border-border/60">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="bg-muted/20">
-                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">
+                    {/* Opaque, or the rows show through it */}
+                    <tr className="bg-muted">
+                      {/* This column takes the slack so the privilege columns
+                          hug their labels and leave no gap at the end */}
+                      <th className="w-full px-3 py-1.5 text-left font-medium text-muted-foreground">
                         Database
                       </th>
                       {DB_PRIVILEGES.map((p) => (
                         <th
                           key={p}
-                          className="w-24 px-3 py-1.5 text-left font-medium text-muted-foreground"
+                          className="whitespace-nowrap px-3 py-1.5 text-center font-medium text-muted-foreground"
                         >
                           {p}
                         </th>
@@ -362,7 +365,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                           );
                           return (
                             <td key={priv} className="px-3 py-1">
-                              <span className="flex items-center gap-1.5">
+                              <span className="flex items-center justify-center gap-1.5">
                                 <Checkbox
                                   checked={grant?.granted ?? false}
                                   disabled={savingGrant}
@@ -409,15 +412,17 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                 </div>
                 <div className="rounded-lg border border-border/60 overflow-hidden max-h-[300px] overflow-y-auto">
                   <table className="w-full text-xs">
-                    <thead className="sticky top-0 bg-muted/40">
+                    {/* Sticky, so it has to be opaque — at 40% the rows slid
+                        visibly underneath it */}
+                    <thead className="sticky top-0 z-10 bg-muted">
                       <tr>
-                        <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
+                        <th className="whitespace-nowrap px-3 py-1.5 text-left font-medium text-muted-foreground">
                           Schema
                         </th>
-                        <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
+                        <th className="whitespace-nowrap px-3 py-1.5 text-left font-medium text-muted-foreground">
                           Table
                         </th>
-                        <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
+                        <th className="w-full px-3 py-1.5 text-left font-medium text-muted-foreground">
                           Privileges
                         </th>
                       </tr>

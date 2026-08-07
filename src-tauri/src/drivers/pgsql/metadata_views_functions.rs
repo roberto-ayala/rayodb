@@ -4,6 +4,7 @@ use crate::common::enums::{AppError, pg_error_message};
 
 use super::{
     DataTypeInfo, ForeignTableInfo, FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo,
+    TriggerFunctionInfo,
 };
 
 pub async fn load_views(client: &Client, schema: &str) -> Result<Vec<String>, AppError> {
@@ -67,7 +68,16 @@ pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<Functio
                JOIN pg_namespace n ON n.oid = p.pronamespace
                WHERE n.nspname = $1
                  AND p.prokind = 'f'
-                 AND pg_get_function_result(p.oid) != 'trigger'
+                 -- Trigger and event trigger functions are fired, not called:
+                 -- they belong to their own listing
+                 AND pg_get_function_result(p.oid) NOT IN ('trigger', 'event_trigger')
+                 -- 'e' = installed by an extension, 'i' = generated for another
+                 -- object, such as the constructors of a range type. Neither is
+                 -- something the user wrote.
+                 AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                                 WHERE d.classid = 'pg_proc'::regclass
+                                   AND d.objid = p.oid
+                                   AND d.deptype IN ('e', 'i'))
                ORDER BY p.proname"#,
             &[&schema],
         )
@@ -166,6 +176,10 @@ pub async fn load_procedures(
                JOIN pg_namespace n ON n.oid = p.pronamespace
                WHERE n.nspname = $1
                  AND p.prokind = 'p'
+                 AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                                 WHERE d.classid = 'pg_proc'::regclass
+                                   AND d.objid = p.oid
+                                   AND d.deptype IN ('e', 'i'))
                ORDER BY p.proname"#,
             &[&schema],
         )
@@ -175,18 +189,26 @@ pub async fn load_procedures(
     Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
 }
 
+/// Functions that exist to be fired rather than called: row triggers and event
+/// triggers alike. An event trigger function returns 'event_trigger', so it used
+/// to land among the ordinary functions.
 pub async fn load_trigger_functions(
     client: &Client,
     schema: &str,
-) -> Result<Vec<(String, String)>, AppError> {
+) -> Result<Vec<TriggerFunctionInfo>, AppError> {
     let rows = client
         .query(
             r#"SELECT p.proname,
-                      pg_get_function_arguments(p.oid)
+                      pg_get_function_arguments(p.oid),
+                      pg_get_function_result(p.oid)
                FROM pg_proc p
                JOIN pg_namespace n ON n.oid = p.pronamespace
                WHERE n.nspname = $1
-                 AND pg_get_function_result(p.oid) = 'trigger'
+                 AND pg_get_function_result(p.oid) IN ('trigger', 'event_trigger')
+                 AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                                 WHERE d.classid = 'pg_proc'::regclass
+                                   AND d.objid = p.oid
+                                   AND d.deptype IN ('e', 'i'))
                ORDER BY p.proname"#,
             &[&schema],
         )
@@ -195,11 +217,7 @@ pub async fn load_trigger_functions(
 
     Ok(rows
         .iter()
-        .map(|r| {
-            let name: String = r.get(0);
-            let args: String = r.get(1);
-            (name, args)
-        })
+        .map(|r| (r.get(0), r.get(1), r.get(2)))
         .collect())
 }
 

@@ -74,6 +74,9 @@ pub type EventTriggerInfo = (String, String, String, String);
 /// Data type info: (name, kind, detail)
 pub type DataTypeInfo = (String, String, String);
 
+/// Trigger function info: (name, arguments, kind) — kind is trigger or event_trigger
+pub type TriggerFunctionInfo = (String, String, String);
+
 /// Procedure info: (name, arguments)
 pub type ProcedureInfo = (String, String);
 

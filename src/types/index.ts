@@ -188,6 +188,8 @@ export interface ProcedureInfo {
 export interface TriggerFunctionInfo {
   name: string;
   arguments: string;
+  /** trigger | event_trigger — both are fired rather than called */
+  kind: string;
 }
 
 export interface PgRole {

@@ -71,6 +71,8 @@ fn main() {
             drivers::pgsql::pgsql_load_materialized_views,
             drivers::pgsql::pgsql_load_sequences,
             drivers::pgsql::pgsql_load_functions,
+            drivers::pgsql::pgsql_load_foreign_tables,
+            drivers::pgsql::pgsql_load_event_triggers,
             drivers::pgsql::pgsql_load_data_types,
             drivers::pgsql::pgsql_load_procedures,
             drivers::pgsql::pgsql_load_trigger_functions,

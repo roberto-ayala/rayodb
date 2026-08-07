@@ -2,7 +2,9 @@ use tokio_postgres::Client;
 
 use crate::common::enums::{AppError, pg_error_message};
 
-use super::{DataTypeInfo, FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo};
+use super::{
+    DataTypeInfo, ForeignTableInfo, FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo,
+};
 
 pub async fn load_views(client: &Client, schema: &str) -> Result<Vec<String>, AppError> {
     let rows = client
@@ -81,6 +83,31 @@ pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<Functio
             (name, ret, args)
         })
         .collect())
+}
+
+/// Foreign tables live outside the database, so they carry the server that
+/// backs them rather than a size.
+pub async fn load_foreign_tables(
+    client: &Client,
+    schema: &str,
+) -> Result<Vec<ForeignTableInfo>, AppError> {
+    let rows = client
+        .query(
+            r#"SELECT c.relname::text,
+                      COALESCE(s.srvname::text, '')
+               FROM pg_class c
+               JOIN pg_namespace n ON n.oid = c.relnamespace
+               LEFT JOIN pg_foreign_table ft ON ft.ftrelid = c.oid
+               LEFT JOIN pg_foreign_server s ON s.oid = ft.ftserver
+               WHERE n.nspname = $1
+                 AND c.relkind = 'f'
+               ORDER BY c.relname"#,
+            &[&schema],
+        )
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
 }
 
 /// User-defined types of a schema: enums, domains, composites and ranges, each

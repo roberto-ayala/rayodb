@@ -1,9 +1,10 @@
 use crate::AppState;
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 use crate::drivers::pgsql::{
-    ColumnDetail, ConstraintDetail, DataTypeInfo, FunctionInfo, IndexDetail, PolicyDetail,
-    ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail, get_pool, load_column_details,
-    load_columns, load_constraints, load_data_types, load_databases, load_functions, load_indexes,
+    ColumnDetail, ConstraintDetail, DataTypeInfo, EventTriggerInfo, ForeignTableInfo, FunctionInfo,
+    IndexDetail, PolicyDetail, ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail, get_pool,
+    load_column_details, load_columns, load_constraints, load_data_types, load_databases,
+    load_event_triggers, load_foreign_tables, load_functions, load_indexes,
     load_materialized_views, load_policies, load_procedures, load_rules, load_schemas,
     load_sequences, load_tables, load_tablespaces, load_trigger_functions, load_triggers,
     load_views,
@@ -69,8 +70,24 @@ pub async fn pgsql_load_tables(
         // reports views and foreign tables, which have their own categories, and
         // sizing by oid avoids quoting the identifier back into a string.
         // 'r' = ordinary table, 'p' = partitioned table.
+        //
+        // A partitioned table stores nothing itself, so its own size reads as 0
+        // however much its partitions hold — hence the sum over the tree. The
+        // parent column is what lets the sidebar nest partitions; old-style
+        // INHERITS children are not partitions and stay at the top level.
         r#"SELECT c.relname,
-                  pg_size_pretty(pg_total_relation_size(c.oid)) AS size
+                  CASE WHEN c.relkind = 'p'
+                       THEN (SELECT pg_size_pretty(SUM(pg_total_relation_size(pt.relid)))
+                             FROM pg_partition_tree(c.oid) pt)
+                       ELSE pg_size_pretty(pg_total_relation_size(c.oid))
+                  END AS size,
+                  CASE WHEN c.relispartition
+                       THEN (SELECT p.relname::text
+                             FROM pg_inherits i
+                             JOIN pg_class p ON p.oid = i.inhparent
+                             WHERE i.inhrelid = c.oid)
+                       ELSE ''
+                  END AS parent
            FROM pg_class c
            JOIN pg_namespace n ON n.oid = c.relnamespace
            WHERE n.nspname = $1
@@ -222,6 +239,29 @@ pub async fn pgsql_load_functions(
     let client = acquire_client(&app_state.meta_clients, project_id).await?;
 
     load_functions(&client, schema).await.map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_foreign_tables(
+    project_id: &str,
+    schema: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<ForeignTableInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_foreign_tables(&client, schema)
+        .await
+        .map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_event_triggers(
+    project_id: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<EventTriggerInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_event_triggers(&client).await.map_err(Into::into)
 }
 
 #[tauri::command(rename_all = "snake_case")]

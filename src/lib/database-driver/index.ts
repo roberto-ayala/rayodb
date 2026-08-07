@@ -3,6 +3,8 @@ import type {
   ConstraintDetail,
   DataTypeInfo,
   DbGrant,
+  EventTriggerInfo,
+  ForeignTableInfo,
   FunctionInfo,
   IndexDetail,
   PgRole,
@@ -18,7 +20,7 @@ import type {
 } from "@/types";
 
 // Wire types from Rust (tuples)
-export type WireTableInfo = [string, string];
+export type WireTableInfo = [string, string, string];
 export type WireQueryResult = [string[], string[][], number];
 export type WirePackedResult = [string, number]; // [packed_string, elapsed_ms]
 
@@ -42,6 +44,8 @@ export type WireFunctionInfo = [string, string, string];
 export type WireSequenceInfo = [string, string];
 export type WireProcedureInfo = [string, string];
 export type WireDataTypeInfo = [string, string, string];
+export type WireForeignTableInfo = [string, string];
+export type WireEventTriggerInfo = [string, string, string, string];
 export type WireTriggerFunctionInfo = [string, string];
 export type WireForeignKeyInfo = [string, string, string, string];
 
@@ -86,6 +90,8 @@ export interface DatabaseDriver {
   loadFunctions(projectId: string, schema: string): Promise<FunctionInfo[]>;
   loadProcedures(projectId: string, schema: string): Promise<ProcedureInfo[]>;
   loadDataTypes(projectId: string, schema: string): Promise<DataTypeInfo[]>;
+  loadForeignTables(projectId: string, schema: string): Promise<ForeignTableInfo[]>;
+  loadEventTriggers(projectId: string): Promise<EventTriggerInfo[]>;
   loadTriggerFunctions(projectId: string, schema: string): Promise<TriggerFunctionInfo[]>;
   runQuery(projectId: string, sql: string, timeoutMs?: number): Promise<WireQueryResult>;
   runQueryStreamed?(
@@ -225,6 +231,19 @@ export function parseFunctionInfo(wire: WireFunctionInfo[]): FunctionInfo[] {
     name,
     returnType,
     arguments: arguments_,
+  }));
+}
+
+export function parseForeignTableInfo(wire: WireForeignTableInfo[]): ForeignTableInfo[] {
+  return wire.map(([name, server]) => ({ name, server }));
+}
+
+export function parseEventTriggerInfo(wire: WireEventTriggerInfo[]): EventTriggerInfo[] {
+  return wire.map(([name, event, enabled, function_]) => ({
+    name,
+    event,
+    enabled,
+    function: function_,
   }));
 }
 

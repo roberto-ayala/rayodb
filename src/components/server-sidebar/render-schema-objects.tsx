@@ -29,6 +29,7 @@ import {
   newForeignTableTemplate,
   newFunctionTemplate,
   newMatViewTemplate,
+  newPartitionedTableTemplate,
   newPartitionTemplate,
   newProcedureTemplate,
   newSequenceTemplate,
@@ -342,14 +343,25 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
               onClick={() => toggle(`${sKey}::tables`, true)}
-              onContextMenu={newObjectMenu(
-                ctx,
-                pid,
-                "New Table…",
-                <Table className="h-3 w-3" />,
-                newTableTemplate(schema),
-                "New table",
-              )}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showMenu(e, [
+                  {
+                    label: "New Table…",
+                    icon: <Table className="h-3 w-3" />,
+                    onClick: () => openTab(pid, newTableTemplate(schema), { title: "New table" }),
+                  },
+                  {
+                    label: "New Partitioned Table…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, newPartitionedTableTemplate(schema), {
+                        title: "New partitioned table",
+                      }),
+                  },
+                ]);
+              }}
             />
             {isOpen(`${sKey}::tables`, true) &&
               rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}

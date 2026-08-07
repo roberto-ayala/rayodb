@@ -2,12 +2,12 @@ use crate::AppState;
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 use crate::drivers::pgsql::{
     ColumnDetail, ConstraintDetail, DataTypeInfo, EventTriggerInfo, ForeignTableInfo, FunctionInfo,
-    IndexDetail, PolicyDetail, ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail, get_pool,
-    load_column_details, load_columns, load_constraints, load_data_types, load_databases,
-    load_event_triggers, load_foreign_tables, load_functions, load_indexes,
-    load_materialized_views, load_policies, load_procedures, load_rules, load_schemas,
-    load_sequences, load_tables, load_tablespaces, load_trigger_functions, load_triggers,
-    load_views,
+    IndexDetail, PolicyDetail, ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail,
+    TriggerFunctionInfo, get_pool, load_column_details, load_columns, load_constraints,
+    load_data_types, load_databases, load_event_triggers, load_foreign_tables, load_functions,
+    load_indexes, load_materialized_views, load_policies, load_procedures, load_rules,
+    load_schemas, load_sequences, load_tables, load_tablespaces, load_trigger_functions,
+    load_triggers, load_views,
 };
 
 use tauri::{AppHandle, Manager, Result, State};
@@ -291,7 +291,7 @@ pub async fn pgsql_load_trigger_functions(
     project_id: &str,
     schema: &str,
     app_state: State<'_, AppState>,
-) -> Result<Vec<(String, String)>> {
+) -> Result<Vec<TriggerFunctionInfo>> {
     let client = acquire_client(&app_state.meta_clients, project_id).await?;
 
     load_trigger_functions(&client, schema)

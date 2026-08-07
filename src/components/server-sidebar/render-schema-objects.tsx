@@ -723,7 +723,9 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                       >
                         <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                         <span className="text-xs text-foreground">{fn.name}()</span>
-                        <span className="text-3xs text-muted-foreground">trigger</span>
+                        <span className="text-3xs text-muted-foreground">
+                          {fn.kind === "event_trigger" ? "event trigger" : "trigger"}
+                        </span>
                       </div>
                     );
                   })}

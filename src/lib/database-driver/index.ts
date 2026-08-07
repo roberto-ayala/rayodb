@@ -46,7 +46,7 @@ export type WireProcedureInfo = [string, string];
 export type WireDataTypeInfo = [string, string, string];
 export type WireForeignTableInfo = [string, string];
 export type WireEventTriggerInfo = [string, string, string, string];
-export type WireTriggerFunctionInfo = [string, string];
+export type WireTriggerFunctionInfo = [string, string, string];
 export type WireForeignKeyInfo = [string, string, string, string];
 
 export interface ForeignKey {
@@ -256,9 +256,10 @@ export function parseProcedureInfo(wire: WireProcedureInfo[]): ProcedureInfo[] {
 }
 
 export function parseTriggerFunctionInfo(wire: WireTriggerFunctionInfo[]): TriggerFunctionInfo[] {
-  return wire.map(([name, arguments_]) => ({
+  return wire.map(([name, arguments_, kind]) => ({
     name,
     arguments: arguments_,
+    kind,
   }));
 }
 

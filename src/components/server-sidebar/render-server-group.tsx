@@ -275,6 +275,14 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                   icon: <Package className="h-3 w-3" />,
                                   onClick: () => openExtensionsTab(dbPid),
                                 },
+                                // Roles belong to the server, not to this
+                                // database — reachable from here, but not a
+                                // branch of it
+                                {
+                                  label: "Server Roles",
+                                  icon: <Shield className="h-3 w-3" />,
+                                  onClick: () => openRolesTab(dbPid),
+                                },
                               ]
                             : []),
                           ...(onEditConnection

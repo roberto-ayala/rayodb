@@ -1,10 +1,11 @@
-import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Database, Loader2, XCircle } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { pgsqlTestConnection } from "@/tauri";
 import type { DriverType, ProjectDetails } from "@/types";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
+import { ModalBanner } from "../ui/modal-banner";
 import {
   AutoConnectCheckbox,
   ConnStringField,
@@ -183,17 +184,16 @@ export function ConnectionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-lg bg-card sm:max-w-[500px] flex flex-col overflow-hidden p-0">
-        <DialogHeader className="shrink-0 px-6 pt-6 pb-0">
-          <DialogTitle className="text-foreground">
-            {isEditing ? "Edit Connection" : "New Connection"}
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground text-xs">
-            {isEditing ? "Update connection details" : "Add a new database connection"}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[500px]">
+        <ModalBanner
+          className="shrink-0"
+          icon={<Database className="h-5 w-5 text-primary" />}
+          title={isEditing ? editData.name : "New Connection"}
+          badge={formData.driver}
+          description={isEditing ? "Update connection details" : "Add a new database connection"}
+        />
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 py-4">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
             {!isEditing && (
               <ConnStringField
                 value={connString}
@@ -275,7 +275,7 @@ export function ConnectionModal({
             )}
           </div>
 
-          <div className="flex shrink-0 justify-between border-border border-t px-6 py-4">
+          <div className="flex shrink-0 justify-between border-border border-t px-5 py-4">
             <Button
               type="button"
               variant="outline"

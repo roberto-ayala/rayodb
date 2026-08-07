@@ -203,6 +203,39 @@ export interface PgRole {
   conn_limit: number;
   valid_until: string;
   member_of: string[];
+  inherit: boolean;
+}
+
+/** What the role editor sends back: every attribute the form can set */
+export interface RoleSpec {
+  name: string;
+  login: boolean;
+  superuser: boolean;
+  create_db: boolean;
+  create_role: boolean;
+  inherit: boolean;
+  replication: boolean;
+  bypass_rls: boolean;
+  conn_limit: number;
+  /** Empty means no expiry */
+  valid_until: string;
+  /** Empty leaves the password untouched when editing */
+  password: string;
+  member_of: string[];
+}
+
+export interface SchemaGrant {
+  schema: string;
+  privilege: string;
+  /** Relations in the schema the role holds it on, granted by name */
+  granted: number;
+  total: number;
+}
+
+export interface DefaultGrant {
+  schema: string;
+  privilege: string;
+  granted: boolean;
 }
 
 export interface TableGrant {
@@ -215,6 +248,10 @@ export interface TableGrant {
 export interface DbGrant {
   database: string;
   privilege: string;
+  /** Granted to this role by name */
+  granted: boolean;
+  /** Available to everyone, so the role has it whether or not it was granted */
+  via_public: boolean;
 }
 
 export interface SchemaObject {

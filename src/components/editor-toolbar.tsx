@@ -2,15 +2,10 @@ import { AlignLeft, Columns2, GitBranch, Play, Save, Square, Timer } from "lucid
 import { useEffect, useRef, useState } from "react";
 import { format as formatSQL } from "sql-formatter";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ModalBanner } from "@/components/ui/modal-banner";
 import { Select } from "@/components/ui/select";
 import { SqlCode } from "@/components/ui/sql-code";
 import { useProjectStore } from "@/stores/project-store";
@@ -166,17 +161,19 @@ export function EditorToolbar({
       </div>
 
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Save Query</DialogTitle>
-            <DialogDescription>Save the current query for quick access later.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="gap-0 p-0 sm:max-w-[420px]">
+          <ModalBanner
+            icon={<Save className="h-5 w-5 text-primary" />}
+            title="Save Query"
+            badge="Query"
+            description="Kept for quick access later"
+          />
           <form
             onSubmit={(e) => {
               e.preventDefault();
               void handleSaveSubmit();
             }}
-            className="mt-2 space-y-3"
+            className="space-y-4 px-5 py-4"
           >
             <Field label="Query Name" htmlFor="save-query-title">
               <Input

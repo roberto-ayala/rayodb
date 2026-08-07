@@ -1,6 +1,7 @@
 import {
   Database,
   Key,
+  Loader2,
   Pencil,
   Plus,
   Shield,
@@ -14,10 +15,14 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RoleEditor } from "@/components/role-editor";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 import type { DbGrant, PgRole, RoleSpec, TableGrant } from "@/types";
+
+/** What one can hold on a database, in the order the table shows them */
+const DB_PRIVILEGES = ["CONNECT", "CREATE", "TEMPORARY"] as const;
 
 interface RolesPanelProps {
   projectId: string;
@@ -32,6 +37,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<PgRole | null>(null);
   const [confirmDrop, setConfirmDrop] = useState(false);
+  const [savingGrant, setSavingGrant] = useState(false);
   const projects = useProjectStore((s) => s.projects);
 
   const driver = projects[projectId] ? DriverFactory.getDriver(projects[projectId].driver) : null;
@@ -63,6 +69,28 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       setDbGrants(dg);
     },
     [driver, projectId],
+  );
+
+  const databases = Array.from(new Set(dbGrants.map((g) => g.database)));
+
+  const toggleGrant = useCallback(
+    async (database: string, privilege: string, granted: boolean) => {
+      if (!driver || !selectedRole) return;
+      setSavingGrant(true);
+      try {
+        await driver.setDatabasePrivilege?.(projectId, database, selectedRole, privilege, granted);
+        const refreshed = await driver.loadDatabaseGrants?.(projectId, selectedRole);
+        setDbGrants(refreshed ?? []);
+      } catch (err: unknown) {
+        toast.error(`Could not change ${privilege} on "${database}"`, {
+          description: err instanceof Error ? err.message : String(err),
+          duration: 10000,
+        });
+      } finally {
+        setSavingGrant(false);
+      }
+    },
+    [driver, projectId, selectedRole],
   );
 
   const saveRole = useCallback(
@@ -294,42 +322,85 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
               </div>
             )}
 
-            {/* Database grants */}
-            {dbGrants.length > 0 && (
-              <div>
-                <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  Database Privileges
-                </div>
-                <div className="rounded-lg border border-border/60 overflow-hidden">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="bg-muted/20">
-                        <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
-                          Database
-                        </th>
-                        <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">
-                          Privilege
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dbGrants.map((g, i) => (
-                        <tr key={i} className="border-t border-border/60">
-                          <td className="px-3 py-1">
-                            <Database className="h-3 w-3 inline mr-1.5 text-muted-foreground/50" />
-                            {g.database}
-                          </td>
-                          <td className="px-3 py-1">{g.privilege}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            {/* Database access */}
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Database Access
+                </span>
+                {savingGrant && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
               </div>
-            )}
+              <div className="overflow-hidden rounded-lg border border-border/60">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-muted/20">
+                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">
+                        Database
+                      </th>
+                      {DB_PRIVILEGES.map((p) => (
+                        <th
+                          key={p}
+                          className="w-24 px-3 py-1.5 text-left font-medium text-muted-foreground"
+                        >
+                          {p}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {databases.map((db) => (
+                      <tr key={db} className="border-t border-border/60">
+                        <td className="px-3 py-1">
+                          <Database className="mr-1.5 inline h-3 w-3 text-muted-foreground/50" />
+                          {db}
+                        </td>
+                        {DB_PRIVILEGES.map((priv) => {
+                          const grant = dbGrants.find(
+                            (g) => g.database === db && g.privilege === priv,
+                          );
+                          return (
+                            <td key={priv} className="px-3 py-1">
+                              <span className="flex items-center gap-1.5">
+                                <Checkbox
+                                  checked={grant?.granted ?? false}
+                                  disabled={savingGrant}
+                                  onChange={(e) => void toggleGrant(db, priv, e.target.checked)}
+                                />
+                                {/* A role usually reaches a database through
+                                    PUBLIC, and revoking its own grant would not
+                                    take that away — so say where it comes from */}
+                                {!grant?.granted && grant?.via_public && (
+                                  <span className="text-3xs text-muted-foreground/60">
+                                    via PUBLIC
+                                  </span>
+                                )}
+                              </span>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-1.5 text-3xs text-muted-foreground/60">
+                Roles belong to the server, not to one database. Granting CONNECT is what lets this
+                role into a database.
+              </p>
+            </div>
 
             {/* Table grants */}
-            {tableGrants.length > 0 && (
+            {tableGrants.length === 0 ? (
+              <div>
+                <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  Table Privileges
+                </div>
+                <div className="rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground/60">
+                  No table privileges in {projects[projectId]?.database ?? "this database"}. Grant
+                  them from a query, or through a group this role belongs to.
+                </div>
+              </div>
+            ) : (
               <div>
                 <div className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   Table Privileges ({tableGrants.length})

@@ -105,6 +105,7 @@ fn main() {
             drivers::pgsql::pgsql_drop_role,
             drivers::pgsql::pgsql_load_table_grants,
             drivers::pgsql::pgsql_load_database_grants,
+            drivers::pgsql::pgsql_set_database_privilege,
             drivers::pgsql::pgsql_extract_schema_objects,
             drivers::pgsql::pgsql_load_locks,
             drivers::pgsql::pgsql_load_index_usage,

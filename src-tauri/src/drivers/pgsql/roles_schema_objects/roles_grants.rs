@@ -249,35 +249,88 @@ pub async fn load_table_grants(
 pub struct DbGrant {
     pub database: String,
     pub privilege: String,
+    /// Granted to this role by name
+    pub granted: bool,
+    /// Available to everyone, so the role has it whether or not it was granted
+    pub via_public: bool,
 }
 
+/// Every database against the three privileges one can hold on it, saying both
+/// what this role was granted and what PUBLIC already gives everyone — a role
+/// usually reaches a database through PUBLIC rather than a grant of its own,
+/// and has_database_privilege cannot tell the two apart.
 pub async fn load_database_grants(
     client: &deadpool_postgres::Client,
     role_name: &str,
 ) -> Result<Vec<DbGrant>, AppError> {
     let rows = client
         .query(
-            "SELECT datname, privilege_type
-             FROM pg_database
-             CROSS JOIN LATERAL (
-               SELECT privilege_type
-               FROM (VALUES ('CONNECT'), ('CREATE'), ('TEMPORARY')) AS privs(privilege_type)
-               WHERE has_database_privilege($1, datname, privilege_type)
-             ) t
-             WHERE NOT datistemplate
-             ORDER BY datname, privilege_type",
+            // A null datacl means the defaults are in force rather than "no
+            // privileges", so acldefault materialises them.
+            "SELECT d.datname::text,
+                    p.privilege_type,
+                    EXISTS (SELECT 1 FROM aclexplode(COALESCE(d.datacl, acldefault('d', d.datdba))) a
+                            WHERE a.grantee = r.oid AND a.privilege_type = p.privilege_type),
+                    EXISTS (SELECT 1 FROM aclexplode(COALESCE(d.datacl, acldefault('d', d.datdba))) a
+                            WHERE a.grantee = 0 AND a.privilege_type = p.privilege_type)
+             FROM pg_database d
+             CROSS JOIN (VALUES ('CONNECT'), ('CREATE'), ('TEMPORARY')) AS p(privilege_type)
+             CROSS JOIN (SELECT oid FROM pg_roles WHERE rolname = $1) r
+             WHERE NOT d.datistemplate
+             ORDER BY d.datname, p.privilege_type",
             &[&role_name],
         )
         .await
         .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
-    let mut grants = Vec::new();
-    for row in rows {
-        grants.push(DbGrant {
+    Ok(rows
+        .iter()
+        .map(|row| DbGrant {
             database: row.get(0),
             privilege: row.get(1),
-        });
-    }
+            granted: row.get(2),
+            via_public: row.get(3),
+        })
+        .collect())
+}
 
-    Ok(grants)
+/// Roles are cluster-wide, so "adding a user to a database" is granting it a
+/// privilege on that database. pg_database is shared, so this works from any
+/// connection to the cluster, not only from the database being granted.
+pub async fn set_database_privilege(
+    client: &deadpool_postgres::Client,
+    database: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+) -> Result<(), AppError> {
+    let privilege = match privilege {
+        "CONNECT" => "CONNECT",
+        "CREATE" => "CREATE",
+        "TEMPORARY" => "TEMPORARY",
+        other => {
+            return Err(AppError::QueryFailed(format!(
+                "Unknown database privilege '{other}'"
+            )));
+        }
+    };
+
+    let sql = if granted {
+        format!(
+            "GRANT {privilege} ON DATABASE {} TO {}",
+            quote_ident(database),
+            quote_ident(role_name)
+        )
+    } else {
+        format!(
+            "REVOKE {privilege} ON DATABASE {} FROM {}",
+            quote_ident(database),
+            quote_ident(role_name)
+        )
+    };
+
+    client
+        .batch_execute(&sql)
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))
 }

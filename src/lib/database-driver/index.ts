@@ -162,6 +162,13 @@ export interface DatabaseDriver {
   dropRole?(projectId: string, name: string): Promise<string>;
   loadTableGrants?(projectId: string, roleName: string): Promise<TableGrant[]>;
   loadDatabaseGrants?(projectId: string, roleName: string): Promise<DbGrant[]>;
+  setDatabasePrivilege?(
+    projectId: string,
+    database: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ): Promise<string>;
   extractSchemaObjects?(projectId: string, schema: string): Promise<SchemaObject[]>;
   loadLocks?(projectId: string): Promise<string[][]>;
   loadIndexUsage?(projectId: string): Promise<string[][]>;

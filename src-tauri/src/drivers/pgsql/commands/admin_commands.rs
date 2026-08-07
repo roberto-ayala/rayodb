@@ -4,7 +4,7 @@ use crate::drivers::pgsql::{
     DbGrant, PgRole, RoleSpec, SchemaObject, TableGrant, alter_role, create_role, drop_role,
     execute_query, extract_schema_objects, import_csv_to_table, load_available_extensions,
     load_database_grants, load_extensions, load_pg_settings, load_roles, load_table_grants,
-    parse_csv_preview,
+    parse_csv_preview, set_database_privilege,
 };
 
 use tauri::ipc::Response;
@@ -130,6 +130,24 @@ pub async fn pgsql_drop_role(
     let client = acquire_client(&app_state.clients, project_id).await?;
     drop_role(&client, name).await?;
     Ok(format!("Role \"{name}\" dropped."))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_set_database_privilege(
+    project_id: &str,
+    database: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    set_database_privilege(&client, database, role_name, privilege, granted).await?;
+    Ok(format!(
+        "{} {privilege} on \"{database}\" {} \"{role_name}\".",
+        if granted { "Granted" } else { "Revoked" },
+        if granted { "to" } else { "from" },
+    ))
 }
 
 #[tauri::command(rename_all = "snake_case")]

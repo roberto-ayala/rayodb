@@ -234,6 +234,10 @@ export interface TableGrant {
 export interface DbGrant {
   database: string;
   privilege: string;
+  /** Granted to this role by name */
+  granted: boolean;
+  /** Available to everyone, so the role has it whether or not it was granted */
+  via_public: boolean;
 }
 
 export interface SchemaObject {

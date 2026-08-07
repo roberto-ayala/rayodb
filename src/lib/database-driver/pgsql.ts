@@ -369,6 +369,21 @@ export class PostgreSQLDriver implements DatabaseDriver {
   async dropRole(projectId: string, name: string) {
     return invoke<string>("pgsql_drop_role", { project_id: projectId, name });
   }
+  async setDatabasePrivilege(
+    projectId: string,
+    database: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ) {
+    return invoke<string>("pgsql_set_database_privilege", {
+      project_id: projectId,
+      database,
+      role_name: roleName,
+      privilege,
+      granted,
+    });
+  }
   async loadTableGrants(projectId: string, roleName: string) {
     return invoke<TableGrant[]>("pgsql_load_table_grants", {
       project_id: projectId,

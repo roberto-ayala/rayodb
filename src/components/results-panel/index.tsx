@@ -215,12 +215,14 @@ export function ResultsPanel() {
     );
   }
 
-  if (!result) {
+  // A statement that returns no result set at all has nothing to lay out, and
+  // the data grid cannot render — let alone hit-test — a zero-column header.
+  if (!result || result.columns.length === 0) {
     return (
       <div className="flex h-full flex-col border-t border-border bg-card">
         <ResultsToolbar
           {...toolbarProps}
-          result={null}
+          result={result ?? null}
           columns={[]}
           filteredRows={[]}
           filteredCount={0}

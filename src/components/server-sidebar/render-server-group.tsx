@@ -1,9 +1,12 @@
 import {
   Activity,
+  Bell,
   Columns3,
   Copy,
   Database,
   Edit3,
+  FileCog,
+  FolderPlus,
   HardDrive,
   Link2,
   Loader2,
@@ -15,12 +18,12 @@ import {
   Shield,
   Trash2,
   Unplug,
-  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectDetails } from "@/types";
 import { ProjectConnectionStatus } from "@/types";
 import { I } from "./constants";
+import { newDatabaseTemplate, newEventTriggerTemplate, newSchemaTemplate } from "./ddl-queries";
 import { renderSchemas } from "./render-schema-objects";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
@@ -197,6 +200,17 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
             label={`Databases${allDbs.length > 0 ? ` (${allDbs.length})` : ""}`}
             expanded={isOpen(dbCatKey, true)}
             onClick={() => toggle(dbCatKey, true)}
+            onContextMenu={(e) =>
+              showMenu(e, [
+                {
+                  label: "New Database…",
+                  icon: <Database className="h-3 w-3" />,
+                  onClick: () =>
+                    connectedPid &&
+                    openTab(connectedPid, newDatabaseTemplate(), { title: "New database" }),
+                },
+              ])
+            }
           />
 
           {isOpen(dbCatKey, true) &&
@@ -262,7 +276,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                 },
                                 {
                                   label: "LISTEN/NOTIFY",
-                                  icon: <Zap className="h-3 w-3" />,
+                                  icon: <Bell className="h-3 w-3" />,
                                   onClick: () => openNotifyTab(dbPid),
                                 },
                                 {
@@ -274,6 +288,12 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                   label: "Extensions",
                                   icon: <Package className="h-3 w-3" />,
                                   onClick: () => openExtensionsTab(dbPid),
+                                },
+                                {
+                                  label: "New Schema…",
+                                  icon: <FolderPlus className="h-3 w-3" />,
+                                  onClick: () =>
+                                    openTab(dbPid, newSchemaTemplate(), { title: "New schema" }),
                                 },
                                 // Roles belong to the server, not to this
                                 // database — reachable from here, but not a
@@ -321,10 +341,22 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                           <>
                             <TreeRow
                               indent={I.schema}
-                              icon={<Zap className="h-3.5 w-3.5 text-muted-foreground" />}
+                              icon={<FileCog className="h-3.5 w-3.5 text-muted-foreground" />}
                               label={`Event Triggers (${eventTriggers[dbPid].length})`}
                               expanded={isOpen(`${dbKey}::evttrig`)}
                               onClick={() => toggle(`${dbKey}::evttrig`)}
+                              onContextMenu={(e) =>
+                                showMenu(e, [
+                                  {
+                                    label: "New Event Trigger…",
+                                    icon: <FileCog className="h-3 w-3" />,
+                                    onClick: () =>
+                                      openTab(dbPid, newEventTriggerTemplate(), {
+                                        title: "New event trigger",
+                                      }),
+                                  },
+                                ])
+                              }
                             />
                             {isOpen(`${dbKey}::evttrig`) &&
                               eventTriggers[dbPid].map((evt) => (
@@ -351,7 +383,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                     ]);
                                   }}
                                 >
-                                  <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                                  <FileCog className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                                   <span className="text-xs text-foreground">{evt.name}</span>
                                   <span className="text-3xs text-muted-foreground">
                                     {evt.event}

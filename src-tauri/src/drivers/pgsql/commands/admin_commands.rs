@@ -1,9 +1,10 @@
 use crate::AppState;
 use crate::common::enums::AppError;
 use crate::drivers::pgsql::{
-    DbGrant, PgRole, SchemaObject, TableGrant, execute_query, extract_schema_objects,
-    import_csv_to_table, load_available_extensions, load_database_grants, load_extensions,
-    load_pg_settings, load_roles, load_table_grants, parse_csv_preview,
+    DbGrant, PgRole, RoleSpec, SchemaObject, TableGrant, alter_role, create_role, drop_role,
+    execute_query, extract_schema_objects, import_csv_to_table, load_available_extensions,
+    load_database_grants, load_extensions, load_pg_settings, load_roles, load_table_grants,
+    parse_csv_preview,
 };
 
 use tauri::ipc::Response;
@@ -96,6 +97,39 @@ pub async fn pgsql_load_available_extensions(
     let result = load_available_extensions(&client).await?;
     let json = sonic_rs::to_string(&result).map_err(|e| AppError::QueryFailed(e.to_string()))?;
     Ok(Response::new(json))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_create_role(
+    project_id: &str,
+    spec: RoleSpec,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    create_role(&client, &spec).await?;
+    Ok(format!("Role \"{}\" created.", spec.name))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_alter_role(
+    project_id: &str,
+    spec: RoleSpec,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    alter_role(&client, &spec).await?;
+    Ok(format!("Role \"{}\" updated.", spec.name))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_drop_role(
+    project_id: &str,
+    name: &str,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    drop_role(&client, name).await?;
+    Ok(format!("Role \"{name}\" dropped."))
 }
 
 #[tauri::command(rename_all = "snake_case")]

@@ -1,9 +1,23 @@
-import { Database, Key, Shield, ShieldCheck, ShieldX, User, Users } from "lucide-react";
+import {
+  Database,
+  Key,
+  Pencil,
+  Plus,
+  Shield,
+  ShieldCheck,
+  ShieldX,
+  Trash2,
+  User,
+  Users,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { RoleEditor } from "@/components/role-editor";
+import { Button } from "@/components/ui/button";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
-import type { DbGrant, PgRole, TableGrant } from "@/types";
+import type { DbGrant, PgRole, RoleSpec, TableGrant } from "@/types";
 
 interface RolesPanelProps {
   projectId: string;
@@ -15,25 +29,31 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
   const [tableGrants, setTableGrants] = useState<TableGrant[]>([]);
   const [dbGrants, setDbGrants] = useState<DbGrant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editing, setEditing] = useState<PgRole | null>(null);
+  const [confirmDrop, setConfirmDrop] = useState(false);
   const projects = useProjectStore((s) => s.projects);
 
   const driver = projects[projectId] ? DriverFactory.getDriver(projects[projectId].driver) : null;
 
-  useEffect(() => {
-    if (!driver) return;
-    setLoading(true);
-    driver
-      .loadRoles?.(projectId)
-      .then((r) => {
-        setRoles(r ?? []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+  const refresh = useCallback(async () => {
+    if (!driver) return [] as PgRole[];
+    const r = (await driver.loadRoles?.(projectId)) ?? [];
+    setRoles(r);
+    return r;
   }, [driver, projectId]);
+
+  useEffect(() => {
+    setLoading(true);
+    refresh()
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [refresh]);
 
   const selectRole = useCallback(
     async (name: string) => {
       setSelectedRole(name);
+      setConfirmDrop(false);
       if (!driver) return;
       const [tg, dg] = await Promise.all([
         driver.loadTableGrants?.(projectId, name) ?? Promise.resolve([]),
@@ -43,6 +63,40 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       setDbGrants(dg);
     },
     [driver, projectId],
+  );
+
+  const saveRole = useCallback(
+    async (spec: RoleSpec) => {
+      if (!driver) return;
+      const message = editing
+        ? await driver.alterRole?.(projectId, spec)
+        : await driver.createRole?.(projectId, spec);
+      await refresh();
+      setSelectedRole(spec.name);
+      toast.success(message ?? "Role saved");
+    },
+    [driver, projectId, editing, refresh],
+  );
+
+  const dropRole = useCallback(
+    async (name: string) => {
+      if (!driver) return;
+      try {
+        const message = await driver.dropRole?.(projectId, name);
+        await refresh();
+        setSelectedRole(null);
+        setConfirmDrop(false);
+        toast.success(message ?? "Role dropped");
+      } catch (err: unknown) {
+        // Postgres refuses while the role still owns objects, and that message
+        // is the useful part — it names what is in the way.
+        toast.error(`Could not drop "${name}"`, {
+          description: err instanceof Error ? err.message : String(err),
+          duration: 10000,
+        });
+      }
+    },
+    [driver, projectId, refresh],
   );
 
   if (loading) {
@@ -59,8 +113,22 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
     <div className="flex h-full">
       {/* Role list */}
       <div className="w-[240px] border-r border-border/60 overflow-y-auto">
-        <div className="px-3 py-2 text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Roles ({roles.length})
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Roles ({roles.length})
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            title="New role"
+            onClick={() => {
+              setEditing(null);
+              setEditorOpen(true);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+          </Button>
         </div>
         {roles.map((role) => (
           <button
@@ -119,6 +187,53 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   {selected.login ? "Login role" : "Group role"}
                   {selected.conn_limit >= 0 && ` (max ${selected.conn_limit} connections)`}
                 </div>
+              </div>
+
+              <div className="ml-auto flex items-center gap-2">
+                {confirmDrop ? (
+                  <>
+                    <span className="text-xs text-muted-foreground">Drop this role?</span>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => void dropRole(selected.name)}
+                    >
+                      Drop
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => setConfirmDrop(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        setEditing(selected);
+                        setEditorOpen(true);
+                      }}
+                    >
+                      <Pencil className="mr-1.5 h-3 w-3" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Drop role"
+                      onClick={() => setConfirmDrop(true)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -268,6 +383,14 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
           </div>
         )}
       </div>
+
+      <RoleEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        editing={editing}
+        roles={roles}
+        onSave={saveRole}
+      />
     </div>
   );
 }

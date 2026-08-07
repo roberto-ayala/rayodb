@@ -11,6 +11,7 @@ import type {
   PolicyDetail,
   ProcedureInfo,
   ProjectConnectionStatus,
+  RoleSpec,
   RuleDetail,
   SchemaObject,
   SequenceInfo,
@@ -156,6 +157,9 @@ export interface DatabaseDriver {
   notifySend?(projectId: string, channel: string, payload: string): Promise<boolean>;
   discoverChannels?(projectId: string): Promise<string[]>;
   loadRoles?(projectId: string): Promise<PgRole[]>;
+  createRole?(projectId: string, spec: RoleSpec): Promise<string>;
+  alterRole?(projectId: string, spec: RoleSpec): Promise<string>;
+  dropRole?(projectId: string, name: string): Promise<string>;
   loadTableGrants?(projectId: string, roleName: string): Promise<TableGrant[]>;
   loadDatabaseGrants?(projectId: string, roleName: string): Promise<DbGrant[]>;
   extractSchemaObjects?(projectId: string, schema: string): Promise<SchemaObject[]>;

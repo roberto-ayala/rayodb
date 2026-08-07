@@ -203,6 +203,25 @@ export interface PgRole {
   conn_limit: number;
   valid_until: string;
   member_of: string[];
+  inherit: boolean;
+}
+
+/** What the role editor sends back: every attribute the form can set */
+export interface RoleSpec {
+  name: string;
+  login: boolean;
+  superuser: boolean;
+  create_db: boolean;
+  create_role: boolean;
+  inherit: boolean;
+  replication: boolean;
+  bypass_rls: boolean;
+  conn_limit: number;
+  /** Empty means no expiry */
+  valid_until: string;
+  /** Empty leaves the password untouched when editing */
+  password: string;
+  member_of: string[];
 }
 
 export interface TableGrant {

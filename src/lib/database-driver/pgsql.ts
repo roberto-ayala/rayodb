@@ -1,6 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { DbGrant, PgRole, ProjectConnectionStatus, SchemaObject, TableGrant } from "@/types";
+import type {
+  DbGrant,
+  PgRole,
+  ProjectConnectionStatus,
+  RoleSpec,
+  SchemaObject,
+  TableGrant,
+} from "@/types";
 import type {
   DatabaseDriver,
   QueryStreamEvent,
@@ -352,6 +359,15 @@ export class PostgreSQLDriver implements DatabaseDriver {
   }
   async loadRoles(projectId: string) {
     return invoke<PgRole[]>("pgsql_load_roles", { project_id: projectId });
+  }
+  async createRole(projectId: string, spec: RoleSpec) {
+    return invoke<string>("pgsql_create_role", { project_id: projectId, spec });
+  }
+  async alterRole(projectId: string, spec: RoleSpec) {
+    return invoke<string>("pgsql_alter_role", { project_id: projectId, spec });
+  }
+  async dropRole(projectId: string, name: string) {
+    return invoke<string>("pgsql_drop_role", { project_id: projectId, name });
   }
   async loadTableGrants(projectId: string, roleName: string) {
     return invoke<TableGrant[]>("pgsql_load_table_grants", {

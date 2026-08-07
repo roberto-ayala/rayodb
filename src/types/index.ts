@@ -39,6 +39,8 @@ export interface Tab {
   title: string;
   editorValue: string;
   isExecuting: boolean;
+  /** Opened by a single click in the tree: the next preview replaces it */
+  preview?: boolean;
   result?: QueryResult;
   /** Set when the last run failed; a failure is not a result set */
   queryError?: { message: string; cancelled?: boolean };

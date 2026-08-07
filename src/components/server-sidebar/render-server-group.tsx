@@ -15,6 +15,7 @@ import {
   Settings,
   Shield,
   Trash2,
+  Unplug,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     isOpen,
     toggle,
     onConnect,
+    onDisconnect,
     addDatabaseToServer,
     deleteProject,
     refreshConnection,
@@ -61,7 +63,10 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
   const gKey = `srv::${fp}`;
   const dbCatKey = `${gKey}::databases`;
 
-  const serverLabel = pids.length === 1 ? pids[0] : `${primaryDetails.host}:${primaryDetails.port}`;
+  // The group is named after the connection it was configured as; the address
+  // it resolves to rides along as muted context.
+  const serverLabel = pids[0];
+  const serverAddress = `${primaryDetails.host}:${primaryDetails.port}`;
   const connectedPid = pids.find((p) => status[p] === ProjectConnectionStatus.Connected);
 
   // Union of databases discovered from pg_database + ones we have a project for
@@ -85,6 +90,11 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
   const anyConnected = pids.some((p) => status[p] === ProjectConnectionStatus.Connected);
   const anyConnecting = pids.some((p) => status[p] === ProjectConnectionStatus.Connecting);
 
+  // Connecting "the server" means opening its default database — the one the
+  // connection was configured with.
+  const defaultPid = pids[0];
+  const defaultDatabase = primaryDetails.database;
+
   return (
     <div key={gKey}>
       <TreeRow
@@ -98,12 +108,22 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
           />
         }
         label={serverLabel}
+        meta={`(${serverAddress})`}
         bold
         expanded={isOpen(gKey, true)}
-        onClick={() => toggle(gKey)}
+        onClick={() => toggle(gKey, true)}
         onContextMenu={(e) =>
           showMenu(e, [
             { header: "Server" },
+            ...(anyConnected || anyConnecting
+              ? []
+              : [
+                  {
+                    label: defaultDatabase ? `Connect (${defaultDatabase})` : "Connect",
+                    icon: <Link2 className="h-3 w-3" />,
+                    onClick: () => void onConnect(defaultPid),
+                  },
+                ]),
             ...(connectedPid
               ? [
                   {
@@ -128,6 +148,20 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
               icon: <Plus className="h-3 w-3" />,
               onClick: () => setAddDbSource(pids[0]),
             },
+            ...(anyConnected
+              ? [
+                  {
+                    label: "Disconnect",
+                    icon: <Unplug className="h-3 w-3" />,
+                    onClick: () => {
+                      for (const pid of pids) {
+                        if (status[pid] === ProjectConnectionStatus.Connected)
+                          void onDisconnect(pid);
+                      }
+                    },
+                  },
+                ]
+              : []),
             ...(onEditConnection
               ? [
                   {
@@ -163,7 +197,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
             icon={<Database className="h-3.5 w-3.5 text-muted-foreground" />}
             label={`Databases${allDbs.length > 0 ? ` (${allDbs.length})` : ""}`}
             expanded={isOpen(dbCatKey, true)}
-            onClick={() => toggle(dbCatKey)}
+            onClick={() => toggle(dbCatKey, true)}
           />
 
           {isOpen(dbCatKey, true) &&
@@ -200,7 +234,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                       expanded={isDbConnected ? isOpen(dbKey, true) : undefined}
                       onClick={() => {
                         if (!isDbConnected && !isDbConnecting) void onConnect(dbPid);
-                        else if (isDbConnected) toggle(dbKey);
+                        else if (isDbConnected) toggle(dbKey, true);
                       }}
                       onContextMenu={(e) =>
                         showMenu(e, [
@@ -221,6 +255,11 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                   label: "Refresh",
                                   icon: <RefreshCw className="h-3 w-3" />,
                                   onClick: () => void refreshConnection(dbPid),
+                                },
+                                {
+                                  label: "Disconnect",
+                                  icon: <Unplug className="h-3 w-3" />,
+                                  onClick: () => void onDisconnect(dbPid),
                                 },
                                 {
                                   label: "LISTEN/NOTIFY",

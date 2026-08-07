@@ -4,11 +4,12 @@ import { CSVImportModal } from "@/components/csv-import-modal";
 import { ObjectPropertiesModal } from "@/components/object-properties-modal";
 import { Button } from "@/components/ui/button";
 import { ContextMenu, useContextMenu } from "@/components/ui/context-menu";
+import { serverFingerprint } from "@/lib/server-group";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useUIStore } from "@/stores/ui-store";
-import type { ProjectDetails } from "@/types";
+import { ProjectConnectionStatus } from "@/types";
 import { AddDatabaseDialog } from "./add-database-dialog";
 import { renderSavedQueries } from "./render-saved-queries";
 import { renderServerGroup } from "./render-server-group";
@@ -27,24 +28,23 @@ export function ServerSidebar({
   const tables = useProjectStore((s) => s.tables);
   const columnDetails = useProjectStore((s) => s.columnDetails);
   const indexes = useProjectStore((s) => s.indexes);
-  const constraints = useProjectStore((s) => s.constraints);
-  const triggers = useProjectStore((s) => s.triggers);
-  const rules = useProjectStore((s) => s.rules);
-  const policies = useProjectStore((s) => s.policies);
   const views = useProjectStore((s) => s.views);
   const materializedViews = useProjectStore((s) => s.materializedViews);
+  const sequences = useProjectStore((s) => s.sequences);
   const functions = useProjectStore((s) => s.functions);
   const triggerFunctions = useProjectStore((s) => s.triggerFunctions);
   const connect = useProjectStore((s) => s.connect);
+  const disconnect = useProjectStore((s) => s.disconnect);
   const loadTables = useProjectStore((s) => s.loadTables);
   const loadColumns = useProjectStore((s) => s.loadColumns);
-  const loadTableMetadata = useProjectStore((s) => s.loadTableMetadata);
+  const loadTableColumns = useProjectStore((s) => s.loadTableColumns);
   const loadSchemaObjects = useProjectStore((s) => s.loadSchemaObjects);
   const refreshConnection = useProjectStore((s) => s.refreshConnection);
   const deleteProject = useProjectStore((s) => s.deleteProject);
   const addDatabaseToServer = useProjectStore((s) => s.addDatabaseToServer);
   const setConnectionModalOpen = useUIStore((s) => s.setConnectionModalOpen);
   const openTab = useTabStore((s) => s.openTab);
+  const pinTab = useTabStore((s) => s.pinTab);
   const openMonitorTab = useTabStore((s) => s.openMonitorTab);
   const openERDTab = useTabStore((s) => s.openERDTab);
   const openNotifyTab = useTabStore((s) => s.openNotifyTab);
@@ -87,7 +87,11 @@ export function ServerSidebar({
   const [loading, setLoading] = React.useState<Record<string, boolean>>({});
   const [selectedItem, setSelectedItem] = React.useState<string | null>(null);
 
-  const toggle = (key: string) => setExpanded((p) => ({ ...p, [key]: !p[key] }));
+  // Rows that render open by default have no entry until their first click, so
+  // the toggle has to start from the same default the row was drawn with —
+  // otherwise that first click writes the state it already looked like.
+  const toggle = (key: string, defaultOpen = false) =>
+    setExpanded((p) => ({ ...p, [key]: !(p[key] ?? defaultOpen) }));
   const isOpen = (key: string, defaultOpen = false) => expanded[key] ?? defaultOpen;
 
   const setLoad = (key: string, v: boolean) => setLoading((p) => ({ ...p, [key]: v }));
@@ -98,43 +102,93 @@ export function ServerSidebar({
     setLoad(projectId, false);
   };
 
-  const onExpandSchema = async (projectId: string, schema: string) => {
-    const key = `schema::${projectId}::${schema}`;
-    toggle(key);
-    if (!isOpen(key)) {
-      const tKey = `${projectId}::${schema}`;
-      if (!tables[tKey]) {
-        setLoad(key, true);
-        try {
-          await Promise.all([loadTables(projectId, schema), loadSchemaObjects(projectId, schema)]);
-        } catch (e) {
-          console.error("Failed to load schema objects:", e);
-        } finally {
-          setLoad(key, false);
+  const onDisconnect = async (projectId: string) => {
+    setLoad(projectId, true);
+    await disconnect(projectId);
+    setLoad(projectId, false);
+  };
+
+  /**
+   * The tree keeps its expanded branches across a disconnect, but the cached
+   * metadata goes with the connection — and it can come back through any route
+   * (the sidebar, the palette, running a query, auto-connect on startup). So
+   * rather than hooking each of them, refill whatever is rendered open and
+   * empty; otherwise the branch stays hollow until it is collapsed and
+   * expanded again.
+   */
+  const refilling = React.useRef(new Set<string>());
+  React.useEffect(() => {
+    const refill = (key: string, load: () => Promise<unknown>) => {
+      if (refilling.current.has(key)) return;
+      refilling.current.add(key);
+      setLoading((p) => ({ ...p, [key]: true }));
+      void load()
+        .catch((e) => console.error("Failed to reload schema objects:", e))
+        .finally(() => {
+          refilling.current.delete(key);
+          setLoading((p) => ({ ...p, [key]: false }));
+        });
+    };
+
+    for (const [projectId, projectSchemas] of Object.entries(schemas)) {
+      if (status[projectId] !== ProjectConnectionStatus.Connected) continue;
+
+      for (const schema of projectSchemas) {
+        const schemaKey = `schema::${projectId}::${schema}`;
+        if (!expanded[schemaKey]) continue;
+
+        const storeKey = `${projectId}::${schema}`;
+        const schemaTables = tables[storeKey];
+        if (!schemaTables) {
+          refill(schemaKey, () =>
+            Promise.all([loadTables(projectId, schema), loadSchemaObjects(projectId, schema)]),
+          );
+          continue;
+        }
+
+        for (const { name } of schemaTables) {
+          const tableKey = `table::${projectId}::${schema}::${name}`;
+          if (!expanded[tableKey] || columnDetails[`${storeKey}::${name}`]) continue;
+          refill(tableKey, () => loadTableColumns(projectId, schema, name));
         }
       }
     }
+  }, [
+    expanded,
+    schemas,
+    status,
+    tables,
+    columnDetails,
+    loadTables,
+    loadSchemaObjects,
+    loadTableColumns,
+  ]);
+
+  // Expanding is just state: the effect above fetches whatever is open and empty.
+  const onExpandSchema = (projectId: string, schema: string) => {
+    toggle(`schema::${projectId}::${schema}`);
   };
 
-  const onExpandTable = async (projectId: string, schema: string, table: string) => {
-    const key = `table::${projectId}::${schema}::${table}`;
-    toggle(key);
-    const metaKey = `${projectId}::${schema}::${table}`;
-    if (!isOpen(key) && !columnDetails[metaKey]) {
-      setLoad(key, true);
-      try {
-        await loadTableMetadata(projectId, schema, table);
-      } catch (e) {
-        console.error("Failed to load table metadata:", e);
-      } finally {
-        setLoad(key, false);
-      }
-    }
+  const onExpandTable = (projectId: string, schema: string, table: string) => {
+    toggle(`table::${projectId}::${schema}::${table}`);
   };
+
+  const selectQuery = (schema: string, table: string) =>
+    `SELECT * FROM "${schema}"."${table}" LIMIT 100;`;
 
   const onOpenTableQuery = (projectId: string, schema: string, table: string) => {
-    openTab(projectId, `SELECT * FROM "${schema}"."${table}" LIMIT 100;`);
+    openTab(projectId, selectQuery(schema, table));
   };
+
+  /** A single click browses: it reuses the preview tab and names it after the object */
+  const onPreviewTableQuery = (projectId: string, schema: string, table: string) => {
+    openTab(projectId, selectQuery(schema, table), {
+      preview: true,
+      title: `${schema}.${table}`,
+    });
+  };
+
+  const onPinPreview = () => pinTab(useTabStore.getState().selectedTabIndex);
 
   const copy = (text: string) => navigator.clipboard.writeText(text);
 
@@ -147,15 +201,13 @@ export function ServerSidebar({
     tables,
     columnDetails,
     indexes,
-    constraints,
-    triggers,
-    rules,
-    policies,
     views,
     materializedViews,
+    sequences,
     functions,
     triggerFunctions,
     connect,
+    disconnect,
     loadColumns,
     refreshConnection,
     deleteProject,
@@ -178,9 +230,12 @@ export function ServerSidebar({
     toggle,
     isOpen,
     onConnect,
+    onDisconnect,
     onExpandSchema,
     onExpandTable,
     onOpenTableQuery,
+    onPreviewTableQuery,
+    onPinPreview,
     copy,
     showMenu,
     onEditConnection,
@@ -205,11 +260,9 @@ export function ServerSidebar({
         {(() => {
           const entries = Object.entries(projects);
           // Auto-group by server fingerprint (host:port:user:ssh)
-          const serverFp = (d: ProjectDetails) =>
-            `${d.host}\0${d.port}\0${d.username}\0${d.sshEnabled === "true" ? `${d.sshHost}:${d.sshPort}` : ""}`;
           const serverGroups = new Map<string, string[]>();
           for (const [pid, d] of entries) {
-            const fp = serverFp(d);
+            const fp = serverFingerprint(d);
             if (!serverGroups.has(fp)) serverGroups.set(fp, []);
             serverGroups.get(fp)?.push(pid);
           }

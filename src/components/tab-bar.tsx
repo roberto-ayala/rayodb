@@ -175,7 +175,10 @@ export function TabBar() {
                 {projectDb && tab.type !== "monitor" && (
                   <span className="text-muted-foreground/70">{projectName}:</span>
                 )}
-                <span className={cn(isActive && "font-medium")}>{tab.title}</span>
+                {/* Italic marks a preview: the next single click in the tree replaces it */}
+                <span className={cn(isActive && "font-medium", tab.preview && "italic")}>
+                  {tab.title}
+                </span>
               </div>
               <button
                 type="button"

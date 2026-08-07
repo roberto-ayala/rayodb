@@ -11,6 +11,7 @@ export type ViewsSlice = {
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
   serverDatabases: Record<string, string[]>;
   serverTablespaces: Record<string, [string, string, string][]>;
+  loadTableColumns: (projectId: string, schema: string, table: string) => Promise<void>;
   loadTableMetadata: (projectId: string, schema: string, table: string) => Promise<void>;
 };
 
@@ -28,10 +29,36 @@ export const createViewsSlice: StateCreator<
   serverDatabases: {},
   serverTablespaces: {},
 
-  loadTableMetadata: async (projectId: string, schema: string, table: string) => {
+  /**
+   * What the sidebar tree shows when a table is expanded: the columns, plus the
+   * indexes it needs to mark the primary key. Everything else is the properties
+   * modal's job — see loadTableMetadata.
+   */
+  loadTableColumns: async (projectId: string, schema: string, table: string) => {
     const key = `${projectId}::${schema}::${table}`;
     const { columnDetails, projects } = get();
     if (columnDetails[key]) return;
+
+    const d = projects[projectId];
+    if (!d) return;
+    const driver = DriverFactory.getDriver(d.driver);
+
+    const [colsR, idxsR] = await Promise.allSettled([
+      driver.loadColumnDetails(projectId, schema, table),
+      driver.loadIndexes(projectId, schema, table),
+    ]);
+
+    set((s) => {
+      s.columnDetails[key] = colsR.status === "fulfilled" ? colsR.value : [];
+      s.indexes[key] = idxsR.status === "fulfilled" ? idxsR.value : [];
+    });
+  },
+
+  /** Every detail the properties modal displays for a table. */
+  loadTableMetadata: async (projectId: string, schema: string, table: string) => {
+    const key = `${projectId}::${schema}::${table}`;
+    const { constraints, projects } = get();
+    if (constraints[key]) return;
 
     const d = projects[projectId];
     if (!d) return;

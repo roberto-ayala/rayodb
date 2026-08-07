@@ -4,6 +4,7 @@ import {
   FileCode,
   FileUp,
   FolderOpen,
+  Hash,
   Layers,
   Plus,
   RefreshCw,
@@ -28,6 +29,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     tables,
     views,
     materializedViews,
+    sequences,
     functions,
     triggerFunctions,
     loading,
@@ -40,6 +42,8 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     onExpandSchema,
     onExpandTable,
     onOpenTableQuery,
+    onPreviewTableQuery,
+    onPinPreview,
     openTab,
     openERDTab,
     loadColumns,
@@ -57,6 +61,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     const schemaTables = tables[schemaStoreKey];
     const schemaViews = views[schemaStoreKey];
     const schemaMatViews = materializedViews[schemaStoreKey];
+    const schemaSequences = sequences[schemaStoreKey];
     const schemaFns = functions[schemaStoreKey];
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
     const isSchemaOpen = isOpen(sKey);
@@ -69,7 +74,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
           label={schema}
           expanded={isSchemaOpen}
           loading={loading[sKey]}
-          onClick={() => void onExpandSchema(pid, schema)}
+          onClick={() => onExpandSchema(pid, schema)}
           onContextMenu={(e) =>
             showMenu(e, [
               {
@@ -100,7 +105,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               icon={<Table className="h-3 w-3" />}
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
-              onClick={() => toggle(`${sKey}::tables`)}
+              onClick={() => toggle(`${sKey}::tables`, true)}
             />
             {isOpen(`${sKey}::tables`, true) &&
               schemaTables?.map((ti) => {
@@ -118,9 +123,13 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                       selected={selectedItem === tKey}
                       onClick={() => {
                         setSelectedItem(tKey);
-                        void onExpandTable(pid, schema, ti.name);
+                        onPreviewTableQuery(pid, schema, ti.name);
                       }}
-                      onDoubleClick={() => onOpenTableQuery(pid, schema, ti.name)}
+                      onDoubleClick={onPinPreview}
+                      onToggle={() => {
+                        setSelectedItem(tKey);
+                        onExpandTable(pid, schema, ti.name);
+                      }}
                       onContextMenu={(e) => {
                         setSelectedItem(tKey);
                         showMenu(e, [
@@ -201,8 +210,9 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         selected={selectedItem === vKey}
                         onClick={() => {
                           setSelectedItem(vKey);
-                          onOpenTableQuery(pid, schema, v);
+                          onPreviewTableQuery(pid, schema, v);
                         }}
+                        onDoubleClick={onPinPreview}
                         onContextMenu={(e) => {
                           setSelectedItem(vKey);
                           showMenu(e, [
@@ -259,8 +269,9 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         selected={selectedItem === mvKey}
                         onClick={() => {
                           setSelectedItem(mvKey);
-                          onOpenTableQuery(pid, schema, mv);
+                          onPreviewTableQuery(pid, schema, mv);
                         }}
+                        onDoubleClick={onPinPreview}
                         onContextMenu={(e) => {
                           setSelectedItem(mvKey);
                           showMenu(e, [
@@ -286,6 +297,61 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                               label: "Copy Name",
                               icon: <Copy className="h-3 w-3" />,
                               onClick: () => copy(`"${schema}"."${mv}"`),
+                            },
+                          ]);
+                        }}
+                      />
+                    );
+                  })}
+              </>
+            )}
+
+            {/* Sequences category */}
+            {schemaSequences && schemaSequences.length > 0 && (
+              <>
+                <SectionHeader
+                  indent={I.schemaObj}
+                  label={`Sequences (${schemaSequences.length})`}
+                  icon={<Hash className="h-3 w-3" />}
+                  sectionKey={`${sKey}::seqs`}
+                  expanded={isOpen(`${sKey}::seqs`)}
+                  onClick={() => toggle(`${sKey}::seqs`)}
+                />
+                {isOpen(`${sKey}::seqs`) &&
+                  schemaSequences.map((seq) => {
+                    const seqKey = `sequence::${pid}::${schema}::${seq.name}`;
+                    return (
+                      <TreeRow
+                        key={seq.name}
+                        indent={I.table}
+                        icon={<Hash className="h-3.5 w-3.5 text-muted-foreground" />}
+                        label={seq.name}
+                        meta={seq.lastValue}
+                        selected={selectedItem === seqKey}
+                        onClick={() => {
+                          setSelectedItem(seqKey);
+                          onPreviewTableQuery(pid, schema, seq.name);
+                        }}
+                        onDoubleClick={onPinPreview}
+                        onContextMenu={(e) => {
+                          setSelectedItem(seqKey);
+                          showMenu(e, [
+                            {
+                              label: "Show State",
+                              icon: <Hash className="h-3 w-3" />,
+                              onClick: () => onOpenTableQuery(pid, schema, seq.name),
+                            },
+                            {
+                              label: "SELECT nextval",
+                              icon: <Hash className="h-3 w-3" />,
+                              onClick: () =>
+                                openTab(pid, `SELECT nextval('"${schema}"."${seq.name}"');`),
+                            },
+                            { separator: true as const },
+                            {
+                              label: "Copy Name",
+                              icon: <Copy className="h-3 w-3" />,
+                              onClick: () => copy(`"${schema}"."${seq.name}"`),
                             },
                           ]);
                         }}

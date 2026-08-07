@@ -469,7 +469,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                   }}
                 />
                 {isOpen(tspCatKey) &&
-                  tspData.map(([name, owner, location]) => (
+                  tspData.map(([name, owner, location, size]) => (
                     <div
                       key={name}
                       className="relative flex items-center gap-1.5 py-0.5 hover:bg-sidebar-accent rounded-sm whitespace-nowrap"
@@ -488,7 +488,8 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                     >
                       <HardDrive className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                       <span className="text-xs text-foreground">{name}</span>
-                      <span className="text-3xs text-muted-foreground">{owner}</span>
+                      <span className="text-3xs text-muted-foreground">{size}</span>
+                      <span className="text-3xs text-muted-foreground/40">{owner}</span>
                       {location && (
                         <span className="text-3xs text-muted-foreground/40">{location}</span>
                       )}

@@ -198,7 +198,7 @@ export interface DatabaseDriver {
   loadIndexUsage?(projectId: string): Promise<string[][]>;
   loadTableBloat?(projectId: string): Promise<string[][]>;
   loadDatabases?(projectId: string): Promise<string[]>;
-  loadTablespaces?(projectId: string): Promise<[string, string, string][]>;
+  loadTablespaces?(projectId: string): Promise<[string, string, string, string][]>;
   loadExtensions?(projectId: string): Promise<string[][]>;
   loadAvailableExtensions?(projectId: string): Promise<string[][]>;
   loadPgSettings?(projectId: string): Promise<string[][]>;

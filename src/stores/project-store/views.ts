@@ -22,7 +22,7 @@ export type ViewsSlice = {
   eventTriggers: Record<string, EventTriggerInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
   serverDatabases: Record<string, string[]>;
-  serverTablespaces: Record<string, [string, string, string][]>;
+  serverTablespaces: Record<string, [string, string, string, string][]>;
   loadTableColumns: (projectId: string, schema: string, table: string) => Promise<void>;
   loadTableMetadata: (projectId: string, schema: string, table: string) => Promise<void>;
 };

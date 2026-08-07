@@ -29,7 +29,7 @@ pub async fn pgsql_load_databases(project_id: &str, app: AppHandle) -> Result<Ve
 pub async fn pgsql_load_tablespaces(
     project_id: &str,
     app: AppHandle,
-) -> Result<Vec<(String, String, String)>> {
+) -> Result<Vec<(String, String, String, String)>> {
     let app_state = app.state::<AppState>();
     let pool = {
         let pools = app_state.meta_clients.lock().await;

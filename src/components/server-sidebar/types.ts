@@ -41,7 +41,7 @@ export interface SidebarRenderCtx {
   projects: ProjectMap;
   status: Record<string, ProjectConnectionStatus>;
   serverDatabases: Record<string, string[]>;
-  serverTablespaces: Record<string, [string, string, string][]>;
+  serverTablespaces: Record<string, [string, string, string, string][]>;
   schemas: Record<string, string[]>;
   tables: Record<string, TableInfo[]>;
   columnDetails: Record<string, ColumnDetail[]>;

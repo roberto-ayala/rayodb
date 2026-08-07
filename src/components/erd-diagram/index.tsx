@@ -194,17 +194,21 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     };
   }, []);
 
-  const handleMouseDown = useCallback(
-    createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart),
-    [],
+  /**
+   * Rebuilt each render on purpose. Memoising them with an empty dependency
+   * list froze the first render's values, and on the first render the diagram
+   * is still loading: boxMap was empty, so no table could ever be picked up,
+   * and dragging was null, so no movement was ever acted on.
+   */
+  const handleMouseDown = createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart);
+  const handleMouseMove = createHandleMouseMove(
+    dragging,
+    dragStart,
+    zoom,
+    setPan,
+    setTablePositions,
   );
-
-  const handleMouseMove = useCallback(
-    createHandleMouseMove(dragging, dragStart, zoom, setPan, setTablePositions),
-    [],
-  );
-
-  const handleMouseUp = useCallback(createHandleMouseUp(setDragging), []);
+  const handleMouseUp = createHandleMouseUp(setDragging);
 
   /** The buttons zoom about the middle of the view, as the wheel does about the pointer */
   const zoomBy = useCallback((factor: number) => {

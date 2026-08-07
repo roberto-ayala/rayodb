@@ -50,32 +50,6 @@ pub async fn load_available_extensions(
         .collect())
 }
 
-pub async fn load_enum_types(
-    client: &deadpool_postgres::Client,
-) -> Result<Vec<Vec<String>>, AppError> {
-    let rows = client
-        .query(
-            "SELECT
-            n.nspname AS schema,
-            t.typname AS name,
-            string_agg(e.enumlabel, ', ' ORDER BY e.enumsortorder) AS labels
-         FROM pg_type t
-         JOIN pg_namespace n ON n.oid = t.typnamespace
-         JOIN pg_enum e ON e.enumtypid = t.oid
-         WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
-         GROUP BY n.nspname, t.typname
-         ORDER BY n.nspname, t.typname",
-            &[],
-        )
-        .await
-        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
-
-    Ok(rows
-        .iter()
-        .map(|r| (0..3).map(|i| r.get::<_, String>(i)).collect())
-        .collect())
-}
-
 pub async fn load_pg_settings(
     client: &deadpool_postgres::Client,
 ) -> Result<Vec<Vec<String>>, AppError> {

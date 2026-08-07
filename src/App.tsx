@@ -3,7 +3,6 @@ import { Toaster } from "sonner";
 import { CommandPalette } from "@/components/command-palette";
 import { ConnectionModal } from "@/components/connection-modal";
 import { EditorToolbar } from "@/components/editor-toolbar";
-import { EnumsPanel } from "@/components/enums-panel";
 import { ERDDiagram } from "@/components/erd-diagram";
 import { ExtensionsPanel } from "@/components/extensions-panel";
 import { NotifyPanel } from "@/components/notify-panel";
@@ -178,10 +177,6 @@ export default function App() {
           ) : activeTab?.type === "extensions" && activeTab.projectId ? (
             <div className="flex-1 min-h-0 overflow-hidden">
               <ExtensionsPanel projectId={activeTab.projectId} />
-            </div>
-          ) : activeTab?.type === "enums" && activeTab.projectId ? (
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <EnumsPanel projectId={activeTab.projectId} />
             </div>
           ) : activeTab?.type === "pg-settings" && activeTab.projectId ? (
             <div className="flex-1 min-h-0 overflow-hidden">

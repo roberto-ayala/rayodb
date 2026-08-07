@@ -7,11 +7,13 @@ import type {
   StreamCallbacks,
   WireColumnDetail,
   WireConstraintDetail,
+  WireDataTypeInfo,
   WireForeignKeyInfo,
   WireFunctionInfo,
   WireIndexDetail,
   WirePackedResult,
   WirePolicyDetail,
+  WireProcedureInfo,
   WireRuleDetail,
   WireSequenceInfo,
   WireTableInfo,
@@ -22,9 +24,11 @@ import {
   CELL_SEP,
   parseColumnDetails,
   parseConstraintDetails,
+  parseDataTypeInfo,
   parseFunctionInfo,
   parseIndexDetails,
   parsePolicyDetails,
+  parseProcedureInfo,
   parseRuleDetails,
   parseSequenceInfo,
   parseTriggerDetails,
@@ -127,6 +131,20 @@ export class PostgreSQLDriver implements DatabaseDriver {
       schema,
     });
     return parseFunctionInfo(wire);
+  }
+  async loadDataTypes(projectId: string, schema: string) {
+    const wire = await invoke<WireDataTypeInfo[]>("pgsql_load_data_types", {
+      project_id: projectId,
+      schema,
+    });
+    return parseDataTypeInfo(wire);
+  }
+  async loadProcedures(projectId: string, schema: string) {
+    const wire = await invoke<WireProcedureInfo[]>("pgsql_load_procedures", {
+      project_id: projectId,
+      schema,
+    });
+    return parseProcedureInfo(wire);
   }
   async loadTriggerFunctions(projectId: string, schema: string) {
     const wire = await invoke<WireTriggerFunctionInfo[]>("pgsql_load_trigger_functions", {
@@ -356,9 +374,6 @@ export class PostgreSQLDriver implements DatabaseDriver {
   }
   async loadAvailableExtensions(projectId: string) {
     return invoke<string[][]>("pgsql_load_available_extensions", { project_id: projectId });
-  }
-  async loadEnumTypes(projectId: string) {
-    return invoke<string[][]>("pgsql_load_enum_types", { project_id: projectId });
   }
   async loadPgSettings(projectId: string) {
     return invoke<string[][]>("pgsql_load_pg_settings", { project_id: projectId });

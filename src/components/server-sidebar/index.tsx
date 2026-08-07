@@ -32,6 +32,8 @@ export function ServerSidebar({
   const materializedViews = useProjectStore((s) => s.materializedViews);
   const sequences = useProjectStore((s) => s.sequences);
   const functions = useProjectStore((s) => s.functions);
+  const procedures = useProjectStore((s) => s.procedures);
+  const dataTypes = useProjectStore((s) => s.dataTypes);
   const triggerFunctions = useProjectStore((s) => s.triggerFunctions);
   const connect = useProjectStore((s) => s.connect);
   const disconnect = useProjectStore((s) => s.disconnect);
@@ -51,7 +53,6 @@ export function ServerSidebar({
   const openRolesTab = useTabStore((s) => s.openRolesTab);
   const openSchemaDiffTab = useTabStore((s) => s.openSchemaDiffTab);
   const openExtensionsTab = useTabStore((s) => s.openExtensionsTab);
-  const openEnumsTab = useTabStore((s) => s.openEnumsTab);
   const openPgSettingsTab = useTabStore((s) => s.openPgSettingsTab);
   const savedQueries = useQueryStore((s) => s.queries);
   const loadQueries = useQueryStore((s) => s.loadQueries);
@@ -205,6 +206,8 @@ export function ServerSidebar({
     materializedViews,
     sequences,
     functions,
+    procedures,
+    dataTypes,
     triggerFunctions,
     connect,
     disconnect,
@@ -219,7 +222,6 @@ export function ServerSidebar({
     openRolesTab,
     openSchemaDiffTab,
     openExtensionsTab,
-    openEnumsTab,
     openPgSettingsTab,
     loading,
     selectedItem,

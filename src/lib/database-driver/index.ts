@@ -1,11 +1,13 @@
 import type {
   ColumnDetail,
   ConstraintDetail,
+  DataTypeInfo,
   DbGrant,
   FunctionInfo,
   IndexDetail,
   PgRole,
   PolicyDetail,
+  ProcedureInfo,
   ProjectConnectionStatus,
   RuleDetail,
   SchemaObject,
@@ -38,6 +40,8 @@ export type WireRuleDetail = [string, string];
 export type WirePolicyDetail = [string, string, string];
 export type WireFunctionInfo = [string, string, string];
 export type WireSequenceInfo = [string, string];
+export type WireProcedureInfo = [string, string];
+export type WireDataTypeInfo = [string, string, string];
 export type WireTriggerFunctionInfo = [string, string];
 export type WireForeignKeyInfo = [string, string, string, string];
 
@@ -80,6 +84,8 @@ export interface DatabaseDriver {
   loadMaterializedViews(projectId: string, schema: string): Promise<string[]>;
   loadSequences(projectId: string, schema: string): Promise<SequenceInfo[]>;
   loadFunctions(projectId: string, schema: string): Promise<FunctionInfo[]>;
+  loadProcedures(projectId: string, schema: string): Promise<ProcedureInfo[]>;
+  loadDataTypes(projectId: string, schema: string): Promise<DataTypeInfo[]>;
   loadTriggerFunctions(projectId: string, schema: string): Promise<TriggerFunctionInfo[]>;
   runQuery(projectId: string, sql: string, timeoutMs?: number): Promise<WireQueryResult>;
   runQueryStreamed?(
@@ -154,7 +160,6 @@ export interface DatabaseDriver {
   loadTablespaces?(projectId: string): Promise<[string, string, string][]>;
   loadExtensions?(projectId: string): Promise<string[][]>;
   loadAvailableExtensions?(projectId: string): Promise<string[][]>;
-  loadEnumTypes?(projectId: string): Promise<string[][]>;
   loadPgSettings?(projectId: string): Promise<string[][]>;
   tableAction?(
     projectId: string,
@@ -221,6 +226,14 @@ export function parseFunctionInfo(wire: WireFunctionInfo[]): FunctionInfo[] {
     returnType,
     arguments: arguments_,
   }));
+}
+
+export function parseDataTypeInfo(wire: WireDataTypeInfo[]): DataTypeInfo[] {
+  return wire.map(([name, kind, detail]) => ({ name, kind, detail }));
+}
+
+export function parseProcedureInfo(wire: WireProcedureInfo[]): ProcedureInfo[] {
+  return wire.map(([name, arguments_]) => ({ name, arguments: arguments_ }));
 }
 
 export function parseTriggerFunctionInfo(wire: WireTriggerFunctionInfo[]): TriggerFunctionInfo[] {

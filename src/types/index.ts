@@ -28,7 +28,6 @@ export type TabType =
   | "roles"
   | "schema-diff"
   | "extensions"
-  | "enums"
   | "pg-settings";
 
 export interface Tab {
@@ -153,6 +152,19 @@ export interface SequenceInfo {
 export interface FunctionInfo {
   name: string;
   returnType: string;
+  arguments: string;
+}
+
+export interface DataTypeInfo {
+  name: string;
+  /** enum | domain | composite | range */
+  kind: string;
+  /** Labels, base type, attributes or subtype, depending on the kind */
+  detail: string;
+}
+
+export interface ProcedureInfo {
+  name: string;
   arguments: string;
 }
 

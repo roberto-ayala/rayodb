@@ -100,6 +100,28 @@ const filterNames: Record<ExportFormat, string> = {
   xml: "XML Files",
 };
 
+/**
+ * Writing through the Tauri dialog rather than an anchor download: the webview
+ * fires no download indicator and can drop the click entirely, and this way the
+ * user picks the destination and knows it happened.
+ */
+export async function saveTextFile(
+  defaultName: string,
+  filterName: string,
+  extension: string,
+  content: string,
+): Promise<string | null> {
+  const filePath = await save({
+    defaultPath: defaultName,
+    filters: [{ name: filterName, extensions: [extension] }],
+  });
+
+  if (!filePath) return null; // user cancelled
+
+  await writeTextFile(filePath, content);
+  return filePath;
+}
+
 export async function exportResults(
   format: ExportFormat,
   columns: string[],
@@ -108,15 +130,7 @@ export async function exportResults(
 ) {
   const content = formatters[format](columns, rows, tableName);
   const ext = extensions[format];
-
-  const filePath = await save({
-    defaultPath: `export.${ext}`,
-    filters: [{ name: filterNames[format], extensions: [ext] }],
-  });
-
-  if (!filePath) return; // user cancelled
-
-  await writeTextFile(filePath, content);
+  await saveTextFile(`export.${ext}`, filterNames[format], ext, content);
 }
 
 export function copyToClipboard(

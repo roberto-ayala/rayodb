@@ -1,6 +1,8 @@
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { DriverFactory } from "@/lib/database-driver";
+import { saveTextFile } from "@/lib/export";
 import { useProjectStore } from "@/stores/project-store";
 import type { ColumnDetail, IndexDetail } from "@/types";
 import {
@@ -16,6 +18,7 @@ import {
 } from "./interactions";
 import { layoutTables } from "./layout";
 import { ERDDefs, ERDFKLines, ERDGridBackground, ERDTableBoxes } from "./rendering";
+import { serialiseERD } from "./svg-export";
 import { useTableDetails } from "./table-details";
 import type { ERDColumn, ERDProps, ForeignKey } from "./types";
 
@@ -233,18 +236,17 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     setPan({ x: 10, y: 10 });
   }, [boxes, totalWidth, totalHeight]);
 
-  const exportSVG = useCallback(() => {
+  const exportSVG = useCallback(async () => {
     if (!svgRef.current) return;
-    const clone = svgRef.current.cloneNode(true) as SVGSVGElement;
-    clone.setAttribute("width", String(totalWidth));
-    clone.setAttribute("height", String(totalHeight));
-    const blob = new Blob([clone.outerHTML], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `erd-${schema}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const content = serialiseERD(svgRef.current, totalWidth, totalHeight);
+      const filePath = await saveTextFile(`erd-${schema}.svg`, "SVG Image", "svg", content);
+      if (filePath) toast.success("Diagram exported", { description: filePath });
+    } catch (err: unknown) {
+      toast.error("Could not export the diagram", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
   }, [totalWidth, totalHeight, schema]);
 
   if (loading || (!detailsReady && schemaTables.length > 0)) {

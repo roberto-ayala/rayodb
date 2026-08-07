@@ -7,7 +7,7 @@ export type Point = { x: number; y: number };
 interface ERDToolbarProps {
   zoomBy: (factor: number) => void;
   fitToView: () => void;
-  exportSVG: () => void;
+  exportSVG: () => void | Promise<void>;
 }
 
 export function ERDToolbar({ zoomBy, fitToView, exportSVG }: ERDToolbarProps) {
@@ -39,7 +39,7 @@ export function ERDToolbar({ zoomBy, fitToView, exportSVG }: ERDToolbarProps) {
       </button>
       <button
         type="button"
-        onClick={exportSVG}
+        onClick={() => void exportSVG()}
         className="p-1.5 rounded bg-card border border-border hover:bg-accent transition-colors shadow-sm"
         title="Export SVG"
       >

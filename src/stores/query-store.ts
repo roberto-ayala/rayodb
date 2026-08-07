@@ -39,6 +39,7 @@ interface QueryStore {
     sql: string,
   ) => Promise<void>;
   removeQuery: (id: string) => Promise<void>;
+  remapProject: (oldProjectId: string, newProjectId: string) => Promise<void>;
 }
 
 export const useQueryStore = create<QueryStore>()(
@@ -73,6 +74,30 @@ export const useQueryStore = create<QueryStore>()(
       await deleteQuery(id);
       set((s) => {
         s.queries = s.queries.filter((q) => q.id !== id);
+      });
+    },
+
+    /** Saved queries carry their project in the id, so a rename rewrites them. */
+    remapProject: async (oldProjectId, newProjectId) => {
+      const store = useQueryStore.getState();
+      // A rename can happen before the sidebar ever asked for the queries.
+      if (!store.loaded) await store.loadQueries();
+
+      const affected = useQueryStore.getState().queries.filter((q) => q.projectId === oldProjectId);
+      if (affected.length === 0) return;
+
+      const remapped = await Promise.all(
+        affected.map(async (q) => {
+          const id = `${newProjectId}:${q.database}:${q.driver}:${q.title}`;
+          await insertQuery(id, q.sql);
+          await deleteQuery(q.id);
+          return { ...q, id, projectId: newProjectId };
+        }),
+      );
+
+      set((s) => {
+        const byOldId = new Map(remapped.map((q, i) => [affected[i].id, q]));
+        s.queries = s.queries.map((q) => byOldId.get(q.id) ?? q);
       });
     },
   })),

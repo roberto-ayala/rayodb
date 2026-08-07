@@ -32,6 +32,7 @@ interface TabState {
   setResult: (index: number, result: QueryResult) => void;
   setExecuting: (index: number, executing: boolean) => void;
   setProjectId: (index: number, projectId: string) => void;
+  remapProjectId: (oldProjectId: string, newProjectId: string) => void;
   setExplainResult: (index: number, plan: ExplainPlan | undefined) => void;
   setVirtualQuery: (index: number, vq: VirtualQuery | undefined) => void;
   toggleSplit: (index: number) => void;
@@ -184,6 +185,12 @@ export const useTabStore = create<TabState>()(
       setProjectId: (index, projectId) =>
         set((s) => {
           s.tabs[index].projectId = projectId;
+        }),
+      remapProjectId: (oldProjectId, newProjectId) =>
+        set((s) => {
+          for (const tab of s.tabs) {
+            if (tab.projectId === oldProjectId) tab.projectId = newProjectId;
+          }
         }),
       setExplainResult: (index, plan) =>
         set((s) => {

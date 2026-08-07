@@ -12,6 +12,7 @@ export interface ProjectDetails {
   sshUser: string;
   sshPassword: string;
   sshKeyPath: string;
+  autoConnect: string;
 }
 
 export type DriverType = "PGSQL";

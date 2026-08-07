@@ -63,6 +63,7 @@ export interface DatabaseDriver {
     key: [string, string, string, string, string, string],
     ssh?: string[],
   ): Promise<ProjectConnectionStatus>;
+  disconnect(projectId: string): Promise<void>;
   cancelQuery?(projectId: string): Promise<boolean>;
   loadSchemas(projectId: string): Promise<string[]>;
   loadTables(projectId: string, schema: string): Promise<WireTableInfo[]>;

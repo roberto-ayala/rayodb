@@ -43,6 +43,9 @@ export class PostgreSQLDriver implements DatabaseDriver {
       ssh: ssh ?? null,
     });
   }
+  async disconnect(projectId: string) {
+    await invoke("pgsql_disconnect", { project_id: projectId });
+  }
   async cancelQuery(projectId: string) {
     return invoke<boolean>("pgsql_cancel_query", { project_id: projectId });
   }

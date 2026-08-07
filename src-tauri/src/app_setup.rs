@@ -116,6 +116,7 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
             "ssh_user",
             "ssh_password",
             "ssh_key_path",
+            "auto_connect",
         ] {
             conn.execute(
                 &format!(

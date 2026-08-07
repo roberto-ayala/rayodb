@@ -13,7 +13,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
 
     let mut rows = conn
         .query(
-            "SELECT id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path FROM projects ORDER BY id",
+            "SELECT id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect FROM projects ORDER BY id",
             (),
         )
         .await
@@ -55,6 +55,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
         let ssh_user: String = row.get::<String>(11).unwrap_or_default();
         let ssh_password: String = row.get::<String>(12).unwrap_or_default();
         let ssh_key_path: String = row.get::<String>(13).unwrap_or_default();
+        let auto_connect: String = row.get::<String>(14).unwrap_or_default();
         projects.insert(
             id,
             vec![
@@ -71,6 +72,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
                 ssh_user,
                 ssh_password,
                 ssh_key_path,
+                auto_connect,
             ],
         );
     }
@@ -104,11 +106,12 @@ pub async fn project_db_insert(
     let ssh_user = project_details.get(10).cloned().unwrap_or_default();
     let ssh_password = project_details.get(11).cloned().unwrap_or_default();
     let ssh_key_path = project_details.get(12).cloned().unwrap_or_default();
+    let auto_connect = project_details.get(13).cloned().unwrap_or_default();
 
     conn.execute(
-        "INSERT OR REPLACE INTO projects (id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
-        libsql::params![project_id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path],
+        "INSERT OR REPLACE INTO projects (id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)",
+        libsql::params![project_id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect],
     )
     .await
     .map_err(|e| AppError::DatabaseError(e.to_string()))?;
@@ -152,6 +155,9 @@ pub async fn project_db_delete(project_id: &str, app_state: State<'_, AppState>)
     app_state.meta_clients.lock().await.remove(project_id);
     app_state.cancel_tokens.lock().await.remove(project_id);
     app_state.client_ssl.lock().await.remove(project_id);
+    if let Some(tunnel) = app_state.ssh_tunnels.lock().await.remove(project_id) {
+        tunnel.stop();
+    }
 
     Ok(())
 }

@@ -2,7 +2,7 @@ use tokio_postgres::Client;
 
 use crate::common::enums::{AppError, pg_error_message};
 
-use super::{FunctionInfo, ObjectStats};
+use super::{FunctionInfo, ObjectStats, SequenceInfo};
 
 pub async fn load_views(client: &Client, schema: &str) -> Result<Vec<String>, AppError> {
     let rows = client
@@ -35,6 +35,24 @@ pub async fn load_materialized_views(
         .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
 
     Ok(rows.iter().map(|r| r.get::<_, String>(0)).collect())
+}
+
+pub async fn load_sequences(client: &Client, schema: &str) -> Result<Vec<SequenceInfo>, AppError> {
+    let rows = client
+        .query(
+            // last_value is null until the sequence is first read — and also when
+            // the role lacks SELECT on it, which reads the same either way.
+            r#"SELECT sequencename::text,
+                      COALESCE(last_value::text, '-')
+               FROM pg_sequences
+               WHERE schemaname = $1
+               ORDER BY sequencename"#,
+            &[&schema],
+        )
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
 }
 
 pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<FunctionInfo>, AppError> {

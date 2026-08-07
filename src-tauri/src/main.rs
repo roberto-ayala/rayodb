@@ -69,6 +69,7 @@ fn main() {
             drivers::pgsql::pgsql_load_policies,
             drivers::pgsql::pgsql_load_views,
             drivers::pgsql::pgsql_load_materialized_views,
+            drivers::pgsql::pgsql_load_sequences,
             drivers::pgsql::pgsql_load_functions,
             drivers::pgsql::pgsql_load_trigger_functions,
             drivers::pgsql::pgsql_run_query,

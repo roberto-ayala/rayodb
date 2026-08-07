@@ -1,11 +1,12 @@
 import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
-import type { FunctionInfo, TriggerFunctionInfo } from "@/types";
+import type { FunctionInfo, SequenceInfo, TriggerFunctionInfo } from "@/types";
 import type { ProjectState } from "./index";
 
 export type ViewsSlice = {
   views: Record<string, string[]>;
   materializedViews: Record<string, string[]>;
+  sequences: Record<string, SequenceInfo[]>;
   functions: Record<string, FunctionInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
   serverDatabases: Record<string, string[]>;
@@ -21,6 +22,7 @@ export const createViewsSlice: StateCreator<
 > = (set, get) => ({
   views: {},
   materializedViews: {},
+  sequences: {},
   functions: {},
   triggerFunctions: {},
   serverDatabases: {},

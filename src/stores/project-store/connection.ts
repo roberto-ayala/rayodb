@@ -24,6 +24,7 @@ export function clearProjectMetadata(s: ProjectState, projectId: string) {
     s.policies,
     s.views,
     s.materializedViews,
+    s.sequences,
     s.functions,
     s.triggerFunctions,
   ] as Record<string, unknown>[];

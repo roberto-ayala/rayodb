@@ -142,6 +142,12 @@ export interface PolicyDetail {
   command: string;
 }
 
+export interface SequenceInfo {
+  name: string;
+  /** Current value, or "-" when the sequence has never been read */
+  lastValue: string;
+}
+
 export interface FunctionInfo {
   name: string;
   returnType: string;

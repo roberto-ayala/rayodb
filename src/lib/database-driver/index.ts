@@ -9,6 +9,7 @@ import type {
   ProjectConnectionStatus,
   RuleDetail,
   SchemaObject,
+  SequenceInfo,
   TableGrant,
   TriggerDetail,
   TriggerFunctionInfo,
@@ -36,6 +37,7 @@ export type WireTriggerDetail = [string, string, string];
 export type WireRuleDetail = [string, string];
 export type WirePolicyDetail = [string, string, string];
 export type WireFunctionInfo = [string, string, string];
+export type WireSequenceInfo = [string, string];
 export type WireTriggerFunctionInfo = [string, string];
 export type WireForeignKeyInfo = [string, string, string, string];
 
@@ -76,6 +78,7 @@ export interface DatabaseDriver {
   loadPolicies(projectId: string, schema: string, table: string): Promise<PolicyDetail[]>;
   loadViews(projectId: string, schema: string): Promise<string[]>;
   loadMaterializedViews(projectId: string, schema: string): Promise<string[]>;
+  loadSequences(projectId: string, schema: string): Promise<SequenceInfo[]>;
   loadFunctions(projectId: string, schema: string): Promise<FunctionInfo[]>;
   loadTriggerFunctions(projectId: string, schema: string): Promise<TriggerFunctionInfo[]>;
   runQuery(projectId: string, sql: string, timeoutMs?: number): Promise<WireQueryResult>;
@@ -206,6 +209,10 @@ export function parsePolicyDetails(wire: WirePolicyDetail[]): PolicyDetail[] {
     permissive,
     command,
   }));
+}
+
+export function parseSequenceInfo(wire: WireSequenceInfo[]): SequenceInfo[] {
+  return wire.map(([name, lastValue]) => ({ name, lastValue }));
 }
 
 export function parseFunctionInfo(wire: WireFunctionInfo[]): FunctionInfo[] {

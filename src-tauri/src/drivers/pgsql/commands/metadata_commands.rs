@@ -2,9 +2,10 @@ use crate::AppState;
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 use crate::drivers::pgsql::{
     ColumnDetail, ConstraintDetail, FunctionInfo, IndexDetail, PolicyDetail, RuleDetail,
-    TriggerDetail, get_pool, load_column_details, load_columns, load_constraints, load_databases,
-    load_functions, load_indexes, load_materialized_views, load_policies, load_rules, load_schemas,
-    load_tables, load_tablespaces, load_trigger_functions, load_triggers, load_views,
+    SequenceInfo, TriggerDetail, get_pool, load_column_details, load_columns, load_constraints,
+    load_databases, load_functions, load_indexes, load_materialized_views, load_policies,
+    load_rules, load_schemas, load_sequences, load_tables, load_tablespaces,
+    load_trigger_functions, load_triggers, load_views,
 };
 
 use tauri::{AppHandle, Manager, Result, State};
@@ -63,11 +64,17 @@ pub async fn pgsql_load_tables(
 
     load_tables(
         &client,
-        r#"SELECT table_name,
-                  pg_size_pretty(pg_total_relation_size('"' || table_schema || '"."' || table_name || '"')) AS size
-           FROM information_schema.tables
-           WHERE table_schema = $1
-           ORDER BY table_name"#,
+        // pg_class rather than information_schema.tables: the standard view also
+        // reports views and foreign tables, which have their own categories, and
+        // sizing by oid avoids quoting the identifier back into a string.
+        // 'r' = ordinary table, 'p' = partitioned table.
+        r#"SELECT c.relname,
+                  pg_size_pretty(pg_total_relation_size(c.oid)) AS size
+           FROM pg_class c
+           JOIN pg_namespace n ON n.oid = c.relnamespace
+           WHERE n.nspname = $1
+             AND c.relkind IN ('r', 'p')
+           ORDER BY c.relname"#,
         schema,
     )
     .await
@@ -192,6 +199,17 @@ pub async fn pgsql_load_materialized_views(
     load_materialized_views(&client, schema)
         .await
         .map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_sequences(
+    project_id: &str,
+    schema: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<SequenceInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_sequences(&client, schema).await.map_err(Into::into)
 }
 
 #[tauri::command(rename_all = "snake_case")]

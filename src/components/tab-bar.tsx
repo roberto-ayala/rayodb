@@ -4,7 +4,6 @@ import {
   Columns3,
   Copy,
   Database,
-  List,
   Package,
   Plus,
   Settings,
@@ -154,10 +153,6 @@ export function TabBar() {
                   />
                 ) : tab.type === "extensions" ? (
                   <Package
-                    className={cn("h-3 w-3", isActive ? "text-primary" : "text-muted-foreground")}
-                  />
-                ) : tab.type === "enums" ? (
-                  <List
                     className={cn("h-3 w-3", isActive ? "text-primary" : "text-muted-foreground")}
                   />
                 ) : tab.type === "pg-settings" ? (

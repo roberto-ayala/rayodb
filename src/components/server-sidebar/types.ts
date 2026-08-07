@@ -2,6 +2,7 @@ import type React from "react";
 import type { ContextMenuEntry } from "@/components/ui/context-menu";
 import type {
   ColumnDetail,
+  DataTypeInfo,
   FunctionInfo,
   IndexDetail,
   ProcedureInfo,
@@ -47,6 +48,7 @@ export interface SidebarRenderCtx {
   sequences: Record<string, SequenceInfo[]>;
   functions: Record<string, FunctionInfo[]>;
   procedures: Record<string, ProcedureInfo[]>;
+  dataTypes: Record<string, DataTypeInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
 
   connect: (projectId: string) => Promise<void>;
@@ -62,7 +64,6 @@ export interface SidebarRenderCtx {
   openRolesTab: (projectId: string) => void;
   openSchemaDiffTab: (projectId: string) => void;
   openExtensionsTab: (projectId: string) => void;
-  openEnumsTab: (projectId: string) => void;
   openPgSettingsTab: (projectId: string) => void;
 
   loading: Record<string, boolean>;

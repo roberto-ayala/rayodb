@@ -6,7 +6,6 @@ import {
   Edit3,
   HardDrive,
   Link2,
-  List,
   Loader2,
   Package,
   Plus,
@@ -49,7 +48,6 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     openRolesTab,
     openSchemaDiffTab,
     openExtensionsTab,
-    openEnumsTab,
     openPgSettingsTab,
     setAddDbSource,
     showMenu,
@@ -275,11 +273,6 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                   label: "Extensions",
                                   icon: <Package className="h-3 w-3" />,
                                   onClick: () => openExtensionsTab(dbPid),
-                                },
-                                {
-                                  label: "Enum Types",
-                                  icon: <List className="h-3 w-3" />,
-                                  onClick: () => openEnumsTab(dbPid),
                                 },
                               ]
                             : []),

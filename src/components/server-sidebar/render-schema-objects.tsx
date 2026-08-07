@@ -9,6 +9,7 @@ import {
   Plus,
   RefreshCw,
   Settings2,
+  Shapes,
   SquarePlay,
   Table,
   Zap,
@@ -33,6 +34,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     sequences,
     functions,
     procedures,
+    dataTypes,
     triggerFunctions,
     loading,
     selectedItem,
@@ -66,6 +68,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     const schemaSequences = sequences[schemaStoreKey];
     const schemaFns = functions[schemaStoreKey];
     const schemaProcs = procedures[schemaStoreKey];
+    const schemaDataTypes = dataTypes[schemaStoreKey];
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
     const isSchemaOpen = isOpen(sKey);
 
@@ -482,6 +485,67 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                         <span className="text-xs text-foreground">
                           {proc.name}({proc.arguments ? "..." : ""})
                         </span>
+                      </div>
+                    );
+                  })}
+              </>
+            )}
+
+            {/* Data Types category */}
+            {schemaDataTypes && schemaDataTypes.length > 0 && (
+              <>
+                <SectionHeader
+                  indent={I.schemaObj}
+                  label={`Data Types (${schemaDataTypes.length})`}
+                  icon={<Shapes className="h-3 w-3" />}
+                  sectionKey={`${sKey}::types`}
+                  expanded={isOpen(`${sKey}::types`)}
+                  onClick={() => toggle(`${sKey}::types`)}
+                />
+                {isOpen(`${sKey}::types`) &&
+                  schemaDataTypes.map((dt) => {
+                    const dtKey = `datatype::${pid}::${schema}::${dt.name}`;
+                    return (
+                      // biome-ignore lint/a11y/noStaticElementInteractions: a type is a label — selection and a context menu, no primary action
+                      <div
+                        key={dt.name}
+                        className={cn(
+                          "relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none",
+                          selectedItem === dtKey ? "bg-primary/10" : "hover:bg-sidebar-accent",
+                        )}
+                        style={{ paddingLeft: `${I.table}px` }}
+                        onClick={() => setSelectedItem(dtKey)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedItem(dtKey);
+                          showMenu(e, [
+                            { header: dt.kind },
+                            {
+                              label: "Copy Name",
+                              icon: <Copy className="h-3 w-3" />,
+                              onClick: () => copy(`"${schema}"."${dt.name}"`),
+                            },
+                            ...(dt.detail
+                              ? [
+                                  {
+                                    label: dt.kind === "enum" ? "Copy Labels" : "Copy Definition",
+                                    icon: <Copy className="h-3 w-3" />,
+                                    onClick: () => copy(dt.detail),
+                                  },
+                                ]
+                              : []),
+                          ]);
+                        }}
+                      >
+                        <Shapes className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                        <span className="text-xs text-foreground">{dt.name}</span>
+                        <span className="text-3xs text-muted-foreground">{dt.kind}</span>
+                        {dt.detail && (
+                          <span className="max-w-64 truncate text-3xs text-muted-foreground/40">
+                            {dt.detail}
+                          </span>
+                        )}
                       </div>
                     );
                   })}

@@ -1,9 +1,9 @@
 use crate::AppState;
-use crate::common::enums::{AppError};
+use crate::common::enums::AppError;
 use crate::drivers::pgsql::{
     DbGrant, PgRole, SchemaObject, TableGrant, execute_query, extract_schema_objects,
-    import_csv_to_table, load_available_extensions, load_database_grants, load_enum_types,
-    load_extensions, load_pg_settings, load_roles, load_table_grants, parse_csv_preview,
+    import_csv_to_table, load_available_extensions, load_database_grants, load_extensions,
+    load_pg_settings, load_roles, load_table_grants, parse_csv_preview,
 };
 
 use tauri::ipc::Response;
@@ -94,17 +94,6 @@ pub async fn pgsql_load_available_extensions(
 ) -> Result<Response> {
     let client = acquire_client(&app_state.meta_clients, project_id).await?;
     let result = load_available_extensions(&client).await?;
-    let json = sonic_rs::to_string(&result).map_err(|e| AppError::QueryFailed(e.to_string()))?;
-    Ok(Response::new(json))
-}
-
-#[tauri::command(rename_all = "snake_case")]
-pub async fn pgsql_load_enum_types(
-    project_id: &str,
-    app_state: State<'_, AppState>,
-) -> Result<Response> {
-    let client = acquire_client(&app_state.meta_clients, project_id).await?;
-    let result = load_enum_types(&client).await?;
     let json = sonic_rs::to_string(&result).map_err(|e| AppError::QueryFailed(e.to_string()))?;
     Ok(Response::new(json))
 }

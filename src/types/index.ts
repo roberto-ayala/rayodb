@@ -156,6 +156,11 @@ export interface FunctionInfo {
   arguments: string;
 }
 
+export interface ProcedureInfo {
+  name: string;
+  arguments: string;
+}
+
 export interface TriggerFunctionInfo {
   name: string;
   arguments: string;

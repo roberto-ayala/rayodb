@@ -1,11 +1,11 @@
 use crate::AppState;
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 use crate::drivers::pgsql::{
-    ColumnDetail, ConstraintDetail, FunctionInfo, IndexDetail, PolicyDetail, RuleDetail,
-    SequenceInfo, TriggerDetail, get_pool, load_column_details, load_columns, load_constraints,
-    load_databases, load_functions, load_indexes, load_materialized_views, load_policies,
-    load_rules, load_schemas, load_sequences, load_tables, load_tablespaces,
-    load_trigger_functions, load_triggers, load_views,
+    ColumnDetail, ConstraintDetail, FunctionInfo, IndexDetail, PolicyDetail, ProcedureInfo,
+    RuleDetail, SequenceInfo, TriggerDetail, get_pool, load_column_details, load_columns,
+    load_constraints, load_databases, load_functions, load_indexes, load_materialized_views,
+    load_policies, load_procedures, load_rules, load_schemas, load_sequences, load_tables,
+    load_tablespaces, load_trigger_functions, load_triggers, load_views,
 };
 
 use tauri::{AppHandle, Manager, Result, State};
@@ -221,6 +221,17 @@ pub async fn pgsql_load_functions(
     let client = acquire_client(&app_state.meta_clients, project_id).await?;
 
     load_functions(&client, schema).await.map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_procedures(
+    project_id: &str,
+    schema: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<ProcedureInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_procedures(&client, schema).await.map_err(Into::into)
 }
 
 #[tauri::command(rename_all = "snake_case")]

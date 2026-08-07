@@ -12,6 +12,7 @@ import type {
   WireIndexDetail,
   WirePackedResult,
   WirePolicyDetail,
+  WireProcedureInfo,
   WireRuleDetail,
   WireSequenceInfo,
   WireTableInfo,
@@ -25,6 +26,7 @@ import {
   parseFunctionInfo,
   parseIndexDetails,
   parsePolicyDetails,
+  parseProcedureInfo,
   parseRuleDetails,
   parseSequenceInfo,
   parseTriggerDetails,
@@ -127,6 +129,13 @@ export class PostgreSQLDriver implements DatabaseDriver {
       schema,
     });
     return parseFunctionInfo(wire);
+  }
+  async loadProcedures(projectId: string, schema: string) {
+    const wire = await invoke<WireProcedureInfo[]>("pgsql_load_procedures", {
+      project_id: projectId,
+      schema,
+    });
+    return parseProcedureInfo(wire);
   }
   async loadTriggerFunctions(projectId: string, schema: string) {
     const wire = await invoke<WireTriggerFunctionInfo[]>("pgsql_load_trigger_functions", {

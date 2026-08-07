@@ -9,6 +9,7 @@ import {
   Plus,
   RefreshCw,
   Settings2,
+  SquarePlay,
   Table,
   Zap,
 } from "lucide-react";
@@ -31,6 +32,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     materializedViews,
     sequences,
     functions,
+    procedures,
     triggerFunctions,
     loading,
     selectedItem,
@@ -63,6 +65,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     const schemaMatViews = materializedViews[schemaStoreKey];
     const schemaSequences = sequences[schemaStoreKey];
     const schemaFns = functions[schemaStoreKey];
+    const schemaProcs = procedures[schemaStoreKey];
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
     const isSchemaOpen = isOpen(sKey);
 
@@ -413,6 +416,72 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                           {fn.name}({fn.arguments ? "..." : ""})
                         </span>
                         <span className="text-3xs text-muted-foreground">{fn.returnType}</span>
+                      </div>
+                    );
+                  })}
+              </>
+            )}
+
+            {/* Procedures category */}
+            {schemaProcs && schemaProcs.length > 0 && (
+              <>
+                <SectionHeader
+                  indent={I.schemaObj}
+                  label={`Procedures (${schemaProcs.length})`}
+                  icon={<SquarePlay className="h-3 w-3" />}
+                  sectionKey={`${sKey}::procs`}
+                  expanded={isOpen(`${sKey}::procs`)}
+                  onClick={() => toggle(`${sKey}::procs`)}
+                />
+                {isOpen(`${sKey}::procs`) &&
+                  schemaProcs.map((proc, i) => {
+                    const procKey = `procedure::${pid}::${schema}::${proc.name}::${i}`;
+                    return (
+                      // biome-ignore lint/a11y/noStaticElementInteractions: mirrors the function rows — selection and a context menu, no primary action
+                      <div
+                        key={`${proc.name}-${i}`}
+                        className={cn(
+                          "relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none",
+                          selectedItem === procKey ? "bg-primary/10" : "hover:bg-sidebar-accent",
+                        )}
+                        style={{ paddingLeft: `${I.table}px` }}
+                        onClick={() => setSelectedItem(procKey)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedItem(procKey);
+                          showMenu(e, [
+                            {
+                              label: "CALL",
+                              icon: <SquarePlay className="h-3 w-3" />,
+                              // The signature goes on its own line: a trailing
+                              // comment would swallow the closing paren.
+                              onClick: () =>
+                                openTab(
+                                  pid,
+                                  proc.arguments
+                                    ? `-- arguments: ${proc.arguments}\nCALL "${schema}"."${proc.name}"();`
+                                    : `CALL "${schema}"."${proc.name}"();`,
+                                ),
+                            },
+                            {
+                              label: "Show Definition",
+                              icon: <FileCode className="h-3 w-3" />,
+                              onClick: () => openTab(pid, ddlFunctionQuery(schema, proc.name)),
+                            },
+                            { separator: true as const },
+                            {
+                              label: "Copy Name",
+                              icon: <Copy className="h-3 w-3" />,
+                              onClick: () => copy(proc.name),
+                            },
+                          ]);
+                        }}
+                      >
+                        <SquarePlay className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                        <span className="text-xs text-foreground">
+                          {proc.name}({proc.arguments ? "..." : ""})
+                        </span>
                       </div>
                     );
                   })}

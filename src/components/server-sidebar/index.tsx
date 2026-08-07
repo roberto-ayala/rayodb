@@ -32,6 +32,7 @@ export function ServerSidebar({
   const materializedViews = useProjectStore((s) => s.materializedViews);
   const sequences = useProjectStore((s) => s.sequences);
   const functions = useProjectStore((s) => s.functions);
+  const procedures = useProjectStore((s) => s.procedures);
   const triggerFunctions = useProjectStore((s) => s.triggerFunctions);
   const connect = useProjectStore((s) => s.connect);
   const disconnect = useProjectStore((s) => s.disconnect);
@@ -205,6 +206,7 @@ export function ServerSidebar({
     materializedViews,
     sequences,
     functions,
+    procedures,
     triggerFunctions,
     connect,
     disconnect,

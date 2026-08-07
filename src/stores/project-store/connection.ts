@@ -26,6 +26,7 @@ export function clearProjectMetadata(s: ProjectState, projectId: string) {
     s.materializedViews,
     s.sequences,
     s.functions,
+    s.procedures,
     s.triggerFunctions,
   ] as Record<string, unknown>[];
   for (const bucket of scoped) {

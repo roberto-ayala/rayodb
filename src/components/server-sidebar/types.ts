@@ -4,6 +4,7 @@ import type {
   ColumnDetail,
   FunctionInfo,
   IndexDetail,
+  ProcedureInfo,
   ProjectConnectionStatus,
   ProjectMap,
   SequenceInfo,
@@ -45,6 +46,7 @@ export interface SidebarRenderCtx {
   materializedViews: Record<string, string[]>;
   sequences: Record<string, SequenceInfo[]>;
   functions: Record<string, FunctionInfo[]>;
+  procedures: Record<string, ProcedureInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
 
   connect: (projectId: string) => Promise<void>;

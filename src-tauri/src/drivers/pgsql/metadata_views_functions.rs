@@ -2,7 +2,7 @@ use tokio_postgres::Client;
 
 use crate::common::enums::{AppError, pg_error_message};
 
-use super::{FunctionInfo, ObjectStats, SequenceInfo};
+use super::{FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo};
 
 pub async fn load_views(client: &Client, schema: &str) -> Result<Vec<String>, AppError> {
     let rows = client
@@ -64,7 +64,7 @@ pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<Functio
                FROM pg_proc p
                JOIN pg_namespace n ON n.oid = p.pronamespace
                WHERE n.nspname = $1
-                 AND p.prokind IN ('f', 'p')
+                 AND p.prokind = 'f'
                  AND pg_get_function_result(p.oid) != 'trigger'
                ORDER BY p.proname"#,
             &[&schema],
@@ -81,6 +81,29 @@ pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<Functio
             (name, ret, args)
         })
         .collect())
+}
+
+/// Procedures are invoked with CALL and have no return type, so they get their
+/// own listing instead of sharing the functions one.
+pub async fn load_procedures(
+    client: &Client,
+    schema: &str,
+) -> Result<Vec<ProcedureInfo>, AppError> {
+    let rows = client
+        .query(
+            r#"SELECT p.proname,
+                      pg_get_function_arguments(p.oid)
+               FROM pg_proc p
+               JOIN pg_namespace n ON n.oid = p.pronamespace
+               WHERE n.nspname = $1
+                 AND p.prokind = 'p'
+               ORDER BY p.proname"#,
+            &[&schema],
+        )
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows.iter().map(|r| (r.get(0), r.get(1))).collect())
 }
 
 pub async fn load_trigger_functions(

@@ -1,6 +1,6 @@
 import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
-import type { FunctionInfo, SequenceInfo, TriggerFunctionInfo } from "@/types";
+import type { FunctionInfo, ProcedureInfo, SequenceInfo, TriggerFunctionInfo } from "@/types";
 import type { ProjectState } from "./index";
 
 export type ViewsSlice = {
@@ -8,6 +8,7 @@ export type ViewsSlice = {
   materializedViews: Record<string, string[]>;
   sequences: Record<string, SequenceInfo[]>;
   functions: Record<string, FunctionInfo[]>;
+  procedures: Record<string, ProcedureInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
   serverDatabases: Record<string, string[]>;
   serverTablespaces: Record<string, [string, string, string][]>;
@@ -25,6 +26,7 @@ export const createViewsSlice: StateCreator<
   materializedViews: {},
   sequences: {},
   functions: {},
+  procedures: {},
   triggerFunctions: {},
   serverDatabases: {},
   serverTablespaces: {},

@@ -129,7 +129,7 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+      <div className="flex h-full items-center justify-center bg-card text-sm text-muted-foreground">
         Loading roles...
       </div>
     );
@@ -138,9 +138,9 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
   const selected = roles.find((r) => r.name === selectedRole);
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-background">
       {/* Role list */}
-      <div className="w-[240px] border-r border-border/60 overflow-y-auto">
+      <div className="w-[240px] shrink-0 overflow-y-auto border-r border-border bg-background">
         <div className="flex items-center justify-between px-3 py-2">
           <span className="text-3xs font-semibold text-muted-foreground uppercase tracking-wider">
             Roles ({roles.length})
@@ -188,7 +188,9 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       </div>
 
       {/* Detail panel */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* The detail sits on the card surface so its tables and chips read
+          against something plain, the way the other panels present content */}
+      <div className="flex-1 overflow-y-auto bg-card p-4">
         {!selected ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/40 text-sm">
             Select a role

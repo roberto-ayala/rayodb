@@ -3,6 +3,7 @@ import type {
   ConstraintDetail,
   DataTypeInfo,
   DbGrant,
+  DefaultGrant,
   EventTriggerInfo,
   ForeignTableInfo,
   FunctionInfo,
@@ -13,6 +14,7 @@ import type {
   ProjectConnectionStatus,
   RoleSpec,
   RuleDetail,
+  SchemaGrant,
   SchemaObject,
   SequenceInfo,
   TableGrant,
@@ -161,6 +163,28 @@ export interface DatabaseDriver {
   alterRole?(projectId: string, spec: RoleSpec): Promise<string>;
   dropRole?(projectId: string, name: string): Promise<string>;
   loadTableGrants?(projectId: string, roleName: string): Promise<TableGrant[]>;
+  loadSchemaTableGrants?(projectId: string, roleName: string): Promise<SchemaGrant[]>;
+  loadDefaultTableGrants?(projectId: string, roleName: string): Promise<DefaultGrant[]>;
+  setSchemaTablePrivilege?(
+    projectId: string,
+    schema: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ): Promise<string>;
+  setDefaultTablePrivilege?(
+    projectId: string,
+    schema: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ): Promise<string>;
+  revokeTablePrivileges?(
+    projectId: string,
+    schema: string,
+    table: string,
+    roleName: string,
+  ): Promise<string>;
   loadDatabaseGrants?(projectId: string, roleName: string): Promise<DbGrant[]>;
   setDatabasePrivilege?(
     projectId: string,

@@ -2,9 +2,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type {
   DbGrant,
+  DefaultGrant,
   PgRole,
   ProjectConnectionStatus,
   RoleSpec,
+  SchemaGrant,
   SchemaObject,
   TableGrant,
 } from "@/types";
@@ -382,6 +384,61 @@ export class PostgreSQLDriver implements DatabaseDriver {
       role_name: roleName,
       privilege,
       granted,
+    });
+  }
+  async loadSchemaTableGrants(projectId: string, roleName: string) {
+    return invoke<SchemaGrant[]>("pgsql_load_schema_table_grants", {
+      project_id: projectId,
+      role_name: roleName,
+    });
+  }
+  async loadDefaultTableGrants(projectId: string, roleName: string) {
+    return invoke<DefaultGrant[]>("pgsql_load_default_table_grants", {
+      project_id: projectId,
+      role_name: roleName,
+    });
+  }
+  async setSchemaTablePrivilege(
+    projectId: string,
+    schema: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ) {
+    return invoke<string>("pgsql_set_schema_table_privilege", {
+      project_id: projectId,
+      schema,
+      role_name: roleName,
+      privilege,
+      granted,
+    });
+  }
+  async setDefaultTablePrivilege(
+    projectId: string,
+    schema: string,
+    roleName: string,
+    privilege: string,
+    granted: boolean,
+  ) {
+    return invoke<string>("pgsql_set_default_table_privilege", {
+      project_id: projectId,
+      schema,
+      role_name: roleName,
+      privilege,
+      granted,
+    });
+  }
+  async revokeTablePrivileges(
+    projectId: string,
+    schema: string,
+    table: string,
+    roleName: string,
+  ) {
+    return invoke<string>("pgsql_revoke_table_privileges", {
+      project_id: projectId,
+      schema,
+      table,
+      role_name: roleName,
     });
   }
   async loadTableGrants(projectId: string, roleName: string) {

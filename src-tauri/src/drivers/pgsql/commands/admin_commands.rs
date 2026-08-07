@@ -1,10 +1,12 @@
 use crate::AppState;
 use crate::common::enums::AppError;
 use crate::drivers::pgsql::{
-    DbGrant, PgRole, RoleSpec, SchemaObject, TableGrant, alter_role, create_role, drop_role,
-    execute_query, extract_schema_objects, import_csv_to_table, load_available_extensions,
-    load_database_grants, load_extensions, load_pg_settings, load_roles, load_table_grants,
-    parse_csv_preview, set_database_privilege,
+    DbGrant, DefaultGrant, PgRole, RoleSpec, SchemaGrant, SchemaObject, TableGrant, alter_role,
+    create_role, drop_role, execute_query, extract_schema_objects, import_csv_to_table,
+    load_available_extensions, load_database_grants, load_default_table_grants, load_extensions,
+    load_pg_settings, load_roles, load_schema_table_grants, load_table_grants, parse_csv_preview,
+    revoke_table_privileges, set_database_privilege, set_default_table_privilege,
+    set_schema_table_privilege,
 };
 
 use tauri::ipc::Response;
@@ -147,6 +149,79 @@ pub async fn pgsql_set_database_privilege(
         "{} {privilege} on \"{database}\" {} \"{role_name}\".",
         if granted { "Granted" } else { "Revoked" },
         if granted { "to" } else { "from" },
+    ))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_schema_table_grants(
+    project_id: &str,
+    role_name: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<SchemaGrant>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+    load_schema_table_grants(&client, role_name)
+        .await
+        .map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_default_table_grants(
+    project_id: &str,
+    role_name: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<DefaultGrant>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+    load_default_table_grants(&client, role_name)
+        .await
+        .map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_set_schema_table_privilege(
+    project_id: &str,
+    schema: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    set_schema_table_privilege(&client, schema, role_name, privilege, granted).await?;
+    Ok(format!(
+        "{} {privilege} on every table in \"{schema}\".",
+        if granted { "Granted" } else { "Revoked" }
+    ))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_set_default_table_privilege(
+    project_id: &str,
+    schema: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    set_default_table_privilege(&client, schema, role_name, privilege, granted).await?;
+    Ok(format!(
+        "New tables in \"{schema}\" will {} {privilege}.",
+        if granted { "carry" } else { "no longer carry" }
+    ))
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_revoke_table_privileges(
+    project_id: &str,
+    schema: &str,
+    table: &str,
+    role_name: &str,
+    app_state: State<'_, AppState>,
+) -> Result<String> {
+    let client = acquire_client(&app_state.clients, project_id).await?;
+    revoke_table_privileges(&client, schema, table, role_name).await?;
+    Ok(format!(
+        "Revoked every privilege on \"{schema}\".\"{table}\"."
     ))
 }
 

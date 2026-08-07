@@ -224,6 +224,20 @@ export interface RoleSpec {
   member_of: string[];
 }
 
+export interface SchemaGrant {
+  schema: string;
+  privilege: string;
+  /** Relations in the schema the role holds it on, granted by name */
+  granted: number;
+  total: number;
+}
+
+export interface DefaultGrant {
+  schema: string;
+  privilege: string;
+  granted: boolean;
+}
+
 export interface TableGrant {
   schema: string;
   table: string;

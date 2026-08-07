@@ -215,6 +215,198 @@ pub struct TableGrant {
     pub privileges: Vec<String>,
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SchemaGrant {
+    pub schema: String,
+    pub privilege: String,
+    /// Relations in the schema this role holds the privilege on, granted by name
+    pub granted: i64,
+    pub total: i64,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct DefaultGrant {
+    pub schema: String,
+    pub privilege: String,
+    pub granted: bool,
+}
+
+/// The seven privileges a table can carry, in the order the UI lays them out.
+const TABLE_PRIVILEGES: &str = "(VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE'), ('TRUNCATE'), ('REFERENCES'), ('TRIGGER'))";
+
+fn check_table_privilege(privilege: &str) -> Result<&'static str, AppError> {
+    match privilege {
+        "SELECT" => Ok("SELECT"),
+        "INSERT" => Ok("INSERT"),
+        "UPDATE" => Ok("UPDATE"),
+        "DELETE" => Ok("DELETE"),
+        "TRUNCATE" => Ok("TRUNCATE"),
+        "REFERENCES" => Ok("REFERENCES"),
+        "TRIGGER" => Ok("TRIGGER"),
+        other => Err(AppError::QueryFailed(format!(
+            "Unknown table privilege '{other}'"
+        ))),
+    }
+}
+
+/// How much of each schema this role can reach, counted over the relations that
+/// exist now. GRANT ON ALL TABLES is a batch, not a rule, so a schema drifts to
+/// a partial count as soon as anything new is created in it.
+pub async fn load_schema_table_grants(
+    client: &deadpool_postgres::Client,
+    role_name: &str,
+) -> Result<Vec<SchemaGrant>, AppError> {
+    let sql = format!(
+        "SELECT n.nspname::text,
+                p.privilege_type,
+                count(*) FILTER (WHERE EXISTS (
+                    SELECT 1 FROM aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner))) a
+                    WHERE a.grantee = r.oid AND a.privilege_type = p.privilege_type))::bigint,
+                count(*)::bigint
+         FROM pg_class c
+         JOIN pg_namespace n ON n.oid = c.relnamespace
+         CROSS JOIN {TABLE_PRIVILEGES} AS p(privilege_type)
+         CROSS JOIN (SELECT oid FROM pg_roles WHERE rolname = $1) r
+         WHERE c.relkind IN ('r', 'p', 'v', 'm', 'f')
+           AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+           AND n.nspname NOT LIKE 'pg\\_%'
+         GROUP BY 1, 2
+         ORDER BY 1, 2"
+    );
+
+    let rows = client
+        .query(&sql, &[&role_name])
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows
+        .iter()
+        .map(|row| SchemaGrant {
+            schema: row.get(0),
+            privilege: row.get(1),
+            granted: row.get(2),
+            total: row.get(3),
+        })
+        .collect())
+}
+
+/// What tables created from here on will carry. Default privileges are keyed by
+/// the role that creates the object, so these are the ones attached to the role
+/// this connection authenticates as — the only ones it can set without FOR ROLE.
+pub async fn load_default_table_grants(
+    client: &deadpool_postgres::Client,
+    role_name: &str,
+) -> Result<Vec<DefaultGrant>, AppError> {
+    let sql = format!(
+        "SELECT n.nspname::text,
+                p.privilege_type,
+                EXISTS (
+                    SELECT 1 FROM pg_default_acl d
+                    CROSS JOIN LATERAL aclexplode(d.defaclacl) a
+                    WHERE d.defaclobjtype = 'r'
+                      AND d.defaclnamespace = n.oid
+                      AND d.defaclrole = (SELECT oid FROM pg_roles WHERE rolname = current_user)
+                      AND a.grantee = r.oid
+                      AND a.privilege_type = p.privilege_type)
+         FROM pg_namespace n
+         CROSS JOIN {TABLE_PRIVILEGES} AS p(privilege_type)
+         CROSS JOIN (SELECT oid FROM pg_roles WHERE rolname = $1) r
+         WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+           AND n.nspname NOT LIKE 'pg\\_%'
+         ORDER BY 1, 2"
+    );
+
+    let rows = client
+        .query(&sql, &[&role_name])
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows
+        .iter()
+        .map(|row| DefaultGrant {
+            schema: row.get(0),
+            privilege: row.get(1),
+            granted: row.get(2),
+        })
+        .collect())
+}
+
+pub async fn set_schema_table_privilege(
+    client: &deadpool_postgres::Client,
+    schema: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+) -> Result<(), AppError> {
+    let privilege = check_table_privilege(privilege)?;
+    let sql = if granted {
+        format!(
+            "GRANT {privilege} ON ALL TABLES IN SCHEMA {} TO {}",
+            quote_ident(schema),
+            quote_ident(role_name)
+        )
+    } else {
+        format!(
+            "REVOKE {privilege} ON ALL TABLES IN SCHEMA {} FROM {}",
+            quote_ident(schema),
+            quote_ident(role_name)
+        )
+    };
+
+    client
+        .batch_execute(&sql)
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))
+}
+
+pub async fn set_default_table_privilege(
+    client: &deadpool_postgres::Client,
+    schema: &str,
+    role_name: &str,
+    privilege: &str,
+    granted: bool,
+) -> Result<(), AppError> {
+    let privilege = check_table_privilege(privilege)?;
+    let sql = if granted {
+        format!(
+            "ALTER DEFAULT PRIVILEGES IN SCHEMA {} GRANT {privilege} ON TABLES TO {}",
+            quote_ident(schema),
+            quote_ident(role_name)
+        )
+    } else {
+        format!(
+            "ALTER DEFAULT PRIVILEGES IN SCHEMA {} REVOKE {privilege} ON TABLES FROM {}",
+            quote_ident(schema),
+            quote_ident(role_name)
+        )
+    };
+
+    client
+        .batch_execute(&sql)
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))
+}
+
+/// The escape hatch for the exceptions the per-schema view cannot express.
+pub async fn revoke_table_privileges(
+    client: &deadpool_postgres::Client,
+    schema: &str,
+    table: &str,
+    role_name: &str,
+) -> Result<(), AppError> {
+    let sql = format!(
+        "REVOKE ALL PRIVILEGES ON TABLE {}.{} FROM {}",
+        quote_ident(schema),
+        quote_ident(table),
+        quote_ident(role_name)
+    );
+
+    client
+        .batch_execute(&sql)
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))
+}
+
 pub async fn load_table_grants(
     client: &deadpool_postgres::Client,
     role_name: &str,

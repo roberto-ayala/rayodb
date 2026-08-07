@@ -16,16 +16,60 @@ import { toast } from "sonner";
 import { RoleEditor } from "@/components/role-editor";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ContextMenu, useContextMenu } from "@/components/ui/context-menu";
 import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
-import type { DbGrant, PgRole, RoleSpec, TableGrant } from "@/types";
+import type { DbGrant, DefaultGrant, PgRole, RoleSpec, SchemaGrant, TableGrant } from "@/types";
 
 /** What one can hold on a database, in the order the table shows them */
 const DB_PRIVILEGES = ["CONNECT", "CREATE", "TEMPORARY"] as const;
 
 /** Shared by the grant header and its rows so the two line up */
 const GRANT_COLUMNS = "grid grid-cols-[8rem_12rem_1fr] items-start";
+
+/** Schema, what the row applies to, then one narrow column per privilege */
+const PRIV_COLUMNS = "grid grid-cols-[1fr_7rem_repeat(7,3.25rem)] items-center";
+
+/** The seven a table can carry, in the order the matrix lays them out */
+const TABLE_PRIVILEGES = [
+  "SELECT",
+  "INSERT",
+  "UPDATE",
+  "DELETE",
+  "TRUNCATE",
+  "REFERENCES",
+  "TRIGGER",
+] as const;
+
+/**
+ * A checkbox that can also say "some": granting on a schema reaches the tables
+ * that exist at that moment, so a schema drifts to partial as soon as one is
+ * created. Clicking a partial box grants the rest.
+ */
+function TriStateBox({
+  state,
+  disabled,
+  title,
+  onChange,
+}: {
+  state: "none" | "some" | "all";
+  disabled?: boolean;
+  title?: string;
+  onChange: (granted: boolean) => void;
+}) {
+  return (
+    <Checkbox
+      ref={(el) => {
+        if (el) el.indeterminate = state === "some";
+      }}
+      checked={state === "all"}
+      disabled={disabled}
+      title={title}
+      onChange={() => onChange(state !== "all")}
+    />
+  );
+}
 
 interface RolesPanelProps {
   projectId: string;
@@ -41,7 +85,10 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
   const [editing, setEditing] = useState<PgRole | null>(null);
   const [confirmDrop, setConfirmDrop] = useState(false);
   const [savingGrant, setSavingGrant] = useState(false);
+  const [schemaGrants, setSchemaGrants] = useState<SchemaGrant[]>([]);
+  const [defaultGrants, setDefaultGrants] = useState<DefaultGrant[]>([]);
   const projects = useProjectStore((s) => s.projects);
+  const { menu, showMenu, closeMenu } = useContextMenu();
 
   const driver = projects[projectId] ? DriverFactory.getDriver(projects[projectId].driver) : null;
 
@@ -64,17 +111,25 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       setSelectedRole(name);
       setConfirmDrop(false);
       if (!driver) return;
-      const [tg, dg] = await Promise.all([
+      const [tg, dg, sg, defg] = await Promise.all([
         driver.loadTableGrants?.(projectId, name) ?? Promise.resolve([]),
         driver.loadDatabaseGrants?.(projectId, name) ?? Promise.resolve([]),
+        driver.loadSchemaTableGrants?.(projectId, name) ?? Promise.resolve([]),
+        driver.loadDefaultTableGrants?.(projectId, name) ?? Promise.resolve([]),
       ]);
       setTableGrants(tg);
       setDbGrants(dg);
+      setSchemaGrants(sg);
+      setDefaultGrants(defg);
     },
     [driver, projectId],
   );
 
   const databases = Array.from(new Set(dbGrants.map((g) => g.database)));
+  // Both listings cover every schema, so either one names them all
+  const schemaNames = Array.from(
+    new Set([...schemaGrants.map((g) => g.schema), ...defaultGrants.map((g) => g.schema)]),
+  ).sort();
 
   const toggleGrant = useCallback(
     async (database: string, privilege: string, granted: boolean) => {
@@ -94,6 +149,83 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
       }
     },
     [driver, projectId, selectedRole],
+  );
+
+  const reloadTablePrivileges = useCallback(
+    async (role: string) => {
+      if (!driver) return;
+      const [tg, sg, defg] = await Promise.all([
+        driver.loadTableGrants?.(projectId, role) ?? Promise.resolve([]),
+        driver.loadSchemaTableGrants?.(projectId, role) ?? Promise.resolve([]),
+        driver.loadDefaultTableGrants?.(projectId, role) ?? Promise.resolve([]),
+      ]);
+      setTableGrants(tg);
+      setSchemaGrants(sg);
+      setDefaultGrants(defg);
+    },
+    [driver, projectId],
+  );
+
+  /** Runs a privilege change and refreshes what it touched, reporting failures */
+  const runPrivilegeChange = useCallback(
+    async (label: string, change: () => Promise<string | undefined>, role: string) => {
+      setSavingGrant(true);
+      try {
+        const message = await change();
+        await reloadTablePrivileges(role);
+        if (message) toast.success(message);
+      } catch (err: unknown) {
+        toast.error(label, {
+          description: err instanceof Error ? err.message : String(err),
+          duration: 10000,
+        });
+      } finally {
+        setSavingGrant(false);
+      }
+    },
+    [reloadTablePrivileges],
+  );
+
+  const toggleSchemaGrant = useCallback(
+    (schema: string, privilege: string, granted: boolean) => {
+      if (!driver || !selectedRole) return;
+      void runPrivilegeChange(
+        `Could not change ${privilege} on "${schema}"`,
+        () =>
+          driver.setSchemaTablePrivilege?.(projectId, schema, selectedRole, privilege, granted) ??
+          Promise.resolve(undefined),
+        selectedRole,
+      );
+    },
+    [driver, projectId, selectedRole, runPrivilegeChange],
+  );
+
+  const toggleDefaultGrant = useCallback(
+    (schema: string, privilege: string, granted: boolean) => {
+      if (!driver || !selectedRole) return;
+      void runPrivilegeChange(
+        `Could not change the default ${privilege} in "${schema}"`,
+        () =>
+          driver.setDefaultTablePrivilege?.(projectId, schema, selectedRole, privilege, granted) ??
+          Promise.resolve(undefined),
+        selectedRole,
+      );
+    },
+    [driver, projectId, selectedRole, runPrivilegeChange],
+  );
+
+  const revokeOnTable = useCallback(
+    (schema: string, table: string) => {
+      if (!driver || !selectedRole) return;
+      void runPrivilegeChange(
+        `Could not revoke on "${schema}"."${table}"`,
+        () =>
+          driver.revokeTablePrivileges?.(projectId, schema, table, selectedRole) ??
+          Promise.resolve(undefined),
+        selectedRole,
+      );
+    },
+    [driver, projectId, selectedRole, runPrivilegeChange],
   );
 
   const saveRole = useCallback(
@@ -397,6 +529,87 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
               </p>
             </div>
 
+            {/* Table access by schema */}
+            <div>
+              <div className="mb-2 text-3xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Table Access
+              </div>
+              <div className="overflow-hidden rounded-lg border border-border/60">
+                <div className={cn(PRIV_COLUMNS, "bg-muted text-xs text-muted-foreground")}>
+                  <span className="px-3 py-1.5 font-medium">Schema</span>
+                  <span className="px-3 py-1.5 font-medium">Applies to</span>
+                  {TABLE_PRIVILEGES.map((p) => (
+                    <span key={p} className="px-2 py-1.5 text-center font-medium" title={p}>
+                      {p.slice(0, 3)}
+                    </span>
+                  ))}
+                </div>
+
+                {schemaNames.map((schema) => {
+                  const stateOf = (privilege: string) => {
+                    const g = schemaGrants.find(
+                      (x) => x.schema === schema && x.privilege === privilege,
+                    );
+                    if (!g || g.granted === 0) return "none" as const;
+                    return g.granted >= g.total ? ("all" as const) : ("some" as const);
+                  };
+                  const counts = (privilege: string) => {
+                    const g = schemaGrants.find(
+                      (x) => x.schema === schema && x.privilege === privilege,
+                    );
+                    return g ? `${g.granted} of ${g.total} tables` : "no tables";
+                  };
+
+                  return (
+                    <div key={schema} className="border-t border-border/60">
+                      <div className={cn(PRIV_COLUMNS, "text-xs")}>
+                        <span className="truncate px-3 py-1 font-medium" title={schema}>
+                          {schema}
+                        </span>
+                        <span className="px-3 py-1 text-muted-foreground">Existing tables</span>
+                        {TABLE_PRIVILEGES.map((p) => (
+                          <span key={p} className="flex justify-center px-2 py-1">
+                            <TriStateBox
+                              state={stateOf(p)}
+                              disabled={savingGrant}
+                              title={counts(p)}
+                              onChange={(granted) => toggleSchemaGrant(schema, p, granted)}
+                            />
+                          </span>
+                        ))}
+                      </div>
+                      {/* GRANT reaches what exists; only default privileges
+                          reach what has not been created yet */}
+                      <div className={cn(PRIV_COLUMNS, "text-xs")}>
+                        <span className="px-3 py-1" />
+                        <span className="px-3 py-1 text-muted-foreground">New tables</span>
+                        {TABLE_PRIVILEGES.map((p) => (
+                          <span key={p} className="flex justify-center px-2 py-1">
+                            <TriStateBox
+                              state={
+                                defaultGrants.find((x) => x.schema === schema && x.privilege === p)
+                                  ?.granted
+                                  ? "all"
+                                  : "none"
+                              }
+                              disabled={savingGrant}
+                              title={`Tables created in ${schema} from now on`}
+                              onChange={(granted) => toggleDefaultGrant(schema, p, granted)}
+                            />
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-3xs text-muted-foreground/60">
+                Granting on a schema reaches the tables that exist now — a partial box means new
+                ones appeared since. "New tables" sets the default privileges that tables created
+                from this connection will carry.
+              </p>
+            </div>
+
             {/* Table grants */}
             {tableGrants.length === 0 ? (
               <div>
@@ -426,9 +639,24 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
                   </div>
                   <div className="max-h-[300px] overflow-y-auto">
                     {tableGrants.map((g) => (
+                      // biome-ignore lint/a11y/noStaticElementInteractions: the row is a listing; only its context menu acts
                       <div
                         key={`${g.schema}.${g.table}`}
-                        className={cn(GRANT_COLUMNS, "border-t border-border/60 text-xs")}
+                        className={cn(
+                          GRANT_COLUMNS,
+                          "border-t border-border/60 text-xs hover:bg-muted/30",
+                        )}
+                        onContextMenu={(e) =>
+                          showMenu(e, [
+                            { header: `${g.schema}.${g.table}` },
+                            {
+                              label: "Revoke all privileges",
+                              icon: <ShieldX className="h-3 w-3" />,
+                              onClick: () => revokeOnTable(g.schema, g.table),
+                              destructive: true,
+                            },
+                          ])
+                        }
                       >
                         <span className="truncate px-3 py-1 text-muted-foreground">{g.schema}</span>
                         <span className="truncate px-3 py-1">{g.table}</span>
@@ -455,6 +683,8 @@ export function RolesPanel({ projectId }: RolesPanelProps) {
           </div>
         )}
       </div>
+
+      {menu && <ContextMenu x={menu.x} y={menu.y} items={menu.items} onClose={closeMenu} />}
 
       <RoleEditor
         open={editorOpen}

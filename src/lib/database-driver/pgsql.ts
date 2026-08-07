@@ -13,6 +13,7 @@ import type {
   WirePackedResult,
   WirePolicyDetail,
   WireRuleDetail,
+  WireSequenceInfo,
   WireTableInfo,
   WireTriggerDetail,
   WireTriggerFunctionInfo,
@@ -25,6 +26,7 @@ import {
   parseIndexDetails,
   parsePolicyDetails,
   parseRuleDetails,
+  parseSequenceInfo,
   parseTriggerDetails,
   parseTriggerFunctionInfo,
   ROW_SEP,
@@ -42,6 +44,9 @@ export class PostgreSQLDriver implements DatabaseDriver {
       key,
       ssh: ssh ?? null,
     });
+  }
+  async disconnect(projectId: string) {
+    await invoke("pgsql_disconnect", { project_id: projectId });
   }
   async cancelQuery(projectId: string) {
     return invoke<boolean>("pgsql_cancel_query", { project_id: projectId });
@@ -108,6 +113,13 @@ export class PostgreSQLDriver implements DatabaseDriver {
   }
   async loadMaterializedViews(projectId: string, schema: string) {
     return invoke<string[]>("pgsql_load_materialized_views", { project_id: projectId, schema });
+  }
+  async loadSequences(projectId: string, schema: string) {
+    const wire = await invoke<WireSequenceInfo[]>("pgsql_load_sequences", {
+      project_id: projectId,
+      schema,
+    });
+    return parseSequenceInfo(wire);
   }
   async loadFunctions(projectId: string, schema: string) {
     const wire = await invoke<WireFunctionInfo[]>("pgsql_load_functions", {

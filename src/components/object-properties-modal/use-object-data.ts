@@ -27,6 +27,7 @@ export function useObjectData(
   const projects = useProjectStore((s) => s.projects);
   const storeLoadColumnDetails = useProjectStore((s) => s.loadColumnDetails);
   const storeLoadIndexes = useProjectStore((s) => s.loadIndexes);
+  const storeLoadTableMetadata = useProjectStore((s) => s.loadTableMetadata);
 
   const metaKey = `${projectId}::${schema}::${name}`;
 
@@ -55,6 +56,9 @@ export function useObjectData(
         if (!indexes[metaKey]) {
           storeLoadIndexes(projectId, schema, name).catch(() => {});
         }
+        // Constraints, triggers, rules and policies are only shown here, so
+        // this modal is what pays for loading them.
+        storeLoadTableMetadata(projectId, schema, name).catch(() => {});
 
         if (statsResult.status === "fulfilled" && statsResult.value) {
           const statsMap = Object.fromEntries(statsResult.value);
@@ -148,6 +152,7 @@ export function useObjectData(
     metaKey,
     storeLoadColumnDetails,
     storeLoadIndexes,
+    storeLoadTableMetadata,
   ]);
 
   useEffect(() => {

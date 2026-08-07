@@ -2,15 +2,12 @@ import type React from "react";
 import type { ContextMenuEntry } from "@/components/ui/context-menu";
 import type {
   ColumnDetail,
-  ConstraintDetail,
   FunctionInfo,
   IndexDetail,
-  PolicyDetail,
   ProjectConnectionStatus,
   ProjectMap,
-  RuleDetail,
+  SequenceInfo,
   TableInfo,
-  TriggerDetail,
   TriggerFunctionInfo,
 } from "@/types";
 
@@ -44,16 +41,14 @@ export interface SidebarRenderCtx {
   tables: Record<string, TableInfo[]>;
   columnDetails: Record<string, ColumnDetail[]>;
   indexes: Record<string, IndexDetail[]>;
-  constraints: Record<string, ConstraintDetail[]>;
-  triggers: Record<string, TriggerDetail[]>;
-  rules: Record<string, RuleDetail[]>;
-  policies: Record<string, PolicyDetail[]>;
   views: Record<string, string[]>;
   materializedViews: Record<string, string[]>;
+  sequences: Record<string, SequenceInfo[]>;
   functions: Record<string, FunctionInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
 
   connect: (projectId: string) => Promise<void>;
+  disconnect: (projectId: string) => Promise<void>;
   loadColumns: (projectId: string, schema: string, table: string) => Promise<string[]>;
   refreshConnection: (projectId: string) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
@@ -75,12 +70,15 @@ export interface SidebarRenderCtx {
   setAddDbSource: (id: string | null) => void;
   openProperties: (objectType: ObjectKind, projectId: string, schema: string, name: string) => void;
 
-  toggle: (key: string) => void;
+  toggle: (key: string, defaultOpen?: boolean) => void;
   isOpen: (key: string, defaultOpen?: boolean) => boolean;
   onConnect: (projectId: string) => Promise<void>;
-  onExpandSchema: (projectId: string, schema: string) => Promise<void>;
-  onExpandTable: (projectId: string, schema: string, table: string) => Promise<void>;
+  onDisconnect: (projectId: string) => Promise<void>;
+  onExpandSchema: (projectId: string, schema: string) => void;
+  onExpandTable: (projectId: string, schema: string, table: string) => void;
   onOpenTableQuery: (projectId: string, schema: string, table: string) => void;
+  onPreviewTableQuery: (projectId: string, schema: string, table: string) => void;
+  onPinPreview: () => void;
 
   copy: (text: string) => void;
   showMenu: (e: React.MouseEvent, items: ContextMenuEntry[]) => void;

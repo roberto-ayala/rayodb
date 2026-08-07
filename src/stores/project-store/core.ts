@@ -1,7 +1,11 @@
+import { toast } from "sonner";
 import type { StateCreator } from "zustand";
+import { useQueryStore } from "@/stores/query-store";
+import { useTabStore } from "@/stores/tab-store";
 import { deleteProject as deleteProjectApi, getProjects, insertProject } from "@/tauri";
 import type { DriverType, ProjectConnectionStatus, ProjectDetails, ProjectMap } from "@/types";
 import { ProjectConnectionStatus as PCS } from "@/types";
+import { clearProjectMetadata } from "./connection";
 import type { ProjectState } from "./index";
 
 export type CoreSlice = {
@@ -12,6 +16,7 @@ export type CoreSlice = {
   deleteProject: (projectId: string) => Promise<void>;
   saveConnection: (name: string, details: ProjectDetails) => Promise<void>;
   updateConnection: (name: string, details: ProjectDetails) => Promise<void>;
+  renameConnection: (oldName: string, newName: string, details: ProjectDetails) => Promise<void>;
   addDatabaseToServer: (sourceProjectId: string, name: string, database: string) => Promise<void>;
 };
 
@@ -30,7 +35,27 @@ export function parseProjectDetails(arr: string[]): ProjectDetails {
     sshUser: arr[10] ?? "",
     sshPassword: arr[11] ?? "",
     sshKeyPath: arr[12] ?? "",
+    autoConnect: arr[13] ?? "false",
   };
+}
+
+function serializeProjectDetails(details: ProjectDetails): string[] {
+  return [
+    details.driver,
+    details.username,
+    details.password,
+    details.database,
+    details.host,
+    details.port,
+    details.ssl,
+    details.sshEnabled ?? "false",
+    details.sshHost ?? "",
+    details.sshPort ?? "22",
+    details.sshUser ?? "",
+    details.sshPassword ?? "",
+    details.sshKeyPath ?? "",
+    details.autoConnect ?? "false",
+  ];
 }
 
 export const createCoreSlice: StateCreator<
@@ -78,43 +103,49 @@ export const createCoreSlice: StateCreator<
   },
 
   saveConnection: async (name: string, details: ProjectDetails) => {
-    const arr = [
-      details.driver,
-      details.username,
-      details.password,
-      details.database,
-      details.host,
-      details.port,
-      details.ssl,
-      details.sshEnabled ?? "false",
-      details.sshHost ?? "",
-      details.sshPort ?? "22",
-      details.sshUser ?? "",
-      details.sshPassword ?? "",
-      details.sshKeyPath ?? "",
-    ];
-    await insertProject(name, arr);
+    await insertProject(name, serializeProjectDetails(details));
     await get().loadProjects();
   },
 
   updateConnection: async (name: string, details: ProjectDetails) => {
-    const arr = [
-      details.driver,
-      details.username,
-      details.password,
-      details.database,
-      details.host,
-      details.port,
-      details.ssl,
-      details.sshEnabled ?? "false",
-      details.sshHost ?? "",
-      details.sshPort ?? "22",
-      details.sshUser ?? "",
-      details.sshPassword ?? "",
-      details.sshKeyPath ?? "",
-    ];
-    await insertProject(name, arr);
+    await insertProject(name, serializeProjectDetails(details));
     await get().loadProjects();
+  },
+
+  /**
+   * The connection name is its primary key, so renaming means moving the row —
+   * and everything keyed by it: the live pools, the cached schema tree, the open
+   * tabs and the saved queries.
+   */
+  renameConnection: async (oldName: string, newName: string, details: ProjectDetails) => {
+    if (oldName === newName) {
+      await get().updateConnection(newName, details);
+      return;
+    }
+    if (get().projects[newName]) {
+      toast.error(`A connection named "${newName}" already exists`);
+      return;
+    }
+
+    const wasConnected = get().status[oldName] === PCS.Connected;
+    if (wasConnected || get().status[oldName] === PCS.Connecting) {
+      await get().disconnect(oldName);
+    }
+
+    await insertProject(newName, serializeProjectDetails(details));
+    await deleteProjectApi(oldName);
+    await get().loadProjects();
+
+    set((s) => {
+      delete s.status[oldName];
+      delete s.connectionErrors[oldName];
+      clearProjectMetadata(s, oldName);
+    });
+
+    useTabStore.getState().remapProjectId(oldName, newName);
+    await useQueryStore.getState().remapProject(oldName, newName);
+
+    if (wasConnected) await get().connect(newName);
   },
 
   addDatabaseToServer: async (sourceProjectId: string, name: string, database: string) => {

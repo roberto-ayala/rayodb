@@ -6,8 +6,38 @@ import type { ProjectState } from "./index";
 
 export type ConnectionSlice = {
   connect: (projectId: string) => Promise<void>;
+  disconnect: (projectId: string) => Promise<void>;
   refreshConnection: (projectId: string) => Promise<void>;
 };
+
+/** Drop every cached schema object belonging to a project. */
+export function clearProjectMetadata(s: ProjectState, projectId: string) {
+  const schemaPrefix = `${projectId}::`;
+  const scoped = [
+    s.tables,
+    s.columns,
+    s.columnDetails,
+    s.indexes,
+    s.constraints,
+    s.triggers,
+    s.rules,
+    s.policies,
+    s.views,
+    s.materializedViews,
+    s.sequences,
+    s.functions,
+    s.triggerFunctions,
+  ] as Record<string, unknown>[];
+  for (const bucket of scoped) {
+    for (const key of Object.keys(bucket)) {
+      if (key.startsWith(schemaPrefix)) delete bucket[key];
+    }
+  }
+
+  delete s.schemas[projectId];
+  delete s.serverDatabases[projectId];
+  delete s.serverTablespaces[projectId];
+}
 
 export const createConnectionSlice: StateCreator<
   ProjectState,
@@ -71,6 +101,27 @@ export const createConnectionSlice: StateCreator<
     }
   },
 
+  disconnect: async (projectId: string) => {
+    const { projects } = get();
+    const d = projects[projectId];
+    if (!d) return;
+
+    try {
+      await DriverFactory.getDriver(d.driver).disconnect(projectId);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : typeof err === "string" ? err : "Disconnect failed";
+      toast.error(`Failed to disconnect: ${d.database || projectId}`, { description: msg });
+      return;
+    }
+
+    set((s) => {
+      s.status[projectId] = PCS.Disconnected;
+      s.connectionErrors[projectId] = "";
+      clearProjectMetadata(s, projectId);
+    });
+  },
+
   refreshConnection: async (projectId: string) => {
     const { projects, status, tables } = get();
     const d = projects[projectId];
@@ -83,46 +134,7 @@ export const createConnectionSlice: StateCreator<
       .map((k) => k.slice(schemaPrefix.length));
 
     set((s) => {
-      for (const key of Object.keys(s.tables)) {
-        if (key.startsWith(schemaPrefix)) delete s.tables[key];
-      }
-      for (const key of Object.keys(s.columns)) {
-        if (key.startsWith(schemaPrefix)) delete s.columns[key];
-      }
-      for (const key of Object.keys(s.columnDetails)) {
-        if (key.startsWith(schemaPrefix)) delete s.columnDetails[key];
-      }
-      for (const key of Object.keys(s.indexes)) {
-        if (key.startsWith(schemaPrefix)) delete s.indexes[key];
-      }
-      for (const key of Object.keys(s.constraints)) {
-        if (key.startsWith(schemaPrefix)) delete s.constraints[key];
-      }
-      for (const key of Object.keys(s.triggers)) {
-        if (key.startsWith(schemaPrefix)) delete s.triggers[key];
-      }
-      for (const key of Object.keys(s.rules)) {
-        if (key.startsWith(schemaPrefix)) delete s.rules[key];
-      }
-      for (const key of Object.keys(s.policies)) {
-        if (key.startsWith(schemaPrefix)) delete s.policies[key];
-      }
-      for (const key of Object.keys(s.views)) {
-        if (key.startsWith(schemaPrefix)) delete s.views[key];
-      }
-      for (const key of Object.keys(s.materializedViews)) {
-        if (key.startsWith(schemaPrefix)) delete s.materializedViews[key];
-      }
-      for (const key of Object.keys(s.functions)) {
-        if (key.startsWith(schemaPrefix)) delete s.functions[key];
-      }
-      for (const key of Object.keys(s.triggerFunctions)) {
-        if (key.startsWith(schemaPrefix)) delete s.triggerFunctions[key];
-      }
-
-      delete s.schemas[projectId];
-      delete s.serverDatabases[projectId];
-      delete s.serverTablespaces[projectId];
+      clearProjectMetadata(s, projectId);
     });
 
     try {

@@ -90,9 +90,10 @@ export const createSchemaSlice: StateCreator<
     const d = projects[projectId];
     if (!d) return;
     const driver = DriverFactory.getDriver(d.driver);
-    const [vR, mvR, fnR, tfnR] = await Promise.allSettled([
+    const [vR, mvR, seqR, fnR, tfnR] = await Promise.allSettled([
       driver.loadViews(projectId, schema),
       driver.loadMaterializedViews(projectId, schema),
+      driver.loadSequences(projectId, schema),
       driver.loadFunctions(projectId, schema),
       driver.loadTriggerFunctions(projectId, schema),
     ]);
@@ -103,6 +104,7 @@ export const createSchemaSlice: StateCreator<
     set((s) => {
       s.views[key] = val(vR, []);
       s.materializedViews[key] = val(mvR, []);
+      s.sequences[key] = val(seqR, []);
       s.functions[key] = val(fnR, []);
       s.triggerFunctions[key] = val(tfnR, []);
     });

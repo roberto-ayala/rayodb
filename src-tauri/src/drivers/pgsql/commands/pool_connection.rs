@@ -8,7 +8,7 @@ use crate::drivers::pgsql::get_pool;
 
 use native_tls::TlsConnector;
 use postgres_native_tls::MakeTlsConnector;
-use tauri::{AppHandle, Manager, Result};
+use tauri::{AppHandle, Manager, Result, State};
 use tokio_postgres::{CancelToken, Config, NoTls};
 
 pub(crate) fn is_sqlite_lock_error(message: &str) -> bool {
@@ -275,4 +275,39 @@ pub async fn pgsql_connector(
     }
 
     Ok(ProjectConnectionStatus::Connected)
+}
+
+/// Tear down every resource tied to a project: both pools, the cancel token,
+/// the SSL flag, any LISTEN task and the SSH tunnel that fronted the server.
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_disconnect(
+    project_id: &str,
+    app_state: State<'_, AppState>,
+) -> Result<ProjectConnectionStatus> {
+    app_state.clients.lock().await.remove(project_id);
+    app_state.meta_clients.lock().await.remove(project_id);
+    app_state.cancel_tokens.lock().await.remove(project_id);
+    app_state.client_ssl.lock().await.remove(project_id);
+
+    {
+        // LISTEN handles are keyed as "<project_id>:<channel>".
+        let mut handles = app_state.notify_handles.lock().await;
+        let prefix = format!("{}:", project_id);
+        let keys: Vec<String> = handles
+            .keys()
+            .filter(|k| k.starts_with(&prefix))
+            .cloned()
+            .collect();
+        for key in keys {
+            if let Some(handle) = handles.remove(&key) {
+                handle.abort();
+            }
+        }
+    }
+
+    if let Some(tunnel) = app_state.ssh_tunnels.lock().await.remove(project_id) {
+        tunnel.stop();
+    }
+
+    Ok(ProjectConnectionStatus::Disconnected)
 }

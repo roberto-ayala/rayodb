@@ -58,19 +58,19 @@ export function DriverDisplay({ driver }: DriverDisplayProps) {
 interface NameFieldProps {
   value: string;
   onChange: (value: string) => void;
-  disabled: boolean;
+  error?: string;
 }
 
-export function NameField({ value, onChange, disabled }: NameFieldProps) {
+export function NameField({ value, onChange, error }: NameFieldProps) {
   return (
-    <Field label="Connection Name" htmlFor="name">
+    <Field label="Connection Name" htmlFor="name" error={error}>
       <Input
         id="name"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="production-db"
         required
-        disabled={disabled}
+        className={error ? "border-destructive" : undefined}
       />
     </Field>
   );
@@ -172,4 +172,20 @@ interface SslCheckboxProps {
 
 export function SslCheckbox({ checked, onChange }: SslCheckboxProps) {
   return <CheckboxField id="ssl" label="Use SSL" checked={checked} onChange={onChange} />;
+}
+
+interface AutoConnectCheckboxProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+export function AutoConnectCheckbox({ checked, onChange }: AutoConnectCheckboxProps) {
+  return (
+    <CheckboxField
+      id="auto-connect"
+      label="Connect on startup"
+      checked={checked}
+      onChange={onChange}
+    />
+  );
 }

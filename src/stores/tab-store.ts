@@ -8,11 +8,28 @@ function genTabId(): string {
   return `tab-${nextId++}-${Date.now()}`;
 }
 
+/** "Query N", picking up where the highest existing one left off */
+function nextQueryTitle(tabs: Tab[]): string {
+  let highest = 0;
+  for (const tab of tabs) {
+    const match = /^Query (\d+)$/.exec(tab.title);
+    if (match) highest = Math.max(highest, Number(match[1]));
+  }
+  return `Query ${highest + 1}`;
+}
+
+export interface OpenTabOptions {
+  /** Reuse the current preview tab instead of adding one, and stay replaceable */
+  preview?: boolean;
+  title?: string;
+}
+
 interface TabState {
   tabs: Tab[];
   selectedTabIndex: number;
 
-  openTab: (projectId?: string, editorValue?: string) => void;
+  openTab: (projectId?: string, editorValue?: string, options?: OpenTabOptions) => void;
+  pinTab: (index: number) => void;
   openMonitorTab: (projectId: string) => void;
   openERDTab: (projectId: string, schema: string) => void;
   openTerminalTab: () => void;
@@ -32,6 +49,7 @@ interface TabState {
   setResult: (index: number, result: QueryResult) => void;
   setExecuting: (index: number, executing: boolean) => void;
   setProjectId: (index: number, projectId: string) => void;
+  remapProjectId: (oldProjectId: string, newProjectId: string) => void;
   setExplainResult: (index: number, plan: ExplainPlan | undefined) => void;
   setVirtualQuery: (index: number, vq: VirtualQuery | undefined) => void;
   toggleSplit: (index: number) => void;
@@ -83,19 +101,46 @@ export const useTabStore = create<TabState>()(
       ],
       selectedTabIndex: 0,
 
-      openTab: (projectId?: string, editorValue: string = "") => {
+      openTab: (projectId?: string, editorValue: string = "", options?: OpenTabOptions) => {
         set((s) => {
+          const title = options?.title ?? nextQueryTitle(s.tabs);
+
+          // Browsing the tree should cost one tab, not one per click: the
+          // previous preview is overwritten unless something pinned it.
+          const previewIndex = options?.preview ? s.tabs.findIndex((t) => t.preview) : -1;
+          if (previewIndex >= 0) {
+            const { id } = s.tabs[previewIndex];
+            s.tabs[previewIndex] = {
+              id,
+              type: "query",
+              projectId,
+              title,
+              editorValue,
+              isExecuting: false,
+              preview: true,
+            };
+            s.selectedTabIndex = previewIndex;
+            return;
+          }
+
           s.tabs.push({
             id: genTabId(),
             type: "query",
             projectId,
-            title: `Query ${s.tabs.length + 1}`,
+            title,
             editorValue,
             isExecuting: false,
+            preview: options?.preview,
           });
           s.selectedTabIndex = s.tabs.length - 1;
         });
       },
+
+      pinTab: (index) =>
+        set((s) => {
+          const tab = s.tabs[index];
+          if (tab) tab.preview = false;
+        }),
 
       openMonitorTab: (projectId) => set(makeSingletonTab("monitor", projectId, "Monitor")),
       openERDTab: (projectId, schema) =>
@@ -159,7 +204,13 @@ export const useTabStore = create<TabState>()(
 
       updateContent: (index, value) =>
         set((s) => {
-          s.tabs[index].editorValue = value;
+          const tab = s.tabs[index];
+          // Editing makes the tab yours, and its object name stops describing it
+          if (tab.preview) {
+            tab.preview = false;
+            tab.title = nextQueryTitle(s.tabs);
+          }
+          tab.editorValue = value;
         }),
       updateResult: (index, result) =>
         set((s) => {
@@ -179,11 +230,19 @@ export const useTabStore = create<TabState>()(
         }),
       setExecuting: (index, executing) =>
         set((s) => {
+          // Running the query is commitment enough to keep the tab around
+          if (executing) s.tabs[index].preview = false;
           s.tabs[index].isExecuting = executing;
         }),
       setProjectId: (index, projectId) =>
         set((s) => {
           s.tabs[index].projectId = projectId;
+        }),
+      remapProjectId: (oldProjectId, newProjectId) =>
+        set((s) => {
+          for (const tab of s.tabs) {
+            if (tab.projectId === oldProjectId) tab.projectId = newProjectId;
+          }
         }),
       setExplainResult: (index, plan) =>
         set((s) => {

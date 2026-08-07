@@ -6,6 +6,7 @@ import type { DriverType, ProjectDetails } from "@/types";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import {
+  AutoConnectCheckbox,
   ConnStringField,
   DatabaseField,
   DriverDisplay,
@@ -22,6 +23,7 @@ interface ConnectionModalProps {
   onOpenChange: (open: boolean) => void;
   onSave: (connection: ConnectionConfig) => void;
   editData?: { name: string; details: ProjectDetails } | null;
+  existingNames: string[];
 }
 
 export interface ConnectionConfig {
@@ -40,6 +42,7 @@ export interface ConnectionConfig {
   sshUser: string;
   sshPassword: string;
   sshKeyPath: string;
+  autoConnect: boolean;
 }
 
 const defaultForm: Omit<ConnectionConfig, "id"> = {
@@ -57,6 +60,7 @@ const defaultForm: Omit<ConnectionConfig, "id"> = {
   sshUser: "",
   sshPassword: "",
   sshKeyPath: "",
+  autoConnect: false,
 };
 
 function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id">> | null {
@@ -84,7 +88,13 @@ function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id"
   }
 }
 
-export function ConnectionModal({ open, onOpenChange, onSave, editData }: ConnectionModalProps) {
+export function ConnectionModal({
+  open,
+  onOpenChange,
+  onSave,
+  editData,
+  existingNames,
+}: ConnectionModalProps) {
   const [formData, setFormData] = useState<Omit<ConnectionConfig, "id">>(defaultForm);
   const [connString, setConnString] = useState("");
   const [connStringError, setConnStringError] = useState(false);
@@ -108,6 +118,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
         sshUser: editData.details.sshUser || "",
         sshPassword: editData.details.sshPassword || "",
         sshKeyPath: editData.details.sshKeyPath || "",
+        autoConnect: editData.details.autoConnect === "true",
       });
       setConnString("");
       setConnStringError(false);
@@ -133,6 +144,8 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
   };
 
   const isEditing = !!editData;
+  const name = formData.name.trim();
+  const nameTaken = name !== editData?.name && existingNames.includes(name);
 
   const handleTestConnection = async () => {
     setTesting(true);
@@ -158,8 +171,10 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (nameTaken) return;
     const connection: ConnectionConfig = {
       ...formData,
+      name,
       id: editData ? editData.name : `conn-${Date.now()}`,
     };
     onSave(connection);
@@ -192,7 +207,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             <NameField
               value={formData.name}
               onChange={(value) => setFormData({ ...formData, name: value })}
-              disabled={isEditing}
+              error={nameTaken ? "A connection with this name already exists" : undefined}
             />
 
             <HostPortFields
@@ -220,6 +235,11 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
             <SslCheckbox
               checked={formData.ssl}
               onChange={(checked) => setFormData({ ...formData, ssl: checked })}
+            />
+
+            <AutoConnectCheckbox
+              checked={formData.autoConnect}
+              onChange={(checked) => setFormData({ ...formData, autoConnect: checked })}
             />
 
             <SshConfig
@@ -275,7 +295,7 @@ export function ConnectionModal({ open, onOpenChange, onSave, editData }: Connec
               >
                 Cancel
               </Button>
-              <Button type="submit" variant="default" className="text-xs">
+              <Button type="submit" variant="default" className="text-xs" disabled={nameTaken}>
                 {isEditing ? "Save Changes" : "Connect"}
               </Button>
             </div>

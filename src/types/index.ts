@@ -12,6 +12,7 @@ export interface ProjectDetails {
   sshUser: string;
   sshPassword: string;
   sshKeyPath: string;
+  autoConnect: string;
 }
 
 export type DriverType = "PGSQL";
@@ -38,6 +39,8 @@ export interface Tab {
   title: string;
   editorValue: string;
   isExecuting: boolean;
+  /** Opened by a single click in the tree: the next preview replaces it */
+  preview?: boolean;
   result?: QueryResult;
   /** Set when the last run failed; a failure is not a result set */
   queryError?: { message: string; cancelled?: boolean };
@@ -139,6 +142,12 @@ export interface PolicyDetail {
   policyName: string;
   permissive: string;
   command: string;
+}
+
+export interface SequenceInfo {
+  name: string;
+  /** Current value, or "-" when the sequence has never been read */
+  lastValue: string;
 }
 
 export interface FunctionInfo {

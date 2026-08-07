@@ -47,7 +47,7 @@ export default function App() {
 
   const projects = useProjectStore((s) => s.projects);
   const saveConnection = useProjectStore((s) => s.saveConnection);
-  const updateConnection = useProjectStore((s) => s.updateConnection);
+  const renameConnection = useProjectStore((s) => s.renameConnection);
 
   const selectedTabIndex = useTabStore((s) => s.selectedTabIndex);
   const activeTab = useActiveTab();
@@ -80,6 +80,7 @@ export default function App() {
       sshUser?: string;
       sshPassword?: string;
       sshKeyPath?: string;
+      autoConnect?: boolean;
     }) => {
       const details = {
         driver: connection.driver as "PGSQL",
@@ -95,15 +96,17 @@ export default function App() {
         sshUser: connection.sshUser ?? "",
         sshPassword: connection.sshPassword ?? "",
         sshKeyPath: connection.sshKeyPath ?? "",
+        autoConnect: connection.autoConnect ? "true" : "false",
       };
       if (editingConnection) {
-        await updateConnection(connection.name, details);
+        // The name is the connection's key, so an edit may be a rename.
+        await renameConnection(editingConnection.name, connection.name, details);
         setEditingConnection(null);
       } else {
         await saveConnection(connection.name, details);
       }
     },
-    [saveConnection, updateConnection, editingConnection],
+    [saveConnection, renameConnection, editingConnection],
   );
 
   const handleEditConnection = useCallback(
@@ -281,6 +284,7 @@ export default function App() {
       <StatusBar />
 
       <ConnectionModal
+        existingNames={Object.keys(projects)}
         open={connectionModalOpen}
         onOpenChange={handleModalClose}
         onSave={handleSaveConnection}

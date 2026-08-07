@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { serverName } from "@/lib/server-group";
 import { cn } from "@/lib/utils";
 import { useHistoryStore } from "@/stores/history-store";
 import { useProjectStore } from "@/stores/project-store";
@@ -81,7 +82,8 @@ export function StatusBar() {
                 !connStatus && "bg-muted",
               )}
             />
-            <span>{projectId}</span>
+            {/* Same hierarchy as the sidebar tree: connection first, then database */}
+            <span>{serverName(projects, projectId)}</span>
             <span className="opacity-50">&bull;</span>
             <span>{details.database}</span>
           </div>

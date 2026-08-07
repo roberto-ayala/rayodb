@@ -65,6 +65,12 @@ pub type PolicyDetail = (String, String, String);
 /// Function info: (name, return_type, arguments)
 pub type FunctionInfo = (String, String, String);
 
+/// Foreign table info: (name, server)
+pub type ForeignTableInfo = (String, String);
+
+/// Event trigger info: (name, event, enabled, function)
+pub type EventTriggerInfo = (String, String, String, String);
+
 /// Data type info: (name, kind, detail)
 pub type DataTypeInfo = (String, String, String);
 

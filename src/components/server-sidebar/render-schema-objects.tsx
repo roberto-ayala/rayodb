@@ -1,5 +1,6 @@
 import {
   Copy,
+  ExternalLink,
   Eye,
   FileCode,
   FileUp,
@@ -35,6 +36,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     functions,
     procedures,
     dataTypes,
+    foreignTables,
     triggerFunctions,
     loading,
     selectedItem,
@@ -69,6 +71,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     const schemaFns = functions[schemaStoreKey];
     const schemaProcs = procedures[schemaStoreKey];
     const schemaDataTypes = dataTypes[schemaStoreKey];
+    const schemaForeignTables = foreignTables[schemaStoreKey];
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
     const isSchemaOpen = isOpen(sKey);
 
@@ -192,6 +195,55 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   </div>
                 );
               })}
+
+            {/* Foreign Tables category */}
+            {schemaForeignTables && schemaForeignTables.length > 0 && (
+              <>
+                <SectionHeader
+                  indent={I.schemaObj}
+                  label={`Foreign Tables (${schemaForeignTables.length})`}
+                  icon={<ExternalLink className="h-3 w-3" />}
+                  sectionKey={`${sKey}::ftables`}
+                  expanded={isOpen(`${sKey}::ftables`)}
+                  onClick={() => toggle(`${sKey}::ftables`)}
+                />
+                {isOpen(`${sKey}::ftables`) &&
+                  schemaForeignTables.map((ft) => {
+                    const ftKey = `ftable::${pid}::${schema}::${ft.name}`;
+                    return (
+                      <TreeRow
+                        key={ft.name}
+                        indent={I.table}
+                        icon={<ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />}
+                        label={ft.name}
+                        meta={ft.server}
+                        selected={selectedItem === ftKey}
+                        onClick={() => {
+                          setSelectedItem(ftKey);
+                          onPreviewTableQuery(pid, schema, ft.name);
+                        }}
+                        onDoubleClick={onPinPreview}
+                        onContextMenu={(e) => {
+                          setSelectedItem(ftKey);
+                          showMenu(e, [
+                            {
+                              label: "SELECT TOP 100",
+                              icon: <ExternalLink className="h-3 w-3" />,
+                              onClick: () => onOpenTableQuery(pid, schema, ft.name),
+                            },
+                            { separator: true as const },
+                            {
+                              label: "Copy Name",
+                              icon: <Copy className="h-3 w-3" />,
+                              onClick: () => copy(`"${schema}"."${ft.name}"`),
+                            },
+                          ]);
+                        }}
+                      />
+                    );
+                  })}
+              </>
+            )}
 
             {/* Views category */}
             {schemaViews && schemaViews.length > 0 && (

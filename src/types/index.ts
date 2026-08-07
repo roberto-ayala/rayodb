@@ -155,6 +155,21 @@ export interface FunctionInfo {
   arguments: string;
 }
 
+export interface ForeignTableInfo {
+  name: string;
+  /** The foreign server backing it */
+  server: string;
+}
+
+export interface EventTriggerInfo {
+  name: string;
+  event: string;
+  /** enabled | disabled | replica | always */
+  enabled: string;
+  /** The function it fires */
+  function: string;
+}
+
 export interface DataTypeInfo {
   name: string;
   /** enum | domain | composite | range */

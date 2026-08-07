@@ -28,6 +28,7 @@ export function clearProjectMetadata(s: ProjectState, projectId: string) {
     s.functions,
     s.procedures,
     s.dataTypes,
+    s.foreignTables,
     s.triggerFunctions,
   ] as Record<string, unknown>[];
   for (const bucket of scoped) {
@@ -37,6 +38,7 @@ export function clearProjectMetadata(s: ProjectState, projectId: string) {
   }
 
   delete s.schemas[projectId];
+  delete s.eventTriggers[projectId];
   delete s.serverDatabases[projectId];
   delete s.serverTablespaces[projectId];
 }
@@ -77,15 +79,19 @@ export const createConnectionSlice: StateCreator<
       });
 
       if (st === PCS.Connected) {
-        const [sc, dbs, tsp] = await Promise.allSettled([
+        // Event triggers hang off the database rather than a schema, so they
+        // load with it instead of with loadSchemaObjects.
+        const [sc, dbs, tsp, evt] = await Promise.allSettled([
           driver.loadSchemas(projectId),
           driver.loadDatabases?.(projectId),
           driver.loadTablespaces?.(projectId),
+          driver.loadEventTriggers(projectId),
         ]);
         set((s) => {
           s.schemas[projectId] = sc.status === "fulfilled" ? sc.value : [];
           s.serverDatabases[projectId] = dbs.status === "fulfilled" && dbs.value ? dbs.value : [];
           s.serverTablespaces[projectId] = tsp.status === "fulfilled" && tsp.value ? tsp.value : [];
+          s.eventTriggers[projectId] = evt.status === "fulfilled" ? evt.value : [];
         });
       }
     } catch (err: unknown) {
@@ -141,15 +147,17 @@ export const createConnectionSlice: StateCreator<
 
     try {
       const driver = DriverFactory.getDriver(d.driver);
-      const [sc, dbs, tsp] = await Promise.allSettled([
+      const [sc, dbs, tsp, evt] = await Promise.allSettled([
         driver.loadSchemas(projectId),
         driver.loadDatabases?.(projectId),
         driver.loadTablespaces?.(projectId),
+        driver.loadEventTriggers(projectId),
       ]);
       set((s) => {
         s.schemas[projectId] = sc.status === "fulfilled" ? sc.value : [];
         s.serverDatabases[projectId] = dbs.status === "fulfilled" && dbs.value ? dbs.value : [];
         s.serverTablespaces[projectId] = tsp.status === "fulfilled" && tsp.value ? tsp.value : [];
+        s.eventTriggers[projectId] = evt.status === "fulfilled" ? evt.value : [];
       });
 
       await Promise.all(

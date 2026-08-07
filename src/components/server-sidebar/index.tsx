@@ -34,6 +34,8 @@ export function ServerSidebar({
   const functions = useProjectStore((s) => s.functions);
   const procedures = useProjectStore((s) => s.procedures);
   const dataTypes = useProjectStore((s) => s.dataTypes);
+  const foreignTables = useProjectStore((s) => s.foreignTables);
+  const eventTriggers = useProjectStore((s) => s.eventTriggers);
   const triggerFunctions = useProjectStore((s) => s.triggerFunctions);
   const connect = useProjectStore((s) => s.connect);
   const disconnect = useProjectStore((s) => s.disconnect);
@@ -208,6 +210,8 @@ export function ServerSidebar({
     functions,
     procedures,
     dataTypes,
+    foreignTables,
+    eventTriggers,
     triggerFunctions,
     connect,
     disconnect,

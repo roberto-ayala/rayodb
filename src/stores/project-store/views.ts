@@ -2,6 +2,8 @@ import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
 import type {
   DataTypeInfo,
+  EventTriggerInfo,
+  ForeignTableInfo,
   FunctionInfo,
   ProcedureInfo,
   SequenceInfo,
@@ -16,6 +18,8 @@ export type ViewsSlice = {
   functions: Record<string, FunctionInfo[]>;
   procedures: Record<string, ProcedureInfo[]>;
   dataTypes: Record<string, DataTypeInfo[]>;
+  foreignTables: Record<string, ForeignTableInfo[]>;
+  eventTriggers: Record<string, EventTriggerInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
   serverDatabases: Record<string, string[]>;
   serverTablespaces: Record<string, [string, string, string][]>;
@@ -35,6 +39,8 @@ export const createViewsSlice: StateCreator<
   functions: {},
   procedures: {},
   dataTypes: {},
+  foreignTables: {},
+  eventTriggers: {},
   triggerFunctions: {},
   serverDatabases: {},
   serverTablespaces: {},

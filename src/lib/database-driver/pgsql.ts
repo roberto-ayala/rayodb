@@ -8,7 +8,9 @@ import type {
   WireColumnDetail,
   WireConstraintDetail,
   WireDataTypeInfo,
+  WireEventTriggerInfo,
   WireForeignKeyInfo,
+  WireForeignTableInfo,
   WireFunctionInfo,
   WireIndexDetail,
   WirePackedResult,
@@ -25,6 +27,8 @@ import {
   parseColumnDetails,
   parseConstraintDetails,
   parseDataTypeInfo,
+  parseEventTriggerInfo,
+  parseForeignTableInfo,
   parseFunctionInfo,
   parseIndexDetails,
   parsePolicyDetails,
@@ -131,6 +135,19 @@ export class PostgreSQLDriver implements DatabaseDriver {
       schema,
     });
     return parseFunctionInfo(wire);
+  }
+  async loadForeignTables(projectId: string, schema: string) {
+    const wire = await invoke<WireForeignTableInfo[]>("pgsql_load_foreign_tables", {
+      project_id: projectId,
+      schema,
+    });
+    return parseForeignTableInfo(wire);
+  }
+  async loadEventTriggers(projectId: string) {
+    const wire = await invoke<WireEventTriggerInfo[]>("pgsql_load_event_triggers", {
+      project_id: projectId,
+    });
+    return parseEventTriggerInfo(wire);
   }
   async loadDataTypes(projectId: string, schema: string) {
     const wire = await invoke<WireDataTypeInfo[]>("pgsql_load_data_types", {

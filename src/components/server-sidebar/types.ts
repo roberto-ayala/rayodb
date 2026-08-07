@@ -3,6 +3,8 @@ import type { ContextMenuEntry } from "@/components/ui/context-menu";
 import type {
   ColumnDetail,
   DataTypeInfo,
+  EventTriggerInfo,
+  ForeignTableInfo,
   FunctionInfo,
   IndexDetail,
   ProcedureInfo,
@@ -49,6 +51,8 @@ export interface SidebarRenderCtx {
   functions: Record<string, FunctionInfo[]>;
   procedures: Record<string, ProcedureInfo[]>;
   dataTypes: Record<string, DataTypeInfo[]>;
+  foreignTables: Record<string, ForeignTableInfo[]>;
+  eventTriggers: Record<string, EventTriggerInfo[]>;
   triggerFunctions: Record<string, TriggerFunctionInfo[]>;
 
   connect: (projectId: string) => Promise<void>;

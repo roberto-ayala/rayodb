@@ -1,9 +1,10 @@
 use crate::AppState;
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 use crate::drivers::pgsql::{
-    ColumnDetail, ConstraintDetail, DataTypeInfo, FunctionInfo, IndexDetail, PolicyDetail,
-    ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail, get_pool, load_column_details,
-    load_columns, load_constraints, load_data_types, load_databases, load_functions, load_indexes,
+    ColumnDetail, ConstraintDetail, DataTypeInfo, EventTriggerInfo, ForeignTableInfo, FunctionInfo,
+    IndexDetail, PolicyDetail, ProcedureInfo, RuleDetail, SequenceInfo, TriggerDetail, get_pool,
+    load_column_details, load_columns, load_constraints, load_data_types, load_databases,
+    load_event_triggers, load_foreign_tables, load_functions, load_indexes,
     load_materialized_views, load_policies, load_procedures, load_rules, load_schemas,
     load_sequences, load_tables, load_tablespaces, load_trigger_functions, load_triggers,
     load_views,
@@ -222,6 +223,29 @@ pub async fn pgsql_load_functions(
     let client = acquire_client(&app_state.meta_clients, project_id).await?;
 
     load_functions(&client, schema).await.map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_foreign_tables(
+    project_id: &str,
+    schema: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<ForeignTableInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_foreign_tables(&client, schema)
+        .await
+        .map_err(Into::into)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn pgsql_load_event_triggers(
+    project_id: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<EventTriggerInfo>> {
+    let client = acquire_client(&app_state.meta_clients, project_id).await?;
+
+    load_event_triggers(&client).await.map_err(Into::into)
 }
 
 #[tauri::command(rename_all = "snake_case")]

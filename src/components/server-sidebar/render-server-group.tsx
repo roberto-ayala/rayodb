@@ -35,6 +35,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     status,
     serverDatabases,
     serverTablespaces,
+    eventTriggers,
     isOpen,
     toggle,
     onConnect,
@@ -303,7 +304,66 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                       }
                     />
 
-                    {isDbConnected && isOpen(dbKey, true) && renderSchemas(ctx, dbPid)}
+                    {isDbConnected && isOpen(dbKey, true) && (
+                      <>
+                        {renderSchemas(ctx, dbPid)}
+                        {/* Event triggers fire on DDL anywhere in the database,
+                            so they sit beside the schemas rather than inside one */}
+                        {(eventTriggers[dbPid]?.length ?? 0) > 0 && (
+                          <>
+                            <TreeRow
+                              indent={I.schema}
+                              icon={<Zap className="h-3.5 w-3.5 text-muted-foreground" />}
+                              label={`Event Triggers (${eventTriggers[dbPid].length})`}
+                              expanded={isOpen(`${dbKey}::evttrig`)}
+                              onClick={() => toggle(`${dbKey}::evttrig`)}
+                            />
+                            {isOpen(`${dbKey}::evttrig`) &&
+                              eventTriggers[dbPid].map((evt) => (
+                                // biome-ignore lint/a11y/noStaticElementInteractions: a label with a context menu, like the function rows
+                                <div
+                                  key={evt.name}
+                                  className="relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none hover:bg-sidebar-accent"
+                                  style={{ paddingLeft: `${I.schemaObj}px` }}
+                                  onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    showMenu(e, [
+                                      { header: evt.event },
+                                      {
+                                        label: "Copy Name",
+                                        icon: <Copy className="h-3 w-3" />,
+                                        onClick: () => copy(evt.name),
+                                      },
+                                      {
+                                        label: "Copy Function Name",
+                                        icon: <Copy className="h-3 w-3" />,
+                                        onClick: () => copy(evt.function),
+                                      },
+                                    ]);
+                                  }}
+                                >
+                                  <Zap className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                                  <span className="text-xs text-foreground">{evt.name}</span>
+                                  <span className="text-3xs text-muted-foreground">
+                                    {evt.event}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      "text-3xs",
+                                      evt.enabled === "enabled"
+                                        ? "text-muted-foreground/40"
+                                        : "text-warning",
+                                    )}
+                                  >
+                                    {evt.enabled === "enabled" ? evt.function : evt.enabled}
+                                  </span>
+                                </div>
+                              ))}
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 );
               } else {

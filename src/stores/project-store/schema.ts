@@ -90,13 +90,14 @@ export const createSchemaSlice: StateCreator<
     const d = projects[projectId];
     if (!d) return;
     const driver = DriverFactory.getDriver(d.driver);
-    const [vR, mvR, seqR, fnR, procR, dtR, tfnR] = await Promise.allSettled([
+    const [vR, mvR, seqR, fnR, procR, dtR, ftR, tfnR] = await Promise.allSettled([
       driver.loadViews(projectId, schema),
       driver.loadMaterializedViews(projectId, schema),
       driver.loadSequences(projectId, schema),
       driver.loadFunctions(projectId, schema),
       driver.loadProcedures(projectId, schema),
       driver.loadDataTypes(projectId, schema),
+      driver.loadForeignTables(projectId, schema),
       driver.loadTriggerFunctions(projectId, schema),
     ]);
 
@@ -110,6 +111,7 @@ export const createSchemaSlice: StateCreator<
       s.functions[key] = val(fnR, []);
       s.procedures[key] = val(procR, []);
       s.dataTypes[key] = val(dtR, []);
+      s.foreignTables[key] = val(ftR, []);
       s.triggerFunctions[key] = val(tfnR, []);
     });
   },

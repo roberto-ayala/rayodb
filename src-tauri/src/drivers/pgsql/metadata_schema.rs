@@ -5,7 +5,10 @@ use tokio_postgres::Client;
 use crate::common::enums::{AppError, pg_error_message};
 use crate::common::pgsql::{PgsqlLoadColumns, PgsqlLoadSchemas, PgsqlLoadTables};
 
-use super::{ColumnDetail, ConstraintDetail, IndexDetail, PolicyDetail, RuleDetail, TriggerDetail};
+use super::{
+    ColumnDetail, ConstraintDetail, EventTriggerInfo, IndexDetail, PolicyDetail, RuleDetail,
+    TriggerDetail,
+};
 
 pub async fn load_schemas(client: &Client, query_sql: &str) -> Result<PgsqlLoadSchemas, AppError> {
     let rows = tokio_time::timeout(
@@ -57,6 +60,34 @@ pub async fn load_tablespaces(pool: &Pool) -> Result<Vec<(String, String, String
                 r.get::<_, String>(2),
             )
         })
+        .collect())
+}
+
+/// Event triggers belong to the database, not to a schema — they fire on DDL
+/// wherever it happens.
+pub async fn load_event_triggers(client: &Client) -> Result<Vec<EventTriggerInfo>, AppError> {
+    let rows = client
+        .query(
+            r#"SELECT e.evtname::text,
+                      e.evtevent::text,
+                      CASE e.evtenabled
+                        WHEN 'D' THEN 'disabled'
+                        WHEN 'R' THEN 'replica'
+                        WHEN 'A' THEN 'always'
+                        ELSE 'enabled'
+                      END,
+                      p.proname::text
+               FROM pg_event_trigger e
+               JOIN pg_proc p ON p.oid = e.evtfoid
+               ORDER BY e.evtname"#,
+            &[],
+        )
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows
+        .iter()
+        .map(|r| (r.get(0), r.get(1), r.get(2), r.get(3)))
         .collect())
 }
 

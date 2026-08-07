@@ -106,6 +106,10 @@ export interface TableInfo {
   size: string;
   /** The table this one is a partition of, empty when it stands alone */
   parent: string;
+  /** FOR VALUES … — a partition's real identity, empty when it is not one */
+  bound: string;
+  /** RANGE (col) | LIST (col) | HASH (col), empty unless partitioned */
+  partitionKey: string;
 }
 
 export interface ColumnDetail {

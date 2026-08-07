@@ -22,7 +22,7 @@ export async function resolveTableRef(
     if (!t) {
       try {
         const rawRows = await driver.loadTables(projectId, schema);
-        t = rawRows.map(([name, size, parent]) => ({ name, size, parent }));
+        t = rawRows.map(([name, size, parent, bound, partitionKey]) => ({ name, size, parent, bound, partitionKey }));
         useProjectStore.setState((s) => {
           s.tables[key] = t!;
         });
@@ -73,7 +73,7 @@ export async function ensureTables(projectId: string, schema: string): Promise<T
 
   try {
     const rawRows = await driver.loadTables(projectId, schema);
-    const t = rawRows.map(([name, size, parent]) => ({ name, size, parent }));
+    const t = rawRows.map(([name, size, parent, bound, partitionKey]) => ({ name, size, parent, bound, partitionKey }));
     useProjectStore.setState((s) => {
       s.tables[key] = t;
     });

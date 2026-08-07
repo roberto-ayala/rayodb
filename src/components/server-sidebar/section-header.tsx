@@ -8,6 +8,7 @@ export function SectionHeader({
   icon,
   expanded,
   onClick,
+  onContextMenu,
 }: {
   indent: number;
   label: string;
@@ -15,11 +16,14 @@ export function SectionHeader({
   sectionKey?: string;
   expanded: boolean;
   onClick: () => void;
+  /** Carries the category's own action — creating the first object of its kind */
+  onContextMenu?: (e: React.MouseEvent) => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      onContextMenu={onContextMenu}
       className="relative flex w-full items-center gap-1.5 py-0.5 text-left hover:bg-sidebar-accent transition-colors rounded-sm whitespace-nowrap"
       style={{ paddingLeft: `${indent}px` }}
     >

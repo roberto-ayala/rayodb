@@ -14,12 +14,30 @@ import {
   Shapes,
   SquarePlay,
   Table,
+  Unlink,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProjectConnectionStatus, type TableInfo } from "@/types";
 import { I, INDENT_STEP } from "./constants";
-import { ddlFunctionQuery, ddlTableQuery, ddlViewQuery } from "./ddl-queries";
+import {
+  convertToPartitionedTemplate,
+  ddlFunctionQuery,
+  ddlTableQuery,
+  ddlViewQuery,
+  detachPartitionTemplate,
+  newDataTypeTemplate,
+  newForeignTableTemplate,
+  newFunctionTemplate,
+  newMatViewTemplate,
+  newPartitionedTableTemplate,
+  newPartitionTemplate,
+  newProcedureTemplate,
+  newSequenceTemplate,
+  newTableTemplate,
+  newTriggerFunctionTemplate,
+  newViewTemplate,
+} from "./ddl-queries";
 import { renderTableDetails } from "./render-table-details";
 import { SectionHeader } from "./section-header";
 import { TreeRow } from "./tree-row";
@@ -115,6 +133,52 @@ function renderTable(
                 });
               },
             },
+            ...(ti.partitionKey
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "New Partition…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(
+                        pid,
+                        newPartitionTemplate(
+                          schema,
+                          ti.name,
+                          ti.partitionKey,
+                          partitions.map((p) => p.bound).filter(Boolean),
+                        ),
+                        { title: `New partition of ${ti.name}` },
+                      ),
+                  },
+                ]
+              : []),
+            ...(!ti.partitionKey && !ti.parent
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Convert to Partitioned…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, convertToPartitionedTemplate(schema, ti.name), {
+                        title: `Partition ${ti.name}`,
+                      }),
+                  },
+                ]
+              : []),
+            ...(ti.parent
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Detach Partition…",
+                    icon: <Unlink className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, detachPartitionTemplate(schema, ti.parent, ti.name), {
+                        title: `Detach ${ti.name}`,
+                      }),
+                  },
+                ]
+              : []),
             { separator: true as const },
             {
               label: "Properties",
@@ -135,7 +199,19 @@ function renderTable(
             },
           ]);
         }}
-        meta={ti.size}
+        meta={
+          ti.bound ? (
+            <>
+              {ti.size}
+              {/* What the partition actually holds, which its name only claims */}
+              <span className="ml-1.5 text-muted-foreground/50">
+                {ti.bound.replace(/^FOR VALUES /, "")}
+              </span>
+            </>
+          ) : (
+            ti.size
+          )
+        }
       />
       {isTableOpen && (
         <>
@@ -160,6 +236,26 @@ function renderTable(
       )}
     </div>
   );
+}
+
+/**
+ * The category's own action: creating the first object of its kind. It has to
+ * live on the category, because an empty one is exactly where there is nothing
+ * else to right-click.
+ */
+function newObjectMenu(
+  ctx: SidebarRenderCtx,
+  pid: string,
+  label: string,
+  icon: React.ReactNode,
+  sql: string,
+  title: string,
+) {
+  return (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    ctx.showMenu(e, [{ label, icon, onClick: () => ctx.openTab(pid, sql, { title }) }]);
+  };
 }
 
 /** Render schemas + tables/views/functions for a connected database project */
@@ -261,6 +357,25 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
               onClick={() => toggle(`${sKey}::tables`, true)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showMenu(e, [
+                  {
+                    label: "New Table…",
+                    icon: <Table className="h-3 w-3" />,
+                    onClick: () => openTab(pid, newTableTemplate(schema), { title: "New table" }),
+                  },
+                  {
+                    label: "New Partitioned Table…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, newPartitionedTableTemplate(schema), {
+                        title: "New partitioned table",
+                      }),
+                  },
+                ]);
+              }}
             />
             {isOpen(`${sKey}::tables`, true) &&
               rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}
@@ -275,6 +390,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::ftables`}
                   expanded={isOpen(`${sKey}::ftables`)}
                   onClick={() => toggle(`${sKey}::ftables`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Foreign Table…",
+                    <ExternalLink className="h-3 w-3" />,
+                    newForeignTableTemplate(schema),
+                    "New foreign table",
+                  )}
                 />
                 {isOpen(`${sKey}::ftables`) &&
                   schemaForeignTables.map((ft) => {
@@ -324,6 +447,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::views`}
                   expanded={isOpen(`${sKey}::views`)}
                   onClick={() => toggle(`${sKey}::views`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New View…",
+                    <Eye className="h-3 w-3" />,
+                    newViewTemplate(schema),
+                    "New view",
+                  )}
                 />
                 {isOpen(`${sKey}::views`) &&
                   schemaViews.map((v) => {
@@ -383,6 +514,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::matviews`}
                   expanded={isOpen(`${sKey}::matviews`)}
                   onClick={() => toggle(`${sKey}::matviews`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Materialized View…",
+                    <Layers className="h-3 w-3" />,
+                    newMatViewTemplate(schema),
+                    "New materialized view",
+                  )}
                 />
                 {isOpen(`${sKey}::matviews`) &&
                   schemaMatViews.map((mv) => {
@@ -443,6 +582,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::seqs`}
                   expanded={isOpen(`${sKey}::seqs`)}
                   onClick={() => toggle(`${sKey}::seqs`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Sequence…",
+                    <Hash className="h-3 w-3" />,
+                    newSequenceTemplate(schema),
+                    "New sequence",
+                  )}
                 />
                 {isOpen(`${sKey}::seqs`) &&
                   schemaSequences.map((seq) => {
@@ -498,6 +645,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::fns`}
                   expanded={isOpen(`${sKey}::fns`)}
                   onClick={() => toggle(`${sKey}::fns`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Function…",
+                    <FileCode className="h-3 w-3" />,
+                    newFunctionTemplate(schema),
+                    "New function",
+                  )}
                 />
                 {isOpen(`${sKey}::fns`) &&
                   schemaFns.map((fn, i) => {
@@ -556,6 +711,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::procs`}
                   expanded={isOpen(`${sKey}::procs`)}
                   onClick={() => toggle(`${sKey}::procs`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Procedure…",
+                    <SquarePlay className="h-3 w-3" />,
+                    newProcedureTemplate(schema),
+                    "New procedure",
+                  )}
                 />
                 {isOpen(`${sKey}::procs`) &&
                   schemaProcs.map((proc, i) => {
@@ -622,6 +785,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::types`}
                   expanded={isOpen(`${sKey}::types`)}
                   onClick={() => toggle(`${sKey}::types`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Data Type…",
+                    <Shapes className="h-3 w-3" />,
+                    newDataTypeTemplate(schema),
+                    "New data type",
+                  )}
                 />
                 {isOpen(`${sKey}::types`) &&
                   schemaDataTypes.map((dt) => {
@@ -683,6 +854,14 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   sectionKey={`${sKey}::trigfns`}
                   expanded={isOpen(`${sKey}::trigfns`)}
                   onClick={() => toggle(`${sKey}::trigfns`)}
+                  onContextMenu={newObjectMenu(
+                    ctx,
+                    pid,
+                    "New Trigger Function…",
+                    <Zap className="h-3 w-3" />,
+                    newTriggerFunctionTemplate(schema),
+                    "New trigger function",
+                  )}
                 />
                 {isOpen(`${sKey}::trigfns`) &&
                   schemaTrigFns.map((fn, i) => {

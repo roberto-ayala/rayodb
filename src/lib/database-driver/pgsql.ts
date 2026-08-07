@@ -472,7 +472,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return invoke<string[]>("pgsql_load_databases", { project_id: projectId });
   }
   async loadTablespaces(projectId: string) {
-    return invoke<[string, string, string][]>("pgsql_load_tablespaces", { project_id: projectId });
+    return invoke<[string, string, string, string][]>("pgsql_load_tablespaces", { project_id: projectId });
   }
   async loadExtensions(projectId: string) {
     return invoke<string[][]>("pgsql_load_extensions", { project_id: projectId });

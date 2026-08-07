@@ -1,5 +1,6 @@
 import type React from "react";
 import type { ContextMenuEntry } from "@/components/ui/context-menu";
+import type { OpenTabOptions } from "@/stores/tab-store";
 import type {
   ColumnDetail,
   DataTypeInfo,
@@ -40,7 +41,7 @@ export interface SidebarRenderCtx {
   projects: ProjectMap;
   status: Record<string, ProjectConnectionStatus>;
   serverDatabases: Record<string, string[]>;
-  serverTablespaces: Record<string, [string, string, string][]>;
+  serverTablespaces: Record<string, [string, string, string, string][]>;
   schemas: Record<string, string[]>;
   tables: Record<string, TableInfo[]>;
   columnDetails: Record<string, ColumnDetail[]>;
@@ -61,7 +62,7 @@ export interface SidebarRenderCtx {
   refreshConnection: (projectId: string) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   addDatabaseToServer: (sourceProjectId: string, name: string, database: string) => Promise<void>;
-  openTab: (projectId?: string, sql?: string) => void;
+  openTab: (projectId?: string, sql?: string, options?: OpenTabOptions) => void;
   openMonitorTab: (projectId: string) => void;
   openERDTab: (projectId: string, schema: string) => void;
   openNotifyTab: (projectId: string) => void;

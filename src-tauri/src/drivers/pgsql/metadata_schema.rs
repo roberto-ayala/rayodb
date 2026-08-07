@@ -37,7 +37,11 @@ pub async fn load_databases(pool: &Pool) -> Result<Vec<String>, AppError> {
     Ok(rows.iter().map(|r| r.get::<_, String>(0)).collect())
 }
 
-pub async fn load_tablespaces(pool: &Pool) -> Result<Vec<(String, String, String)>, AppError> {
+/// (name, owner, location, size) — a tablespace is looked at when a disk is
+/// filling up, so the size is the reason to open the node at all.
+pub async fn load_tablespaces(
+    pool: &Pool,
+) -> Result<Vec<(String, String, String, String)>, AppError> {
     let client = pool
         .get()
         .await
@@ -45,7 +49,8 @@ pub async fn load_tablespaces(pool: &Pool) -> Result<Vec<(String, String, String
     let rows = client
         .query(
             "SELECT spcname, pg_catalog.pg_get_userbyid(spcowner) AS owner, \
-             COALESCE(pg_catalog.pg_tablespace_location(oid), '') AS location \
+             COALESCE(pg_catalog.pg_tablespace_location(oid), '') AS location, \
+             pg_size_pretty(pg_catalog.pg_tablespace_size(oid)) AS size \
              FROM pg_catalog.pg_tablespace ORDER BY spcname",
             &[],
         )
@@ -58,6 +63,7 @@ pub async fn load_tablespaces(pool: &Pool) -> Result<Vec<(String, String, String
                 r.get::<_, String>(0),
                 r.get::<_, String>(1),
                 r.get::<_, String>(2),
+                r.get::<_, String>(3),
             )
         })
         .collect())
@@ -103,7 +109,7 @@ pub async fn load_tables(
 
     Ok(rows
         .iter()
-        .map(|r| (r.get(0), r.get(1), r.get(2)))
+        .map(|r| (r.get(0), r.get(1), r.get(2), r.get(3), r.get(4)))
         .collect())
 }
 

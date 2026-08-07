@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { ProjectConnectionStatus, type TableInfo } from "@/types";
 import { I, INDENT_STEP } from "./constants";
 import {
+  convertToPartitionedTemplate,
   ddlFunctionQuery,
   ddlTableQuery,
   ddlViewQuery,
@@ -149,6 +150,19 @@ function renderTable(
                         ),
                         { title: `New partition of ${ti.name}` },
                       ),
+                  },
+                ]
+              : []),
+            ...(!ti.partitionKey && !ti.parent
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Convert to Partitioned…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, convertToPartitionedTemplate(schema, ti.name), {
+                        title: `Partition ${ti.name}`,
+                      }),
                   },
                 ]
               : []),

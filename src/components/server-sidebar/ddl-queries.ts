@@ -222,6 +222,68 @@ export function newPartitionTemplate(
   FOR VALUES FROM (${from}) TO ('end');`;
 }
 
+/**
+ * Partitioning a table that already holds data is a migration, not a command —
+ * Postgres has no ALTER for it. The recipe is written out with the three things
+ * that bite, each verified rather than remembered: LIKE INCLUDING ALL is
+ * rejected when the primary key does not contain the partition key, foreign
+ * keys pointing at the table follow the rename onto the old one, and they
+ * cannot be recreated against the new table unless they carry the partition key
+ * too.
+ */
+export function convertToPartitionedTemplate(schema: string, table: string): string {
+  const src = `"${schema}"."${table}"`;
+  return `-- Partitioning ${table} is a migration in four steps, not an ALTER.
+-- Steps 2 to 4 need a window with no writes to ${src}: rows written after
+-- the copy starts would be left behind, and the rename takes an ACCESS
+-- EXCLUSIVE lock.
+--
+-- Read this first, because it may change the plan:
+--   * Every primary or unique key must contain the partition key. If
+--     ${table} has one that does not, it cannot be carried over as is —
+--     which is why the copy below leaves indexes out and states the key
+--     explicitly.
+--   * Foreign keys in other tables that point at ${table} will follow the
+--     rename and end up pointing at ${table}_old. They have to be dropped
+--     and recreated, and they can only be recreated if the referencing
+--     table also carries the partition key: Postgres requires the whole
+--     unique key, so a reference to (id) alone is rejected.
+
+-- 1. The partitioned shell, shaped like the original
+CREATE TABLE "${schema}"."${table}_partitioned" (
+  LIKE ${src}
+    INCLUDING DEFAULTS
+    INCLUDING CONSTRAINTS
+    INCLUDING STORAGE
+    INCLUDING COMMENTS
+    INCLUDING IDENTITY,
+  PRIMARY KEY (id, partition_column)
+) PARTITION BY RANGE (partition_column);
+
+-- 2. Somewhere for every row to land. DEFAULT catches whatever falls
+--    outside the ranges, which would otherwise fail the copy.
+CREATE TABLE "${schema}"."${table}_p1"
+  PARTITION OF "${schema}"."${table}_partitioned"
+  FOR VALUES FROM ('start') TO ('end');
+CREATE TABLE "${schema}"."${table}_default"
+  PARTITION OF "${schema}"."${table}_partitioned" DEFAULT;
+
+-- 3. Copy. On a large table this is the slow part — consider running it in
+--    batches by key before taking the write window, then a final catch-up.
+INSERT INTO "${schema}"."${table}_partitioned" SELECT * FROM ${src};
+
+-- 4. Swap, in one transaction so nothing sees a half-renamed pair
+BEGIN;
+ALTER TABLE ${src} RENAME TO "${table}_old";
+ALTER TABLE "${schema}"."${table}_partitioned" RENAME TO "${table}";
+COMMIT;
+
+-- Then, by hand: recreate the indexes (LIKE left them out), repoint the
+-- foreign keys now aimed at ${table}_old, and re-check any view or function
+-- that referenced the table.
+-- DROP TABLE "${schema}"."${table}_old";  -- once, and only once, everything checks out`;
+}
+
 export function detachPartitionTemplate(schema: string, parent: string, partition: string): string {
   return `-- The data stays: the partition becomes a table of its own.
 -- CONCURRENTLY (PG 14+) avoids holding an ACCESS EXCLUSIVE lock on the

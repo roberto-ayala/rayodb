@@ -23,7 +23,7 @@ import type {
 } from "@/types";
 
 // Wire types from Rust (tuples)
-export type WireTableInfo = [string, string, string];
+export type WireTableInfo = [string, string, string, string, string];
 export type WireQueryResult = [string[], string[][], number];
 export type WirePackedResult = [string, number]; // [packed_string, elapsed_ms]
 

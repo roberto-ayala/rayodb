@@ -109,7 +109,7 @@ pub async fn load_tables(
 
     Ok(rows
         .iter()
-        .map(|r| (r.get(0), r.get(1), r.get(2)))
+        .map(|r| (r.get(0), r.get(1), r.get(2), r.get(3), r.get(4)))
         .collect())
 }
 

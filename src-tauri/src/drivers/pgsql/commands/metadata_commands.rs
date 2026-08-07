@@ -87,7 +87,11 @@ pub async fn pgsql_load_tables(
                              JOIN pg_class p ON p.oid = i.inhparent
                              WHERE i.inhrelid = c.oid)
                        ELSE ''
-                  END AS parent
+                  END AS parent,
+                  -- A partition's identity is its bound; its name only says
+                  -- what someone called it
+                  COALESCE(pg_get_expr(c.relpartbound, c.oid), '') AS partition_bound,
+                  CASE WHEN c.relkind = 'p' THEN pg_get_partkeydef(c.oid) ELSE '' END AS partition_key
            FROM pg_class c
            JOIN pg_namespace n ON n.oid = c.relnamespace
            WHERE n.nspname = $1

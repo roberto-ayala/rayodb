@@ -146,3 +146,57 @@ CREATE DATABASE "new_database"
 export function newSchemaTemplate(): string {
   return `CREATE SCHEMA "new_schema";`;
 }
+
+/**
+ * The next partition, worked out from what the parent already holds rather than
+ * left as a blank: the lower bound is copied verbatim from where the last one
+ * ended, so the ranges cannot overlap or leave a gap. The upper bound is the
+ * one thing only the user knows, so it stays a placeholder — guessing an
+ * interval from two dates would be a guess presented as an answer.
+ */
+export function newPartitionTemplate(
+  schema: string,
+  parent: string,
+  partitionKey: string,
+  childBounds: string[],
+): string {
+  const qualified = `"${schema}"."${parent}"`;
+  const strategy = partitionKey.trim().split(/[\s(]/)[0].toUpperCase();
+  const existing = childBounds.length
+    ? `-- Partitions so far:\n${childBounds.map((b) => `--   ${b}`).join("\n")}\n`
+    : "";
+  const header = `-- ${parent} is partitioned BY ${partitionKey}\n${existing}`;
+
+  if (strategy === "HASH") {
+    const modulus = childBounds
+      .map((b) => /MODULUS (\d+)/i.exec(b)?.[1])
+      .find((m): m is string => !!m);
+    return `${header}CREATE TABLE "${schema}"."${parent}_p${childBounds.length}"
+  PARTITION OF ${qualified}
+  FOR VALUES WITH (MODULUS ${modulus ?? "4"}, REMAINDER ${childBounds.length});`;
+  }
+
+  if (strategy === "LIST") {
+    return `${header}CREATE TABLE "${schema}"."${parent}_new"
+  PARTITION OF ${qualified}
+  FOR VALUES IN ('value');`;
+  }
+
+  // RANGE: pick up exactly where the last one ended
+  const upperBounds = childBounds
+    .map((b) => /^FOR VALUES FROM \(.*\) TO \((.*)\)$/.exec(b)?.[1])
+    .filter((b): b is string => !!b);
+  const from = upperBounds.length ? upperBounds[upperBounds.length - 1] : "'start'";
+
+  return `${header}CREATE TABLE "${schema}"."${parent}_new"
+  PARTITION OF ${qualified}
+  FOR VALUES FROM (${from}) TO ('end');`;
+}
+
+export function detachPartitionTemplate(schema: string, parent: string, partition: string): string {
+  return `-- The data stays: the partition becomes a table of its own.
+-- CONCURRENTLY (PG 14+) avoids holding an ACCESS EXCLUSIVE lock on the
+-- parent, at the cost of not running inside a transaction block.
+ALTER TABLE "${schema}"."${parent}" DETACH PARTITION "${schema}"."${partition}";
+-- ALTER TABLE "${schema}"."${parent}" DETACH PARTITION "${schema}"."${partition}" CONCURRENTLY;`;
+}

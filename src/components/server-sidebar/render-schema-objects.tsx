@@ -14,6 +14,7 @@ import {
   Shapes,
   SquarePlay,
   Table,
+  Unlink,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -23,10 +24,12 @@ import {
   ddlFunctionQuery,
   ddlTableQuery,
   ddlViewQuery,
+  detachPartitionTemplate,
   newDataTypeTemplate,
   newForeignTableTemplate,
   newFunctionTemplate,
   newMatViewTemplate,
+  newPartitionTemplate,
   newProcedureTemplate,
   newSequenceTemplate,
   newTableTemplate,
@@ -128,6 +131,39 @@ function renderTable(
                 });
               },
             },
+            ...(ti.partitionKey
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "New Partition…",
+                    icon: <Grid2x2 className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(
+                        pid,
+                        newPartitionTemplate(
+                          schema,
+                          ti.name,
+                          ti.partitionKey,
+                          partitions.map((p) => p.bound).filter(Boolean),
+                        ),
+                        { title: `New partition of ${ti.name}` },
+                      ),
+                  },
+                ]
+              : []),
+            ...(ti.parent
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Detach Partition…",
+                    icon: <Unlink className="h-3 w-3" />,
+                    onClick: () =>
+                      openTab(pid, detachPartitionTemplate(schema, ti.parent, ti.name), {
+                        title: `Detach ${ti.name}`,
+                      }),
+                  },
+                ]
+              : []),
             { separator: true as const },
             {
               label: "Properties",
@@ -148,7 +184,19 @@ function renderTable(
             },
           ]);
         }}
-        meta={ti.size}
+        meta={
+          ti.bound ? (
+            <>
+              {ti.size}
+              {/* What the partition actually holds, which its name only claims */}
+              <span className="ml-1.5 text-muted-foreground/50">
+                {ti.bound.replace(/^FOR VALUES /, "")}
+              </span>
+            </>
+          ) : (
+            ti.size
+          )
+        }
       />
       {isTableOpen && (
         <>

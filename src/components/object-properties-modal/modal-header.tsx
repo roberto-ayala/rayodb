@@ -13,7 +13,7 @@ import {
   Table,
   Zap,
 } from "lucide-react";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ModalBanner } from "@/components/ui/modal-banner";
 import { SegmentedTabs } from "@/components/ui/panel";
 import type { ObjectType, Tab } from "./types";
 
@@ -67,42 +67,35 @@ export function ModalHeader({
   setActiveTab: (tab: Tab) => void;
 }) {
   return (
-    <div className="border-b border-border bg-muted px-5 pt-5 pb-3">
-      <DialogHeader>
-        <div className="flex items-stretch gap-2.5">
-          {/* Square, sized by the two text rows next to it */}
-          <div className="flex w-11 shrink-0 items-center justify-center rounded-md border border-border bg-background">
-            {objectIcon[objectType]}
-          </div>
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="flex items-center gap-2 text-base">
-              <span className="truncate">{name}</span>
-              <button
-                type="button"
-                onClick={() => copyText(`"${schema}"."${name}"`, "name")}
-                className="text-muted-foreground/40 hover:text-foreground transition-colors shrink-0"
-                title="Copy qualified name"
-              >
-                {copied === "name" ? (
-                  <Check className="h-3 w-3 text-success" />
-                ) : (
-                  <Copy className="h-3 w-3" />
-                )}
-              </button>
-            </DialogTitle>
-            <DialogDescription className="mt-0.5 flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-3xs font-medium uppercase tracking-wider">
-                {objectLabel[objectType]}
-              </span>
-              <span className="text-xs">{schema}</span>
-              <span className="text-muted-foreground/30">|</span>
-              <span className="text-xs text-muted-foreground/60">{projectId}</span>
-              {loading && <Loader2 className="h-3 w-3 animate-spin ml-1" />}
-            </DialogDescription>
-          </div>
-        </div>
-      </DialogHeader>
-
+    <ModalBanner
+      icon={objectIcon[objectType]}
+      title={name}
+      badge={objectLabel[objectType]}
+      description={
+        <>
+          {schema}
+          <span className="mx-1.5 text-muted-foreground/30">|</span>
+          <span className="text-muted-foreground/60">{projectId}</span>
+        </>
+      }
+      actions={
+        <>
+          <button
+            type="button"
+            onClick={() => copyText(`"${schema}"."${name}"`, "name")}
+            className="text-muted-foreground/40 hover:text-foreground transition-colors shrink-0"
+            title="Copy qualified name"
+          >
+            {copied === "name" ? (
+              <Check className="h-3 w-3 text-success" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+          </button>
+          {loading && <Loader2 className="h-3 w-3 animate-spin" />}
+        </>
+      }
+    >
       <SegmentedTabs
         stretch
         className="mt-3"
@@ -110,6 +103,6 @@ export function ModalHeader({
         value={activeTab}
         onChange={setActiveTab}
       />
-    </div>
+    </ModalBanner>
   );
 }

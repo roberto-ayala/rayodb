@@ -1,14 +1,10 @@
+import { Database } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ModalBanner } from "@/components/ui/modal-banner";
 import type { ProjectDetails } from "@/types";
 
 export function AddDatabaseDialog({
@@ -43,17 +39,14 @@ export function AddDatabaseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle className="">Add Database</DialogTitle>
-          <DialogDescription>
-            Add a database to{" "}
-            <span className="font-semibold text-foreground">
-              {source?.host}:{source?.port}
-            </span>
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="mt-2 space-y-3">
+      <DialogContent className="gap-0 p-0 sm:max-w-[420px]">
+        <ModalBanner
+          icon={<Database className="h-5 w-5 text-primary" />}
+          title="Add Database"
+          badge="Server"
+          description={`${source?.host}:${source?.port}`}
+        />
+        <form onSubmit={handleSubmit} className="space-y-4 px-5 py-4">
           <Field label="Database Name" htmlFor="addDbName">
             <Input
               id="addDbName"

@@ -6,7 +6,8 @@ import { DriverFactory } from "@/lib/database-driver";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent } from "./ui/dialog";
+import { ModalBanner } from "./ui/modal-banner";
 
 interface CSVImportModalProps {
   open: boolean;
@@ -108,19 +109,14 @@ export function CSVImportModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[700px] p-0 gap-0">
-        <DialogHeader className="px-5 pt-5 pb-3">
-          <DialogTitle className="flex items-center gap-2">
-            <FileUp className="h-4 w-4 text-primary" /> Import CSV
-          </DialogTitle>
-          <DialogDescription>
-            Import data into{" "}
-            <span className="text-foreground">
-              {schema}.{table}
-            </span>
-          </DialogDescription>
-        </DialogHeader>
+        <ModalBanner
+          icon={<FileUp className="h-5 w-5 text-primary" />}
+          title="Import CSV"
+          badge="Table"
+          description={`${schema}.${table}`}
+        />
 
-        <div className="px-5 pb-5 space-y-4">
+        <div className="space-y-4 px-5 py-4">
           {/* File picker */}
           <Button
             variant="outline"

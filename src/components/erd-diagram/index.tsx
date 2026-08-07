@@ -4,14 +4,15 @@ import { DriverFactory } from "@/lib/database-driver";
 import { useProjectStore } from "@/stores/project-store";
 import type { ColumnDetail, IndexDetail } from "@/types";
 import {
-  MAX_ZOOM,
-  MIN_ZOOM,
+  createGestureHandlers,
   createHandleMouseDown,
   createHandleMouseMove,
   createHandleMouseUp,
   createHandleWheel,
   ERDStatusBar,
   ERDToolbar,
+  MAX_ZOOM,
+  MIN_ZOOM,
 } from "./interactions";
 import { layoutTables } from "./layout";
 import { ERDDefs, ERDFKLines, ERDGridBackground, ERDTableBoxes } from "./rendering";
@@ -166,16 +167,32 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
   // The handler reads the live view through a ref, so it can be attached once
   const viewRef = useRef({ zoom, pan });
   viewRef.current = { zoom, pan };
-  const handleWheel = useCallback(createHandleWheel(containerRef, viewRef, setZoom, setPan), []);
-
-  // React attaches onWheel passively, where preventDefault does nothing and the
-  // webview would zoom itself on a pinch. This one has to be a native listener.
-  useEffect(() => {
-    const el = containerRef.current;
+  /**
+   * The listeners go on through the ref rather than an effect: the diagram
+   * renders a spinner first, so on mount there is no element to attach to and
+   * an effect would never run again once one appeared.
+   *
+   * They are also native rather than React's own, because React registers
+   * wheel handlers passively — preventDefault there does nothing, and the
+   * webview would zoom itself on a pinch.
+   */
+  const attachViewport = useCallback((el: HTMLDivElement | null) => {
+    containerRef.current = el;
     if (!el) return;
-    el.addEventListener("wheel", handleWheel, { passive: false });
-    return () => el.removeEventListener("wheel", handleWheel);
-  }, [handleWheel]);
+
+    const onWheel = createHandleWheel(containerRef, viewRef, setZoom, setPan);
+    const gesture = createGestureHandlers(containerRef, viewRef, setZoom, setPan);
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("gesturestart", gesture.onStart, { passive: false });
+    el.addEventListener("gesturechange", gesture.onChange, { passive: false });
+
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("gesturestart", gesture.onStart);
+      el.removeEventListener("gesturechange", gesture.onChange);
+      containerRef.current = null;
+    };
+  }, []);
 
   const handleMouseDown = useCallback(
     createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart),
@@ -250,7 +267,7 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
       <ERDStatusBar boxCount={boxes.length} fkCount={fks.length} zoom={zoom} />
 
       <div
-        ref={containerRef}
+        ref={attachViewport}
         className="h-full cursor-grab active:cursor-grabbing bg-background"
         onMouseDown={(e) => handleMouseDown(e)}
         onMouseMove={handleMouseMove}

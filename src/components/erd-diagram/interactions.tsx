@@ -81,6 +81,66 @@ function pixelDelta(value: number, mode: number): number {
   return value;
 }
 
+/** WebKit's own pinch event, which is not in the DOM typings */
+export interface WebKitGestureEvent extends UIEvent {
+  scale: number;
+  clientX: number;
+  clientY: number;
+}
+
+/** Applies a new zoom while holding the given screen point in place */
+function zoomAround(
+  view: React.RefObject<{ zoom: number; pan: Point }>,
+  setZoom: React.Dispatch<React.SetStateAction<number>>,
+  setPan: React.Dispatch<React.SetStateAction<Point>>,
+  target: number,
+  cx: number,
+  cy: number,
+) {
+  const { zoom, pan } = view.current;
+  const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, target));
+  if (next === zoom) return;
+  const ratio = next / zoom;
+  setPan({ x: cx - (cx - pan.x) * ratio, y: cy - (cy - pan.y) * ratio });
+  setZoom(next);
+}
+
+/**
+ * Safari and the webview Tauri runs on report a trackpad pinch as their own
+ * gesture events, not as ctrl + wheel the way Chrome does, so the pinch has to
+ * be handled twice to work in both.
+ */
+export function createGestureHandlers(
+  container: React.RefObject<HTMLDivElement | null>,
+  view: React.RefObject<{ zoom: number; pan: Point }>,
+  setZoom: React.Dispatch<React.SetStateAction<number>>,
+  setPan: React.Dispatch<React.SetStateAction<Point>>,
+) {
+  // scale arrives relative to the start of the gesture, not the last event
+  let zoomAtStart = 1;
+
+  const onStart = (e: Event) => {
+    e.preventDefault();
+    zoomAtStart = view.current.zoom;
+  };
+
+  const onChange = (e: Event) => {
+    e.preventDefault();
+    const gesture = e as WebKitGestureEvent;
+    const rect = container.current?.getBoundingClientRect();
+    zoomAround(
+      view,
+      setZoom,
+      setPan,
+      zoomAtStart * gesture.scale,
+      rect ? gesture.clientX - rect.left : 0,
+      rect ? gesture.clientY - rect.top : 0,
+    );
+  };
+
+  return { onStart, onChange };
+}
+
 /**
  * The wheel pans and the modifier zooms, which is also what a trackpad sends:
  * two fingers arrive as a plain wheel, a pinch arrives as ctrl + wheel.
@@ -106,16 +166,16 @@ export function createHandleWheel(
       return;
     }
 
-    const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * Math.exp(-dy * ZOOM_PER_PIXEL)));
-    if (next === zoom) return;
-
     // Keep whatever is under the pointer under the pointer
     const rect = container.current?.getBoundingClientRect();
-    const cx = rect ? e.clientX - rect.left : 0;
-    const cy = rect ? e.clientY - rect.top : 0;
-    const ratio = next / zoom;
-    setPan({ x: cx - (cx - pan.x) * ratio, y: cy - (cy - pan.y) * ratio });
-    setZoom(next);
+    zoomAround(
+      view,
+      setZoom,
+      setPan,
+      zoom * Math.exp(-dy * ZOOM_PER_PIXEL),
+      rect ? e.clientX - rect.left : 0,
+      rect ? e.clientY - rect.top : 0,
+    );
   };
 }
 

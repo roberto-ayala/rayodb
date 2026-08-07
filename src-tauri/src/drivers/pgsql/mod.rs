@@ -65,6 +65,9 @@ pub type PolicyDetail = (String, String, String);
 /// Function info: (name, return_type, arguments)
 pub type FunctionInfo = (String, String, String);
 
+/// Data type info: (name, kind, detail)
+pub type DataTypeInfo = (String, String, String);
+
 /// Procedure info: (name, arguments)
 pub type ProcedureInfo = (String, String);
 

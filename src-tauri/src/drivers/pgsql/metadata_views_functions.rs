@@ -2,7 +2,7 @@ use tokio_postgres::Client;
 
 use crate::common::enums::{AppError, pg_error_message};
 
-use super::{FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo};
+use super::{DataTypeInfo, FunctionInfo, ObjectStats, ProcedureInfo, SequenceInfo};
 
 pub async fn load_views(client: &Client, schema: &str) -> Result<Vec<String>, AppError> {
     let rows = client
@@ -80,6 +80,48 @@ pub async fn load_functions(client: &Client, schema: &str) -> Result<Vec<Functio
             let args: String = r.get(2);
             (name, ret, args)
         })
+        .collect())
+}
+
+/// User-defined types of a schema: enums, domains, composites and ranges, each
+/// with the detail that identifies it (labels, base type, attributes, subtype).
+pub async fn load_data_types(client: &Client, schema: &str) -> Result<Vec<DataTypeInfo>, AppError> {
+    let rows = client
+        .query(
+            // Tables, views and sequences each own a composite type describing
+            // their row; only relkind 'c' is a type the user actually declared.
+            r#"SELECT t.typname::text,
+                      CASE t.typtype
+                        WHEN 'e' THEN 'enum'
+                        WHEN 'd' THEN 'domain'
+                        WHEN 'c' THEN 'composite'
+                        ELSE 'range'
+                      END,
+                      COALESCE(
+                        CASE t.typtype
+                          WHEN 'e' THEN (SELECT string_agg(e.enumlabel, ', ' ORDER BY e.enumsortorder)
+                                         FROM pg_enum e WHERE e.enumtypid = t.oid)
+                          WHEN 'd' THEN format_type(t.typbasetype, t.typtypmod)
+                          WHEN 'c' THEN (SELECT string_agg(a.attname || ' ' || format_type(a.atttypid, a.atttypmod), ', ' ORDER BY a.attnum)
+                                         FROM pg_attribute a
+                                         WHERE a.attrelid = t.typrelid AND a.attnum > 0 AND NOT a.attisdropped)
+                          ELSE (SELECT format_type(r.rngsubtype, NULL) FROM pg_range r WHERE r.rngtypid = t.oid)
+                        END, '')
+               FROM pg_type t
+               JOIN pg_namespace n ON n.oid = t.typnamespace
+               WHERE n.nspname = $1
+                 AND t.typtype IN ('e', 'd', 'c', 'r')
+                 AND (t.typtype <> 'c'
+                      OR EXISTS (SELECT 1 FROM pg_class c WHERE c.oid = t.typrelid AND c.relkind = 'c'))
+               ORDER BY t.typname"#,
+            &[&schema],
+        )
+        .await
+        .map_err(|e| AppError::QueryFailed(pg_error_message(&e)))?;
+
+    Ok(rows
+        .iter()
+        .map(|r| (r.get(0), r.get(1), r.get(2)))
         .collect())
 }
 

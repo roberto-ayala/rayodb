@@ -37,7 +37,6 @@ interface TabState {
   openRolesTab: (projectId: string) => void;
   openSchemaDiffTab: (projectId: string) => void;
   openExtensionsTab: (projectId: string) => void;
-  openEnumsTab: (projectId: string) => void;
   openPgSettingsTab: (projectId: string) => void;
   closeTab: (index: number) => void;
   closeAllTabs: () => void;
@@ -58,6 +57,18 @@ interface TabState {
   setSplitExecuting: (index: number, executing: boolean) => void;
   setQueryTimeout: (index: number, timeout: number) => void;
 }
+
+const KNOWN_TAB_TYPES = new Set<string>([
+  "query",
+  "monitor",
+  "erd",
+  "terminal",
+  "notify",
+  "roles",
+  "schema-diff",
+  "extensions",
+  "pg-settings",
+]);
 
 function makeSingletonTab(
   type: Tab["type"],
@@ -163,7 +174,6 @@ export const useTabStore = create<TabState>()(
         set(makeSingletonTab("schema-diff", projectId, "Schema Diff")),
       openExtensionsTab: (projectId) =>
         set(makeSingletonTab("extensions", projectId, "Extensions")),
-      openEnumsTab: (projectId) => set(makeSingletonTab("enums", projectId, "Enum Types")),
       openPgSettingsTab: (projectId) =>
         set(makeSingletonTab("pg-settings", projectId, "PG Settings")),
 
@@ -311,7 +321,13 @@ export const useTabStore = create<TabState>()(
         if (p.tabs.length === 0) return { ...current, tabs: [], selectedTabIndex: -1 };
         const validTabs = p.tabs.filter(
           (t): t is Tab =>
-            t != null && typeof t === "object" && "id" in t && "type" in t && "title" in t,
+            t != null &&
+            typeof t === "object" &&
+            "id" in t &&
+            "type" in t &&
+            "title" in t &&
+            // Tab kinds that no longer exist would restore into a blank pane
+            KNOWN_TAB_TYPES.has((t as Tab).type),
         );
         if (validTabs.length === 0) return { ...current, tabs: [], selectedTabIndex: -1 };
         const idx = Math.min(Math.max(0, p.selectedTabIndex ?? 0), validTabs.length - 1);

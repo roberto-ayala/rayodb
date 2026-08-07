@@ -158,7 +158,6 @@ export function EditorToolbar({
         ) : (
           <Button variant="default" size="sm" onClick={onExecute} disabled={!activeProject}>
             <Play className="h-3.5 w-3.5" />
-            Execute
             <kbd className="font-mono hidden sm:inline-flex ml-0.5 text-3xs text-primary-foreground/70">
               {navigator.platform.includes("Mac") ? "\u2318" : "Ctrl"}+Enter
             </kbd>

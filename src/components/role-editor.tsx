@@ -1,16 +1,11 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, User, Users } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CheckboxField, Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { ModalBanner } from "@/components/ui/modal-banner";
 import { cn } from "@/lib/utils";
 import type { PgRole, RoleSpec } from "@/types";
 
@@ -106,20 +101,29 @@ export function RoleEditor({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-lg bg-card sm:max-w-[560px] flex flex-col overflow-hidden p-0">
-        <DialogHeader className="shrink-0 px-6 pt-6 pb-0">
-          <DialogTitle className="text-foreground">
-            {isEditing ? `Edit Role: ${editing.name}` : "New Role"}
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground text-xs">
-            {isEditing
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[560px]">
+        <ModalBanner
+          className="shrink-0"
+          icon={
+            form.superuser ? (
+              <ShieldCheck className="h-5 w-5 text-warning" />
+            ) : form.login ? (
+              <User className="h-5 w-5 text-primary" />
+            ) : (
+              <Users className="h-5 w-5 text-muted-foreground" />
+            )
+          }
+          title={isEditing ? editing.name : "New Role"}
+          badge={form.login ? "Login role" : "Group role"}
+          description={
+            isEditing
               ? "Attributes, password and group memberships"
-              : "A login role is a user; without LOGIN it is a group"}
-          </DialogDescription>
-        </DialogHeader>
+              : "A login role is a user; without LOGIN it is a group"
+          }
+        />
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
             <Field
               label="Role Name"
               htmlFor="role-name"
@@ -175,7 +179,7 @@ export function RoleEditor({
               <div className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Attributes
               </div>
-              <div className="grid grid-cols-2 gap-x-4">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-lg border border-border bg-muted/20 p-3">
                 <CheckboxField
                   id="role-login"
                   label="LOGIN"
@@ -220,8 +224,9 @@ export function RoleEditor({
                 />
               </div>
               {form.superuser && (
-                <p className="text-xs text-warning">
-                  A superuser bypasses every permission check, including row level security.
+                <p className="flex items-start gap-1.5 text-xs text-warning">
+                  <Shield className="mt-0.5 h-3 w-3 shrink-0" />A superuser bypasses every
+                  permission check, including row level security.
                 </p>
               )}
             </div>
@@ -231,7 +236,7 @@ export function RoleEditor({
                 <div className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground">
                   Member of
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 rounded-lg border border-border bg-muted/20 p-3">
                   {groupOptions.map((r) => {
                     const active = form.member_of.includes(r.name);
                     return (
@@ -261,7 +266,7 @@ export function RoleEditor({
             )}
           </div>
 
-          <div className="flex shrink-0 justify-end gap-2 border-border border-t px-6 py-4">
+          <div className="flex shrink-0 justify-end gap-2 border-border border-t px-5 py-4">
             <Button
               type="button"
               variant="ghost"

@@ -4,6 +4,8 @@ import { DriverFactory } from "@/lib/database-driver";
 import { useProjectStore } from "@/stores/project-store";
 import type { ColumnDetail, IndexDetail } from "@/types";
 import {
+  MAX_ZOOM,
+  MIN_ZOOM,
   createHandleMouseDown,
   createHandleMouseMove,
   createHandleMouseUp,
@@ -161,7 +163,19 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
 
   const { connectedTables, connectedFKs } = useTableDetails(hoveredTable, fks);
 
-  const handleWheel = useCallback(createHandleWheel(setZoom), []);
+  // The handler reads the live view through a ref, so it can be attached once
+  const viewRef = useRef({ zoom, pan });
+  viewRef.current = { zoom, pan };
+  const handleWheel = useCallback(createHandleWheel(containerRef, viewRef, setZoom, setPan), []);
+
+  // React attaches onWheel passively, where preventDefault does nothing and the
+  // webview would zoom itself on a pinch. This one has to be a native listener.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [handleWheel]);
 
   const handleMouseDown = useCallback(
     createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart),
@@ -174,6 +188,19 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
   );
 
   const handleMouseUp = useCallback(createHandleMouseUp(setDragging), []);
+
+  /** The buttons zoom about the middle of the view, as the wheel does about the pointer */
+  const zoomBy = useCallback((factor: number) => {
+    const el = containerRef.current;
+    const { zoom, pan } = viewRef.current;
+    const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * factor));
+    if (next === zoom) return;
+    const cx = el ? el.clientWidth / 2 : 0;
+    const cy = el ? el.clientHeight / 2 : 0;
+    const ratio = next / zoom;
+    setPan({ x: cx - (cx - pan.x) * ratio, y: cy - (cy - pan.y) * ratio });
+    setZoom(next);
+  }, []);
 
   const fitToView = useCallback(() => {
     if (!containerRef.current || boxes.length === 0) return;
@@ -218,14 +245,13 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <ERDToolbar setZoom={setZoom} fitToView={fitToView} exportSVG={exportSVG} />
+      <ERDToolbar zoomBy={zoomBy} fitToView={fitToView} exportSVG={exportSVG} />
 
       <ERDStatusBar boxCount={boxes.length} fkCount={fks.length} zoom={zoom} />
 
       <div
         ref={containerRef}
         className="h-full cursor-grab active:cursor-grabbing bg-background"
-        onWheel={handleWheel}
         onMouseDown={(e) => handleMouseDown(e)}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

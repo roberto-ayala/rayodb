@@ -178,6 +178,33 @@ mod tests {
         assert_eq!(caps, Capabilities::default());
     }
 
+    /// The connection form turns its driver field into a picker only when more
+    /// than one engine is selectable, so this is what decides whether the user
+    /// can choose at all.
+    #[test]
+    fn every_shipped_engine_is_selectable() {
+        let selectable: Vec<&str> = DriverKind::ALL
+            .into_iter()
+            .filter(|k| k.is_implemented())
+            .map(|k| k.as_str())
+            .collect();
+
+        assert_eq!(selectable, vec!["PGSQL", "MYSQL", "SQLITE"]);
+        assert!(
+            selectable.len() >= 2,
+            "with fewer than two the form shows a static field, not a picker"
+        );
+    }
+
+    #[test]
+    fn a_file_based_engine_asks_for_a_path() {
+        assert!(DriverKind::Sqlite.is_file_based());
+        assert!(!DriverKind::Pgsql.is_file_based());
+        assert!(!DriverKind::Mysql.is_file_based());
+        assert_eq!(DriverKind::Mysql.default_port(), "3306");
+        assert_eq!(DriverKind::Pgsql.default_port(), "5432");
+    }
+
     #[test]
     fn postgres_enables_the_whole_surface() {
         let caps = DriverKind::Pgsql.capabilities();

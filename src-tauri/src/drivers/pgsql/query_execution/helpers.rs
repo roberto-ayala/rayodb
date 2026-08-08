@@ -1,6 +1,6 @@
 use tokio_postgres::SimpleQueryMessage;
 
-use super::super::{CELL_SEP, ROW_SEP};
+pub(crate) use crate::drivers::packing::{join_sep, pack_rows_vec};
 
 /// Process simple_query messages, returning the last result set the query
 /// produced — including an empty one, so a SELECT matching no rows still keeps
@@ -70,49 +70,4 @@ pub(crate) fn process_simple_messages(
     } else {
         (Vec::new(), Vec::new())
     }
-}
-
-/// Join string slices with a char separator — avoids .to_string() on the separator.
-#[inline]
-pub(crate) fn join_sep(items: &[String], sep: char) -> String {
-    let total: usize = items.iter().map(|s| s.len()).sum::<usize>() + items.len();
-    let mut out = String::with_capacity(total);
-    for (i, item) in items.iter().enumerate() {
-        if i > 0 {
-            out.push(sep);
-        }
-        out.push_str(item);
-    }
-    out
-}
-
-/// Pack a slice of rows (each row = Vec<String>) into wire format.
-/// Pre-allocates capacity and writes directly — zero intermediate allocations.
-pub(crate) fn pack_rows_vec(rows: &[Vec<String>]) -> String {
-    if rows.is_empty() {
-        return String::new();
-    }
-    // Estimate capacity: avg ~20 chars per cell
-    let est = rows.len() * rows.first().map_or(10, |r| r.len()) * 20;
-    let mut out = String::with_capacity(est);
-
-    for (ri, row) in rows.iter().enumerate() {
-        if ri > 0 {
-            out.push(ROW_SEP);
-        }
-        for (ci, cell) in row.iter().enumerate() {
-            if ci > 0 {
-                out.push(CELL_SEP);
-            }
-            // Inline separator sanitization — avoids .replace() allocations
-            for ch in cell.chars() {
-                if ch == CELL_SEP || ch == ROW_SEP {
-                    out.push(' ');
-                } else {
-                    out.push(ch);
-                }
-            }
-        }
-    }
-    out
 }

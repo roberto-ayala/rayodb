@@ -182,7 +182,8 @@ export function ConnectionModal({
       const key: [string, string, string, string, string, string] = [
         formData.username,
         formData.password,
-        formData.database,
+        // A file-based engine has a path where a server has a database name.
+        isFileBased ? formData.filePath : formData.database,
         formData.host,
         formData.port,
         formData.ssl ? "true" : "false",

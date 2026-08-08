@@ -50,7 +50,15 @@ import {
   unpackResult,
 } from "./index";
 
-export class PostgreSQLDriver implements DatabaseDriver {
+/**
+ * The one frontend driver. Every method invokes a `db_*` command, and the
+ * backend dispatches on the project's engine, so nothing here is
+ * engine-specific — a new driver is a Rust concern, not a class in this file.
+ *
+ * Methods an engine does not implement reject with `Unsupported`; the UI is
+ * expected to gate on capabilities rather than call and catch.
+ */
+export class IpcDriver implements DatabaseDriver {
   async connect(
     projectId: string,
     key: [string, string, string, string, string, string],

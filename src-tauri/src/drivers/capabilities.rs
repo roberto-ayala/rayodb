@@ -60,6 +60,22 @@ impl Capabilities {
         Self::default()
     }
 
+    /// SQLite is a file, not a server: no roles, no extensions, no pub/sub, no
+    /// server statistics to report. What it does have is the structural core —
+    /// tables, views, indexes, foreign keys — plus the original DDL, which it
+    /// stores verbatim in `sqlite_master`.
+    pub fn sqlite() -> Self {
+        Self {
+            // One implicit schema, so nothing to browse between server and
+            // table; `load_schemas` still names it so the tree keeps its shape.
+            schemas: false,
+            triggers: true,
+            ddl_generation: true,
+            streaming: true,
+            ..Self::none()
+        }
+    }
+
     pub fn postgres() -> Self {
         Self {
             schemas: true,
@@ -100,8 +116,9 @@ impl DriverKind {
     pub fn capabilities(self) -> Capabilities {
         match self {
             DriverKind::Pgsql => Capabilities::postgres(),
-            // No driver behind these yet; claiming nothing is the honest answer.
-            DriverKind::Mysql | DriverKind::Sqlite => Capabilities::none(),
+            DriverKind::Sqlite => Capabilities::sqlite(),
+            // No driver behind this yet; claiming nothing is the honest answer.
+            DriverKind::Mysql => Capabilities::none(),
         }
     }
 }

@@ -1,11 +1,17 @@
 import type { DriverType } from "@/types";
 import type { DatabaseDriver } from "./index";
-import { PostgreSQLDriver } from "./pgsql";
+import { IpcDriver } from "./ipc-driver";
 
 export class DriverFactory {
+  // Every engine goes through the same IPC driver: the backend dispatches on
+  // the project's kind, so the frontend needs one implementation, not one per
+  // engine. Registration here is what makes a driver selectable in the UI.
+  private static shared: DatabaseDriver = new IpcDriver();
+
   private static drivers: Map<DriverType, DatabaseDriver> = new Map([
-    ["PGSQL", new PostgreSQLDriver()],
-  ]);
+    ["PGSQL", DriverFactory.shared],
+    ["SQLITE", DriverFactory.shared],
+  ] as [DriverType, DatabaseDriver][]);
 
   static getDriver(driverType: DriverType): DatabaseDriver {
     const driver = DriverFactory.drivers.get(driverType);
@@ -31,6 +37,7 @@ export interface DriverConfig {
  */
 export const DRIVER_CONFIGS: Partial<Record<DriverType, DriverConfig>> = {
   PGSQL: { name: "PostgreSQL", defaultPort: "5432" },
+  SQLITE: { name: "SQLite", defaultPort: "" },
 };
 
 export type { DriverType };

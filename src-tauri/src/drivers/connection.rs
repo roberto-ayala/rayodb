@@ -133,6 +133,10 @@ pub async fn connect(
             let driver = crate::drivers::pgsql::connect(params).await?;
             Ok(Arc::new(driver))
         }
+        DriverKind::Sqlite => {
+            let driver = crate::drivers::sqlite::connect(params).await?;
+            Ok(Arc::new(driver))
+        }
         other => Err(AppError::DriverNotImplemented(other.display_name())),
     }
 }
@@ -145,6 +149,7 @@ pub async fn test_connection(
 ) -> Result<String, AppError> {
     match kind {
         DriverKind::Pgsql => crate::drivers::pgsql::test_connection(params).await,
+        DriverKind::Sqlite => crate::drivers::sqlite::test_connection(params).await,
         other => Err(AppError::DriverNotImplemented(other.display_name())),
     }
 }

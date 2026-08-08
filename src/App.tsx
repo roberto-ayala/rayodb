@@ -87,7 +87,10 @@ export default function App() {
         driver: connection.driver,
         username: connection.username,
         password: connection.password,
-        database: connection.database,
+        // For a file-based engine the path *is* the database, so it goes in
+        // both places: `database` is what the connect key carries, `options`
+        // is the canonical home the driver reads first.
+        database: connection.filePath || connection.database,
         host: connection.host,
         port: connection.port,
         ssl: connection.ssl ? "true" : "false",

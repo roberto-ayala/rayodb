@@ -7,21 +7,31 @@ interface ConnStringFieldProps {
   value: string;
   onChange: (value: string) => void;
   error: boolean;
+  driver: DriverType;
 }
 
-export function ConnStringField({ value, onChange, error }: ConnStringFieldProps) {
+/** The URL shape each engine accepts, shown as the placeholder. */
+const CONN_STRING_EXAMPLE: Record<DriverType, string> = {
+  PGSQL: "postgresql://user:password@host:5432/database",
+  MYSQL: "mysql://user:password@host:3306/database",
+  SQLITE: "/path/to/database.sqlite",
+};
+
+export function ConnStringField({ value, onChange, error, driver }: ConnStringFieldProps) {
+  const isFile = driver === "SQLITE";
+
   return (
     <div className="space-y-4">
       <Field
-        label="Connection URL"
+        label={isFile ? "Database File" : "Connection URL"}
         htmlFor="connString"
-        error={error ? "Invalid connection URL format" : undefined}
+        error={error ? "Not a connection URL this app recognises" : undefined}
       >
         <Input
           id="connString"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="postgresql://user:password@host:5432/database"
+          placeholder={CONN_STRING_EXAMPLE[driver]}
           className={error ? "border-destructive" : undefined}
         />
       </Field>
@@ -157,16 +167,23 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
 interface DatabaseFieldProps {
   value: string;
   onChange: (value: string) => void;
-  /** The engine can open the server without one and list the rest. */
+  /** The engine can open the server without one. */
   optional?: boolean;
+  driver: DriverType;
 }
 
-export function DatabaseField({ value, onChange, optional = false }: DatabaseFieldProps) {
+/** Blank means different things per engine, so say which. */
+const BLANK_DATABASE_MEANS: Partial<Record<DriverType, string>> = {
+  MYSQL: "Leave blank to browse every database on the server",
+  PGSQL: "Leave blank to use the database named after the user",
+};
+
+export function DatabaseField({ value, onChange, optional = false, driver }: DatabaseFieldProps) {
   return (
     <Field
       label={optional ? "Database (optional)" : "Database"}
       htmlFor="database"
-      hint={optional ? "Leave blank to browse every database on the server" : undefined}
+      hint={optional ? BLANK_DATABASE_MEANS[driver] : undefined}
     >
       <Input
         id="database"

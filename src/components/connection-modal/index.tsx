@@ -81,20 +81,40 @@ function readFilePath(options: string | undefined): string {
 }
 
 function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id">> | null {
+  const raw = url.trim();
+  if (!raw) return null;
+
+  // A bare path or a sqlite: URL is a file, not a server.
+  if (raw.startsWith("sqlite:") || raw.startsWith("/") || raw.startsWith("~/")) {
+    const path = raw.replace(/^sqlite:(\/\/)?/, "");
+    return path ? { driver: "SQLITE", filePath: path } : null;
+  }
+
+  // Each engine has its own scheme; the rest of the URL is shaped the same.
+  const schemes: Record<string, DriverType> = {
+    "postgresql:": "PGSQL",
+    "postgres:": "PGSQL",
+    "mysql:": "MYSQL",
+    "mariadb:": "MYSQL",
+  };
+
   try {
-    // Handle postgresql:// and postgres:// schemes
-    const normalized = url.trim().replace(/^postgres:\/\//, "postgresql://");
-    if (!normalized.startsWith("postgresql://")) return null;
-    const parsed = new URL(normalized);
+    const parsed = new URL(raw);
+    const driver = schemes[parsed.protocol];
+    if (!driver) return null;
+
     const params = parsed.searchParams;
     const ssl =
       params.get("sslmode") === "require" ||
       params.get("sslmode") === "verify-full" ||
       params.get("ssl") === "true";
+
     return {
-      driver: "PGSQL",
+      driver,
       host: parsed.hostname || "localhost",
-      port: parsed.port || "5432",
+      port: parsed.port || (driver === "MYSQL" ? "3306" : "5432"),
+      // A URL without a path names no database, which is allowed: what blank
+      // means is the engine's business, not the parser's.
       database: parsed.pathname.replace(/^\//, "") || "",
       username: decodeURIComponent(parsed.username || ""),
       password: decodeURIComponent(parsed.password || ""),
@@ -162,7 +182,13 @@ export function ConnectionModal({
     if (!value.trim()) return;
     const parsed = parseConnectionString(value);
     if (parsed) {
-      setFormData((prev) => ({ ...prev, ...parsed, name: prev.name || parsed.database || "" }));
+      setFormData((prev) => ({
+        ...prev,
+        ...parsed,
+        // Name it after whatever the URL identified it by.
+        name:
+          prev.name || parsed.database || parsed.filePath?.split("/").pop() || parsed.host || "",
+      }));
     } else {
       setConnStringError(true);
     }
@@ -172,6 +198,11 @@ export function ConnectionModal({
   const selected = drivers.find((d) => d.id === formData.driver);
   const isFileBased = selected?.fileBased ?? false;
   const databaseOptional = selected?.databaseOptional ?? false;
+  // A file-based engine needs its path; a server needs a host, and a database
+  // only when the engine cannot do without one.
+  const canTest = isFileBased
+    ? !!formData.filePath
+    : !!formData.host && (databaseOptional || !!formData.database);
 
   const isEditing = !!editData;
   const name = formData.name.trim();
@@ -229,6 +260,7 @@ export function ConnectionModal({
                 value={connString}
                 onChange={handleConnStringPaste}
                 error={connStringError}
+                driver={formData.driver}
               />
             )}
 
@@ -270,6 +302,7 @@ export function ConnectionModal({
                   value={formData.database}
                   onChange={(value) => setFormData({ ...formData, database: value })}
                   optional={databaseOptional}
+                  driver={formData.driver}
                 />
 
                 <UsernameField
@@ -333,7 +366,7 @@ export function ConnectionModal({
               type="button"
               variant="outline"
               onClick={() => void handleTestConnection()}
-              disabled={testing || !formData.host || !formData.database}
+              disabled={testing || !canTest}
               className="text-xs"
             >
               {testing && <Loader2 className="h-3 w-3 animate-spin mr-1.5" />}

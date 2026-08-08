@@ -54,11 +54,12 @@ impl DriverKind {
         matches!(self, DriverKind::Sqlite)
     }
 
-    /// Whether the server can be opened without naming a database, and list
-    /// the rest once connected. PostgreSQL cannot: a connection is bound to one
-    /// database and reaching another means reconnecting.
+    /// Whether the field may be left blank. What blank *means* differs: MySQL
+    /// opens the server and lists every database, while PostgreSQL falls back
+    /// to the one named after the connecting user, since a connection there is
+    /// bound to a single database.
     pub fn database_optional(self) -> bool {
-        matches!(self, DriverKind::Mysql)
+        matches!(self, DriverKind::Mysql | DriverKind::Pgsql)
     }
 
     pub fn default_port(self) -> &'static str {

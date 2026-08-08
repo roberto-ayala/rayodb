@@ -75,9 +75,16 @@ fn config_from(params: &ConnectionParams) -> Config {
     let mut cfg = Config::new();
     cfg.user(&params.username)
         .password(&params.password)
-        .dbname(&params.database)
         .host(&params.host)
         .port(params.port.parse().unwrap_or(5432));
+
+    // Omitting dbname is not the same as passing an empty one: left out, the
+    // server falls back to the database named after the user, which is what
+    // psql does. An empty string would be an error.
+    if !params.database.is_empty() {
+        cfg.dbname(&params.database);
+    }
+
     cfg
 }
 

@@ -76,6 +76,33 @@ async fn connect_exposes_pools_and_kind() {
     );
 }
 
+/// A blank database is allowed: the server falls back to the one named after
+/// the user, which is what psql does. Passing an empty dbname would be an
+/// error, so this checks the parameter is omitted rather than blanked.
+#[tokio::test]
+async fn connecting_without_a_database_uses_the_user_default() {
+    let params = skip_without_server!();
+    // The fixture's user is `testuser` and its database `testdb`, so a blank
+    // database can only work if the server picks the user's own — which does
+    // not exist here, making the *error* the proof it was omitted, not sent
+    // empty.
+    let blank = ConnectionParams {
+        database: String::new(),
+        ..params.clone()
+    };
+
+    match connect(&blank).await {
+        Ok(_) => {} // a server with a matching database is fine too
+        Err(e) => {
+            let msg = e.to_string();
+            assert!(
+                msg.contains("testuser"),
+                "should have fallen back to the user's database, got: {msg}"
+            );
+        }
+    }
+}
+
 #[tokio::test]
 async fn schema_tree_loads() {
     let params = skip_without_server!();

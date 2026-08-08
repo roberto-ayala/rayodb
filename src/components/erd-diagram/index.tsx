@@ -1,6 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { DriverFactory } from "@/lib/database-driver";
 import { saveTextFile } from "@/lib/export";
 import { useProjectStore } from "@/stores/project-store";
@@ -34,6 +35,8 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     null,
   );
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
   const [hoveredTable, setHoveredTable] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -45,13 +48,18 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
   const loadColumnDetails = useProjectStore((s) => s.loadColumnDetails);
   const loadIndexes = useProjectStore((s) => s.loadIndexes);
   const loadTables = useProjectStore((s) => s.loadTables);
+  // The diagram may be opened, or restored from a previous session, before the
+  // connection is up — so it reloads when the project reaches Connected
+  const connectionStatus = useProjectStore((s) => s.status[projectId]);
 
   const key = `${projectId}::${schema}`;
   const schemaTables = tables[key] ?? [];
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: connectionStatus and reloadToken are triggers, not inputs — the effect exists to re-run when the project connects or the user retries
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setLoadError(null);
     detailsLoadedRef.current = false;
 
     async function load() {
@@ -65,18 +73,26 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
       const driver = DriverFactory.getDriver(d.driver);
 
       let loadedFks: ForeignKey[] = [];
-      try {
-        const [, fkResult] = await Promise.allSettled([
-          loadTables(projectId, schema),
-          driver.loadForeignKeys(projectId, schema),
-        ]);
-        if (fkResult.status === "fulfilled") {
-          loadedFks = fkResult.value;
-        } else {
-          console.warn("ERD: Failed to load foreign keys:", fkResult.reason);
+      const [tableResult, fkResult] = await Promise.allSettled([
+        loadTables(projectId, schema),
+        driver.loadForeignKeys(projectId, schema),
+      ]);
+
+      if (fkResult.status === "fulfilled") {
+        loadedFks = fkResult.value;
+      } else {
+        console.warn("ERD: Failed to load foreign keys:", fkResult.reason);
+      }
+
+      // Without this the failure reads as an empty schema, which is a
+      // different thing and sends you looking in the wrong place
+      if (tableResult.status === "rejected") {
+        const reason = tableResult.reason;
+        if (!cancelled) {
+          setLoadError(reason instanceof Error ? reason.message : String(reason));
+          setLoading(false);
         }
-      } catch (e) {
-        console.warn("ERD: Error loading data:", e);
+        return;
       }
 
       if (cancelled) return;
@@ -113,8 +129,15 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, schema, loadColumnDetails, loadTables, loadIndexes]);
+  }, [
+    projectId,
+    schema,
+    connectionStatus,
+    reloadToken,
+    loadColumnDetails,
+    loadTables,
+    loadIndexes,
+  ]);
 
   const detailsReady =
     schemaTables.length === 0 ||
@@ -260,6 +283,23 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
       <div className="flex h-full items-center justify-center text-muted-foreground gap-2">
         <Loader2 className="h-5 w-5 animate-spin" />
         <span className="text-sm">Loading ERD...</span>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
+        <span className="text-sm text-destructive">Could not read schema "{schema}"</span>
+        <span className="max-w-lg text-xs text-muted-foreground">{loadError}</span>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={() => setReloadToken((t) => t + 1)}
+        >
+          Try again
+        </Button>
       </div>
     );
   }

@@ -23,8 +23,9 @@ import { cn } from "@/lib/utils";
 import type { ProjectDetails } from "@/types";
 import { ProjectConnectionStatus } from "@/types";
 import { I } from "./constants";
-import { newDatabaseTemplate, newEventTriggerTemplate, newSchemaTemplate } from "./ddl-queries";
+import { newEventTriggerTemplate } from "./ddl-queries";
 import { renderSchemas } from "./render-schema-objects";
+import { newDatabaseTemplateFor, newSchemaTemplateFor } from "./templates-by-driver";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
 
@@ -38,6 +39,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     status,
     serverDatabases,
     capsFor,
+    driverOf,
     serverTablespaces,
     eventTriggers,
     isOpen,
@@ -216,7 +218,9 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                   icon: <Database className="h-3 w-3" />,
                   onClick: () =>
                     connectedPid &&
-                    openTab(connectedPid, newDatabaseTemplate(), { title: "New database" }),
+                    openTab(connectedPid, newDatabaseTemplateFor(driverOf(connectedPid)), {
+                      title: "New database",
+                    }),
                 },
               ])
             }
@@ -316,7 +320,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                         label: "New Schema…",
                                         icon: <FolderPlus className="h-3 w-3" />,
                                         onClick: () =>
-                                          openTab(dbPid, newSchemaTemplate(), {
+                                          openTab(dbPid, newSchemaTemplateFor(driverOf(dbPid)), {
                                             title: "New schema",
                                           }),
                                       },

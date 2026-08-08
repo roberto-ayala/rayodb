@@ -79,6 +79,12 @@ impl Capabilities {
             triggers: true,
             ddl_generation: true,
             streaming: true,
+            object_templates: true,
+            // SQLite's ALTER TABLE cannot change a column's type, drop a
+            // constraint or add one; the editor's statements have no SQLite
+            // equivalent short of rebuilding the table, which is a different
+            // feature rather than a dialect.
+            structure_editing: false,
             ..Self::none()
         }
     }
@@ -131,10 +137,17 @@ impl Capabilities {
             triggers: true,
             databases: true,
             server_settings: true,
-            monitoring: true,
+            // The performance monitor is one panel with six tabs — activity,
+            // database and table stats, locks, index usage, bloat — and only
+            // activity has a MySQL implementation so far. A panel with five
+            // dead tabs is worse than no panel, so this stays off until the
+            // rest exist. SHOW PROCESSLIST is still reachable as a query.
+            monitoring: false,
             query_cancellation: true,
             streaming: true,
             ddl_generation: true,
+            object_templates: true,
+            structure_editing: true,
             ..Self::none()
         }
     }

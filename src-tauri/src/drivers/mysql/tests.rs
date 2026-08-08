@@ -298,6 +298,8 @@ async fn ddl_comes_from_show_create() {
 async fn monitoring_reads_the_server() {
     let Some(driver) = driver().await else { return };
 
+    // Implemented even though the monitor panel is gated off: it is the one
+    // piece that works, and the panel turns on once the rest catch up.
     let activity = driver.load_activity().await.expect("activity");
     assert!(!activity.is_empty(), "our own connection is in there");
 
@@ -324,13 +326,14 @@ async fn unsupported_features_say_so() {
     let caps = DriverKind::Mysql.capabilities();
     assert!(caps.schemas, "a database is a schema");
     assert!(caps.triggers);
-    assert!(caps.monitoring);
+    // The monitor panel needs five more implementations before it is honest.
+    assert!(!caps.monitoring);
     assert!(!caps.materialized_views);
     assert!(!caps.pubsub);
     assert!(!caps.policies);
-    // The frontend's SQL generators are still PostgreSQL-shaped.
-    assert!(!caps.object_templates);
-    assert!(!caps.structure_editing);
+    // The frontend's SQL generators now have a MySQL dialect.
+    assert!(caps.object_templates);
+    assert!(caps.structure_editing);
 }
 
 /// information_schema filters take object names as data. A name that tried to

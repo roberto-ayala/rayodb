@@ -5,6 +5,7 @@ import type { OpenTabOptions } from "@/stores/tab-store";
 import type {
   ColumnDetail,
   DataTypeInfo,
+  DriverType,
   EventTriggerInfo,
   ForeignTableInfo,
   FunctionInfo,
@@ -42,6 +43,8 @@ export interface SidebarRenderCtx {
   projects: ProjectMap;
   /** What the engine behind a project supports; gates branches and menus. */
   capsFor: (projectId: string) => DriverCapabilities;
+  /** Which engine a project speaks; picks the dialect for generated SQL. */
+  driverOf: (projectId: string) => DriverType;
   status: Record<string, ProjectConnectionStatus>;
   serverDatabases: Record<string, string[]>;
   serverTablespaces: Record<string, [string, string, string, string][]>;

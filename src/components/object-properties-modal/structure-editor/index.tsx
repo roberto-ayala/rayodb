@@ -69,9 +69,11 @@ export function StructureEditorContent({
   const availableSchemas = schemas[projectId] ?? [];
   const getTablesForSchema = (s: string) => (tables[`${projectId}::${s}`] ?? []).map((t) => t.name);
 
+  // The statements are dialect-specific, so they follow the project's engine.
+  const kind = useProjectStore((s) => s.projects[projectId]?.driver);
   const sqlStatements = useMemo(
-    () => generateAlterTableSQL(schema, tableName, initialState, draft),
-    [schema, tableName, initialState, draft],
+    () => generateAlterTableSQL(schema, tableName, initialState, draft, kind),
+    [schema, tableName, initialState, draft, kind],
   );
   const sqlPreview = sqlStatements.join("\n");
 

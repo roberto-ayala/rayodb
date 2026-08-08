@@ -12,6 +12,7 @@ import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useUIStore } from "@/stores/ui-store";
+import type { DriverType } from "@/types";
 import { ProjectConnectionStatus } from "@/types";
 import { AddDatabaseDialog } from "./add-database-dialog";
 import { renderSavedQueries } from "./render-saved-queries";
@@ -203,6 +204,11 @@ export function ServerSidebar({
   const copy = (text: string) => navigator.clipboard.writeText(text);
 
   const capsByDriver = useCapabilityStore((s) => s.byDriver);
+  const driverOf = useCallback(
+    (projectId: string): DriverType => projects[projectId]?.driver ?? "PGSQL",
+    [projects],
+  );
+
   const capsFor = useCallback(
     (projectId: string) => {
       const driver = projects[projectId]?.driver;
@@ -214,6 +220,7 @@ export function ServerSidebar({
   const ctx: SidebarRenderCtx = {
     projects,
     capsFor,
+    driverOf,
     status,
     serverDatabases,
     serverTablespaces,

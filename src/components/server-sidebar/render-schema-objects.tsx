@@ -28,18 +28,20 @@ import {
   detachPartitionTemplate,
   newDataTypeTemplate,
   newForeignTableTemplate,
-  newFunctionTemplate,
   newMatViewTemplate,
   newPartitionedTableTemplate,
   newPartitionTemplate,
-  newProcedureTemplate,
   newSequenceTemplate,
-  newTableTemplate,
   newTriggerFunctionTemplate,
-  newViewTemplate,
 } from "./ddl-queries";
 import { renderTableDetails } from "./render-table-details";
 import { SectionHeader } from "./section-header";
+import {
+  newFunctionTemplateFor,
+  newProcedureTemplateFor,
+  newTableTemplateFor,
+  newViewTemplateFor,
+} from "./templates-by-driver";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
 
@@ -271,6 +273,7 @@ function newObjectMenu(
 export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
   const {
     capsFor,
+    driverOf,
     schemas,
     status,
     tables,
@@ -376,7 +379,10 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   {
                     label: "New Table…",
                     icon: <Table className="h-3 w-3" />,
-                    onClick: () => openTab(pid, newTableTemplate(schema), { title: "New table" }),
+                    onClick: () =>
+                      openTab(pid, newTableTemplateFor(driverOf(pid), schema), {
+                        title: "New table",
+                      }),
                   },
                   {
                     label: "New Partitioned Table…",
@@ -464,7 +470,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New View…",
                     <Eye className="h-3 w-3" />,
-                    newViewTemplate(schema),
+                    newViewTemplateFor(driverOf(pid), schema),
                     "New view",
                   )}
                 />
@@ -662,7 +668,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New Function…",
                     <FileCode className="h-3 w-3" />,
-                    newFunctionTemplate(schema),
+                    newFunctionTemplateFor(driverOf(pid), schema),
                     "New function",
                   )}
                 />
@@ -728,7 +734,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New Procedure…",
                     <SquarePlay className="h-3 w-3" />,
-                    newProcedureTemplate(schema),
+                    newProcedureTemplateFor(driverOf(pid), schema),
                     "New procedure",
                   )}
                 />

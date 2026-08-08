@@ -185,6 +185,15 @@ fn pack_rows(header: &str, rows: &[&str]) -> String {
     result
 }
 
+/// Writing goes through the backend rather than the fs plugin: the plugin would
+/// need blanket write permission for a path the user has just chosen in the
+/// native save dialog, and granting the webview the whole filesystem to write
+/// the one file it already picked is the wrong trade.
+#[tauri::command(rename_all = "snake_case")]
+pub fn save_text_file(path: &str, contents: &str) -> Result<(), String> {
+    std::fs::write(path, contents).map_err(|e| format!("Could not write {path}: {e}"))
+}
+
 /// Compute diff between two packed result sets.
 /// Input: two packed strings (rows separated by \x1E, cells by \x1F).
 /// First row of each is the header (columns).

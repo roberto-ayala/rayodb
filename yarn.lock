@@ -1112,13 +1112,6 @@
   dependencies:
     "@tauri-apps/api" "^2.8.0"
 
-"@tauri-apps/plugin-fs@^2.4.5":
-  version "2.4.5"
-  resolved "https://registry.npmjs.org/@tauri-apps/plugin-fs/-/plugin-fs-2.4.5.tgz"
-  integrity sha512-dVxWWGE6VrOxC7/jlhyE+ON/Cc2REJlM35R3PJX3UvFw2XwYhLGQVAIyrehenDdKjotipjYEVc4YjOl3qq90fA==
-  dependencies:
-    "@tauri-apps/api" "^2.8.0"
-
 "@tauri-apps/plugin-process@^2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@tauri-apps/plugin-process/-/plugin-process-2.3.1.tgz"

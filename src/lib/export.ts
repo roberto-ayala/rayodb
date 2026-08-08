@@ -1,5 +1,5 @@
+import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
-import { writeTextFile } from "@tauri-apps/plugin-fs";
 
 export type ExportFormat = "csv" | "json" | "sql" | "markdown" | "xml";
 
@@ -118,7 +118,7 @@ export async function saveTextFile(
 
   if (!filePath) return null; // user cancelled
 
-  await writeTextFile(filePath, content);
+  await invoke("save_text_file", { path: filePath, contents: content });
   return filePath;
 }
 

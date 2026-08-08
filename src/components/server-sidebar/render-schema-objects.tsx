@@ -329,37 +329,42 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     }
     const rootTables = (schemaTables ?? []).filter((ti) => !ti.parent);
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
-    const isSchemaOpen = isOpen(sKey);
+    // Where a database *is* the schema, the level carries no information:
+    // show the objects directly under the database rather than nesting them
+    // one deeper inside a node with the same name.
+    const isSchemaOpen = caps.schemas ? isOpen(sKey) : true;
 
     return (
       <div key={schema}>
-        <TreeRow
-          indent={I.schema}
-          icon={<FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />}
-          label={schema}
-          expanded={isSchemaOpen}
-          loading={loading[sKey]}
-          onClick={() => onExpandSchema(pid, schema)}
-          onContextMenu={(e) =>
-            showMenu(e, [
-              {
-                label: "ERD Diagram",
-                icon: <Layers className="h-3 w-3" />,
-                onClick: () => openERDTab(pid, schema),
-              },
-              {
-                label: "Copy Schema Name",
-                icon: <Copy className="h-3 w-3" />,
-                onClick: () => copy(schema),
-              },
-              {
-                label: "New Query",
-                icon: <Plus className="h-3 w-3" />,
-                onClick: () => openTab(pid, `-- Schema: ${schema}\n`),
-              },
-            ])
-          }
-        />
+        {caps.schemas && (
+          <TreeRow
+            indent={I.schema}
+            icon={<FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />}
+            label={schema}
+            expanded={isSchemaOpen}
+            loading={loading[sKey]}
+            onClick={() => onExpandSchema(pid, schema)}
+            onContextMenu={(e) =>
+              showMenu(e, [
+                {
+                  label: "ERD Diagram",
+                  icon: <Layers className="h-3 w-3" />,
+                  onClick: () => openERDTab(pid, schema),
+                },
+                {
+                  label: "Copy Schema Name",
+                  icon: <Copy className="h-3 w-3" />,
+                  onClick: () => copy(schema),
+                },
+                {
+                  label: "New Query",
+                  icon: <Plus className="h-3 w-3" />,
+                  onClick: () => openTab(pid, `-- Schema: ${schema}\n`),
+                },
+              ])
+            }
+          />
+        )}
 
         {isSchemaOpen && (
           <>

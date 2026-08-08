@@ -156,5 +156,9 @@ export const createCoreSlice: StateCreator<
     if (!source) return;
     const details = { ...source, database };
     await get().saveConnection(name, details);
+    // Clicking a database in the tree, or picking "Connect" from its menu,
+    // means open it. Saving the connection and stopping there left the user to
+    // click a second time on something that looked no different.
+    await get().connect(name);
   },
 });

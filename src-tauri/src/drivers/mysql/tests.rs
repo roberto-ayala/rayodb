@@ -68,13 +68,19 @@ async fn the_schema_tree_loads() {
 
     assert_eq!(driver.kind(), DriverKind::Mysql);
 
-    // A database *is* a schema here; the server's own four are not the user's.
+    // A database *is* the schema, so a connected database's schema level is
+    // that database alone. Returning the server's whole list here is what put
+    // every database inside every other one.
     let schemas = driver.load_schemas().await.expect("load_schemas");
-    assert!(schemas.contains(&"shop".to_string()), "{schemas:?}");
+    assert_eq!(schemas, vec!["shop".to_string()], "{schemas:?}");
+
+    // The server's list is a separate question, and that one is complete.
+    let databases = driver.load_databases().await.expect("load_databases");
+    assert!(databases.contains(&"shop".to_string()), "{databases:?}");
     for internal in ["mysql", "information_schema", "performance_schema", "sys"] {
         assert!(
-            !schemas.iter().any(|s| s == internal),
-            "{internal} should be hidden: {schemas:?}"
+            !databases.iter().any(|d| d == internal),
+            "{internal} should be hidden: {databases:?}"
         );
     }
 
@@ -324,7 +330,12 @@ async fn unsupported_features_say_so() {
     }
 
     let caps = DriverKind::Mysql.capabilities();
-    assert!(caps.schemas, "a database is a schema");
+    // A database *is* the schema, so there is no level between the two and
+    // the tree collapses it.
+    assert!(
+        !caps.schemas,
+        "a database is the schema, not a container of them"
+    );
     assert!(caps.triggers);
     // The monitor panel needs five more implementations before it is honest.
     assert!(!caps.monitoring);
@@ -362,10 +373,16 @@ async fn connecting_without_a_database_lists_them_all() {
 
     let driver = connect(&params).await.expect("connect with no database");
 
+    // With no database to be inside, the schema level is the server's list —
+    // which is what the user browses.
     let schemas = driver.load_schemas().await.expect("load_schemas");
     assert!(
         schemas.contains(&"shop".to_string()),
         "the server's databases should be browsable: {schemas:?}"
+    );
+    assert!(
+        schemas.len() > 1 || schemas == vec!["shop".to_string()],
+        "{schemas:?}"
     );
 
     // And objects inside one are still reachable by naming it explicitly.

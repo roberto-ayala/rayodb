@@ -131,7 +131,9 @@ impl Capabilities {
     /// that still emit PostgreSQL — those wait for the dialect work.
     pub fn mysql() -> Self {
         Self {
-            schemas: true,
+            // A database is the schema, so there is no level between a database
+            // and its tables — the tree collapses one.
+            schemas: false,
             functions: true,
             procedures: true,
             triggers: true,

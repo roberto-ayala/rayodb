@@ -241,7 +241,16 @@ impl Driver for MysqlDriver {
     // ---- schema tree ---------------------------------------------------
 
     async fn load_schemas(&self) -> Result<SchemaList, AppError> {
-        intro::load_schemas(&mut self.conn().await?).await
+        // A database *is* the schema here, so the schema level of a connected
+        // database is that database and nothing else. Returning every database
+        // would repeat the server's whole list inside each one.
+        //
+        // With no database configured there is nothing to be inside, so the
+        // server's list is the right answer: it is what the user browses.
+        if self.database.is_empty() {
+            return intro::load_schemas(&mut self.conn().await?).await;
+        }
+        Ok(vec![self.database.clone()])
     }
 
     async fn load_databases(&self) -> Result<Vec<String>, AppError> {

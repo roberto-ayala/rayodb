@@ -18,7 +18,7 @@ import {
 } from "./interactions";
 import { layoutTables } from "./layout";
 import { ERDDefs, ERDFKLines, ERDGridBackground, ERDTableBoxes } from "./rendering";
-import { serialiseERD } from "./svg-export";
+import { erdFileName, serialiseERD } from "./svg-export";
 import { useTableDetails } from "./table-details";
 import type { ERDColumn, ERDProps, ForeignKey } from "./types";
 
@@ -240,14 +240,20 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     if (!svgRef.current) return;
     try {
       const content = serialiseERD(svgRef.current, totalWidth, totalHeight);
-      const filePath = await saveTextFile(`erd-${schema}.svg`, "SVG Image", "svg", content);
+      const database = useProjectStore.getState().projects[projectId]?.database ?? projectId;
+      const filePath = await saveTextFile(
+        erdFileName(database, schema),
+        "SVG Image",
+        "svg",
+        content,
+      );
       if (filePath) toast.success("Diagram exported", { description: filePath });
     } catch (err: unknown) {
       toast.error("Could not export the diagram", {
         description: err instanceof Error ? err.message : String(err),
       });
     }
-  }, [totalWidth, totalHeight, schema]);
+  }, [totalWidth, totalHeight, schema, projectId]);
 
   if (loading || (!detailsReady && schemaTables.length > 0)) {
     return (

@@ -29,6 +29,22 @@ function inlineCustomProperties(markup: string, scope: Element): string {
   });
 }
 
+/**
+ * What the diagram is of, in the order you would say it out loud. Anything a
+ * file system would rather not see becomes a dash, since a database or schema
+ * may be named with spaces, slashes or quotes.
+ */
+export function erdFileName(database: string, schema: string): string {
+  const slug = (value: string) =>
+    value
+      .trim()
+      .replace(/[^\w.-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase();
+
+  return [slug(database), slug(schema), "erd"].filter(Boolean).join("-") + ".svg";
+}
+
 export function serialiseERD(svg: SVGSVGElement, width: number, height: number): string {
   const clone = svg.cloneNode(true) as SVGSVGElement;
 

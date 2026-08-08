@@ -193,6 +193,7 @@ export function ObjectPropertiesModal({
               pols={pols}
               copyText={copyText}
               copied={copied}
+              loading={loading}
             />
           )}
           {activeTab === "columns" && <ColumnsContent cols={cols} pkCols={pkCols} />}

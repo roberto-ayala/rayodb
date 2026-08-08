@@ -336,6 +336,44 @@ pub async fn load_triggers(conn: &Connection, table: &str) -> Result<Vec<Trigger
         .collect())
 }
 
+/// What SQLite can say about a table's size and shape.
+///
+/// There is no statistics catalogue here, so the row count is a real COUNT(*)
+/// rather than an estimate — exact, and cheap enough at the scale a SQLite file
+/// reaches. Sizes would need the dbstat virtual table, which is a compile-time
+/// option, so they are reported as unavailable rather than as zero.
+pub async fn table_statistics(conn: &Connection, table: &str) -> Result<ObjectStats, AppError> {
+    let (_, rows) = fetch_grid(
+        conn,
+        &format!("SELECT count(*) FROM {}", quote_ident(table)),
+    )
+    .await?;
+    let row_count = rows
+        .first()
+        .and_then(|r| r.first())
+        .cloned()
+        .unwrap_or_else(|| "0".to_string());
+
+    let columns = load_column_details(conn, table).await?.len();
+    let indexes = load_indexes(conn, table).await?;
+    let index_names: std::collections::BTreeSet<&str> =
+        indexes.iter().map(|i| i.0.as_str()).collect();
+
+    Ok(vec![
+        ("row_estimate".to_string(), row_count),
+        ("table_size".to_string(), "-".to_string()),
+        ("index_size".to_string(), "-".to_string()),
+        ("total_size".to_string(), "-".to_string()),
+        ("columns".to_string(), columns.to_string()),
+        ("indexes".to_string(), index_names.len().to_string()),
+    ])
+}
+
+/// Quote an identifier. SQLite accepts the standard double quote.
+pub fn quote_ident(name: &str) -> String {
+    format!("\"{}\"", name.replace('"', "\"\""))
+}
+
 /// The DDL SQLite recorded when the object was created.
 pub async fn object_ddl(conn: &Connection, name: &str) -> Result<String, AppError> {
     let (_, rows) = fetch_grid(

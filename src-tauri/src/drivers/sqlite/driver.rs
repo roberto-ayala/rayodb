@@ -260,6 +260,10 @@ impl Driver for SqliteDriver {
         intro::fk_details(&self.conn()?, table, direction).await
     }
 
+    async fn table_statistics(&self, _schema: &str, table: &str) -> Result<ObjectStats, AppError> {
+        intro::table_statistics(&self.conn()?, table).await
+    }
+
     async fn generate_ddl(
         &self,
         _schema: &str,

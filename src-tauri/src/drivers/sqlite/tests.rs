@@ -319,6 +319,25 @@ async fn virtual_paging_caches_and_serves_pages() {
     assert!(cache.lock().await.is_empty());
 }
 
+/// Same reason as MySQL: without these the overview never stops loading.
+/// SQLite has no statistics catalogue, so the count is exact and the sizes are
+/// honestly unavailable.
+#[tokio::test]
+async fn table_statistics_come_back() {
+    let (_temp, driver) = fixture("stats").await;
+
+    let stats = driver
+        .table_statistics("main", "orders")
+        .await
+        .expect("table_statistics");
+    let map: std::collections::BTreeMap<_, _> = stats.into_iter().collect();
+
+    assert_eq!(map.get("row_estimate").map(String::as_str), Some("200"));
+    assert_eq!(map.get("columns").map(String::as_str), Some("3"));
+    // No dbstat, so no size — said as "-" rather than a made-up zero.
+    assert_eq!(map.get("total_size").map(String::as_str), Some("-"));
+}
+
 #[tokio::test]
 async fn ddl_comes_back_verbatim() {
     let (_temp, driver) = fixture("ddl").await;

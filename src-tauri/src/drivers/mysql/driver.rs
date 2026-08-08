@@ -351,6 +351,15 @@ impl Driver for MysqlDriver {
         .await
     }
 
+    async fn table_statistics(&self, schema: &str, table: &str) -> Result<ObjectStats, AppError> {
+        intro::table_statistics(
+            &mut self.conn().await?,
+            self.schema_or_default(schema),
+            table,
+        )
+        .await
+    }
+
     async fn generate_ddl(
         &self,
         schema: &str,

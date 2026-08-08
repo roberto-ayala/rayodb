@@ -280,6 +280,32 @@ async fn virtual_paging_caches_and_serves_pages() {
         .unwrap();
 }
 
+/// The properties overview treats missing statistics as "still loading", so an
+/// engine that reports none leaves it spinning. MySQL reports them.
+#[tokio::test]
+async fn table_statistics_come_back() {
+    let Some(driver) = driver().await else { return };
+
+    let stats = driver
+        .table_statistics("shop", "orders")
+        .await
+        .expect("table_statistics");
+    let map: std::collections::BTreeMap<_, _> = stats.into_iter().collect();
+
+    // InnoDB's row count is sampled, so this is an estimate near 200 rather
+    // than exactly it — assert it is a number, not a specific one.
+    assert!(
+        map.get("row_estimate")
+            .is_some_and(|v| v.parse::<i64>().is_ok()),
+        "{map:?}"
+    );
+    assert_eq!(map.get("engine").map(String::as_str), Some("InnoDB"));
+    assert!(
+        map.get("total_size").is_some_and(|v| !v.is_empty()),
+        "{map:?}"
+    );
+}
+
 #[tokio::test]
 async fn ddl_comes_from_show_create() {
     let Some(driver) = driver().await else { return };

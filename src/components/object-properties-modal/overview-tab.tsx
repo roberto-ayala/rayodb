@@ -34,9 +34,12 @@ export function OverviewContent({
   pols,
   copyText,
   copied,
+  loading = false,
 }: {
   objectType: ObjectType;
   tableStats: TableStats | null;
+  /** Still fetching, as opposed to fetched and unavailable. */
+  loading?: boolean;
   viewInfo: ViewInfo | null;
   matViewStats: MatViewStats | null;
   functionMeta: FunctionMeta | null;
@@ -48,73 +51,89 @@ export function OverviewContent({
   copied: string | null;
 }) {
   if (objectType === "table") {
-    if (!tableStats) {
+    // Absence of stats is not the same as still loading: an engine that does
+    // not report them would spin here forever. The rest of the overview —
+    // foreign keys, triggers, policies — does not depend on them.
+    if (!tableStats && loading) {
       return <LoadingPlaceholder />;
     }
     return (
       <div className="space-y-4 py-3">
-        {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-2">
-          <StatCard
-            label="Rows (est.)"
-            value={Number(tableStats.rowEstimate).toLocaleString()}
-            icon={<Database className="h-3.5 w-3.5" />}
-          />
-          <StatCard
-            label="Table Size"
-            value={tableStats.tableSize}
-            icon={<HardDrive className="h-3.5 w-3.5" />}
-          />
-          <StatCard
-            label="Total Size"
-            value={tableStats.totalSize}
-            icon={<HardDrive className="h-3.5 w-3.5" />}
-          />
-          <StatCard
-            label="Index Size"
-            value={tableStats.indexSize}
-            icon={<Key className="h-3.5 w-3.5" />}
-          />
-          <StatCard
-            label="Live Tuples"
-            value={Number(tableStats.liveTuples).toLocaleString()}
-            icon={<Check className="h-3.5 w-3.5 text-success" />}
-          />
-          <StatCard
-            label="Dead Tuples"
-            value={Number(tableStats.deadTuples).toLocaleString()}
-            icon={<AlertTriangle className="h-3.5 w-3.5 text-warning" />}
-          />
-        </div>
+        {/* Statistics, and the PostgreSQL-only sections that hang off them.
+            An engine that reports none omits the lot; the rest of the overview
+            stands on its own. */}
+        {tableStats && (
+          <>
+            <div className="grid grid-cols-3 gap-2">
+              <StatCard
+                label="Rows (est.)"
+                value={Number(tableStats.rowEstimate).toLocaleString()}
+                icon={<Database className="h-3.5 w-3.5" />}
+              />
+              <StatCard
+                label="Table Size"
+                value={tableStats.tableSize}
+                icon={<HardDrive className="h-3.5 w-3.5" />}
+              />
+              <StatCard
+                label="Total Size"
+                value={tableStats.totalSize}
+                icon={<HardDrive className="h-3.5 w-3.5" />}
+              />
+              <StatCard
+                label="Index Size"
+                value={tableStats.indexSize}
+                icon={<Key className="h-3.5 w-3.5" />}
+              />
+              <StatCard
+                label="Live Tuples"
+                value={Number(tableStats.liveTuples).toLocaleString()}
+                icon={<Check className="h-3.5 w-3.5 text-success" />}
+              />
+              <StatCard
+                label="Dead Tuples"
+                value={Number(tableStats.deadTuples).toLocaleString()}
+                icon={<AlertTriangle className="h-3.5 w-3.5 text-warning" />}
+              />
+            </div>
 
-        {/* Scan stats */}
-        <PropertySection title="Scan Statistics" icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
-              <div className="text-muted-foreground text-3xs uppercase mb-0.5">
-                Sequential Scans
+            {/* Scan stats */}
+            <PropertySection title="Scan Statistics" icon={<RefreshCw className="h-3.5 w-3.5" />}>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
+                  <div className="text-muted-foreground text-3xs uppercase mb-0.5">
+                    Sequential Scans
+                  </div>
+                  <div className="text-foreground">
+                    {Number(tableStats.seqScan).toLocaleString()}
+                  </div>
+                </div>
+                <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
+                  <div className="text-muted-foreground text-3xs uppercase mb-0.5">Index Scans</div>
+                  <div className="text-foreground">
+                    {Number(tableStats.idxScan).toLocaleString()}
+                  </div>
+                </div>
               </div>
-              <div className="text-foreground">{Number(tableStats.seqScan).toLocaleString()}</div>
-            </div>
-            <div className="px-3 py-2 rounded-md bg-muted/30 text-xs">
-              <div className="text-muted-foreground text-3xs uppercase mb-0.5">Index Scans</div>
-              <div className="text-foreground">{Number(tableStats.idxScan).toLocaleString()}</div>
-            </div>
-          </div>
-        </PropertySection>
+            </PropertySection>
 
-        {/* Maintenance */}
-        <PropertySection title="Maintenance" icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 px-1 [&>*:nth-last-child(-n+2)]:border-b-0">
-            <InfoRow label="Last Vacuum" value={formatTimestamp(tableStats.lastVacuum)} />
-            <InfoRow label="Last Auto Vacuum" value={formatTimestamp(tableStats.lastAutoVacuum)} />
-            <InfoRow label="Last Analyze" value={formatTimestamp(tableStats.lastAnalyze)} />
-            <InfoRow
-              label="Last Auto Analyze"
-              value={formatTimestamp(tableStats.lastAutoAnalyze)}
-            />
-          </div>
-        </PropertySection>
+            {/* Maintenance */}
+            <PropertySection title="Maintenance" icon={<RefreshCw className="h-3.5 w-3.5" />}>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 px-1 [&>*:nth-last-child(-n+2)]:border-b-0">
+                <InfoRow label="Last Vacuum" value={formatTimestamp(tableStats.lastVacuum)} />
+                <InfoRow
+                  label="Last Auto Vacuum"
+                  value={formatTimestamp(tableStats.lastAutoVacuum)}
+                />
+                <InfoRow label="Last Analyze" value={formatTimestamp(tableStats.lastAnalyze)} />
+                <InfoRow
+                  label="Last Auto Analyze"
+                  value={formatTimestamp(tableStats.lastAutoAnalyze)}
+                />
+              </div>
+            </PropertySection>
+          </>
+        )}
 
         {/* Constraints summary */}
         {cons && cons.length > 0 && (

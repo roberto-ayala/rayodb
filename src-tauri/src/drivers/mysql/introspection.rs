@@ -420,6 +420,66 @@ pub async fn load_databases(conn: &mut Conn) -> Result<Vec<String>, AppError> {
     load_schemas(conn).await
 }
 
+/// What information_schema knows about a table's size and shape.
+///
+/// TABLE_ROWS is an estimate for InnoDB — it comes from the same sampling that
+/// feeds the optimiser, not a count — so it is reported as an estimate rather
+/// than presented as the row count.
+pub async fn table_statistics(
+    conn: &mut Conn,
+    schema: &str,
+    table: &str,
+) -> Result<ObjectStats, AppError> {
+    let (_, rows) = fetch_grid(
+        conn,
+        &format!(
+            "SELECT COALESCE(table_rows, 0),
+                    COALESCE(data_length, 0),
+                    COALESCE(index_length, 0),
+                    COALESCE(data_length, 0) + COALESCE(index_length, 0),
+                    COALESCE(engine, ''),
+                    COALESCE(table_collation, ''),
+                    COALESCE(CAST(create_time AS CHAR), ''),
+                    COALESCE(CAST(update_time AS CHAR), '')
+             FROM information_schema.tables
+             WHERE table_schema = {} AND table_name = {}",
+            quote_literal(schema),
+            quote_literal(table)
+        ),
+    )
+    .await?;
+
+    let Some(r) = rows.into_iter().next() else {
+        return Ok(Vec::new());
+    };
+    let get = |i: usize| r.get(i).cloned().unwrap_or_default();
+
+    Ok(vec![
+        ("row_estimate".to_string(), get(0)),
+        ("table_size".to_string(), human_size(&get(1))),
+        ("index_size".to_string(), human_size(&get(2))),
+        ("total_size".to_string(), human_size(&get(3))),
+        ("engine".to_string(), get(4)),
+        ("collation".to_string(), get(5)),
+        ("created".to_string(), get(6)),
+        ("updated".to_string(), get(7)),
+    ])
+}
+
+/// Bytes as the sidebar spells them.
+fn human_size(bytes: &str) -> String {
+    let n: f64 = bytes.parse().unwrap_or(0.0);
+    if n >= 1_073_741_824.0 {
+        format!("{:.1} GB", n / 1_073_741_824.0)
+    } else if n >= 1_048_576.0 {
+        format!("{:.1} MB", n / 1_048_576.0)
+    } else if n >= 1024.0 {
+        format!("{:.1} kB", n / 1024.0)
+    } else {
+        format!("{n:.0} bytes")
+    }
+}
+
 /// `SHOW CREATE` is the only place MySQL exposes an object's DDL.
 pub async fn generate_ddl(
     conn: &mut Conn,

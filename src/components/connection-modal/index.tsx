@@ -1,6 +1,7 @@
-import { CheckCircle2, Database, Loader2, XCircle } from "lucide-react";
+import { Database, Loader2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useCapabilityStore } from "@/stores/capability-store";
 import { testConnection } from "@/tauri";
 import type { DriverType, ProjectDetails } from "@/types";
@@ -136,7 +137,6 @@ export function ConnectionModal({
   const [connString, setConnString] = useState("");
   const [connStringError, setConnStringError] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   useEffect(() => {
     if (open && editData) {
@@ -160,7 +160,6 @@ export function ConnectionModal({
       });
       setConnString("");
       setConnStringError(false);
-      setTestResult(null);
     } else if (open && !editData) {
       // Default to the first engine that actually ships rather than a
       // hardcoded one, so the form is right the day a second driver lands.
@@ -172,7 +171,6 @@ export function ConnectionModal({
       );
       setConnString("");
       setConnStringError(false);
-      setTestResult(null);
     }
   }, [open, editData]);
 
@@ -210,7 +208,6 @@ export function ConnectionModal({
 
   const handleTestConnection = async () => {
     setTesting(true);
-    setTestResult(null);
     try {
       const key: [string, string, string, string, string, string] = [
         formData.username,
@@ -222,10 +219,14 @@ export function ConnectionModal({
         formData.ssl ? "true" : "false",
       ];
       const version = await testConnection(formData.driver, key);
-      setTestResult({ ok: true, message: version });
+      // The banner runs to a compiler and a target triple; the part worth
+      // reading is what comes before the first comma.
+      toast.success("Connection successful", {
+        description: version.split(",")[0].trim(),
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setTestResult({ ok: false, message: msg });
+      toast.error("Connection failed", { description: msg, duration: 10000 });
     } finally {
       setTesting(false);
     }
@@ -342,23 +343,6 @@ export function ConnectionModal({
               onSshPasswordChange={(value) => setFormData({ ...formData, sshPassword: value })}
               onSshKeyPathChange={(value) => setFormData({ ...formData, sshKeyPath: value })}
             />
-
-            {testResult && (
-              <div
-                className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs ${
-                  testResult.ok
-                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
-                    : "border-destructive/30 bg-destructive/5 text-destructive"
-                }`}
-              >
-                {testResult.ok ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                ) : (
-                  <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                )}
-                <span className="break-all">{testResult.message}</span>
-              </div>
-            )}
           </div>
 
           <div className="flex shrink-0 justify-between border-border border-t px-5 py-4">

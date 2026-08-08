@@ -70,6 +70,9 @@ pub struct DriverInfo {
     /// The database is a file on disk, so the form asks for a path instead of
     /// a host, port, user and password.
     pub file_based: bool,
+    /// The database field may be left blank, and the server then lists what it
+    /// has.
+    pub database_optional: bool,
 }
 
 /// The engines that can actually be opened. An engine the app has a name for
@@ -84,6 +87,7 @@ pub async fn db_drivers() -> Result<Vec<DriverInfo>> {
             name: k.display_name(),
             default_port: k.default_port(),
             file_based: k.is_file_based(),
+            database_optional: k.database_optional(),
         })
         .collect())
 }

@@ -109,6 +109,8 @@ export interface DriverInfo {
   defaultPort: string;
   /** The database is a file on disk: ask for a path, not a host and port. */
   fileBased: boolean;
+  /** The database field may be left blank; the server then lists what it has. */
+  databaseOptional: boolean;
 }
 
 /**

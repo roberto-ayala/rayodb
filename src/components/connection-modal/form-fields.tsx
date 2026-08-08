@@ -157,17 +157,23 @@ export function HostPortFields({ host, port, onHostChange, onPortChange }: HostP
 interface DatabaseFieldProps {
   value: string;
   onChange: (value: string) => void;
+  /** The engine can open the server without one and list the rest. */
+  optional?: boolean;
 }
 
-export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
+export function DatabaseField({ value, onChange, optional = false }: DatabaseFieldProps) {
   return (
-    <Field label="Database" htmlFor="database">
+    <Field
+      label={optional ? "Database (optional)" : "Database"}
+      htmlFor="database"
+      hint={optional ? "Leave blank to browse every database on the server" : undefined}
+    >
       <Input
         id="database"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="mydb"
-        required
+        placeholder={optional ? "all databases" : "mydb"}
+        required={!optional}
       />
     </Field>
   );

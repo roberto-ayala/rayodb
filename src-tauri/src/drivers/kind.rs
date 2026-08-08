@@ -54,6 +54,13 @@ impl DriverKind {
         matches!(self, DriverKind::Sqlite)
     }
 
+    /// Whether the server can be opened without naming a database, and list
+    /// the rest once connected. PostgreSQL cannot: a connection is bound to one
+    /// database and reaching another means reconnecting.
+    pub fn database_optional(self) -> bool {
+        matches!(self, DriverKind::Mysql)
+    }
+
     pub fn default_port(self) -> &'static str {
         match self {
             DriverKind::Pgsql => "5432",

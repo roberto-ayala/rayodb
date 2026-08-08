@@ -169,7 +169,9 @@ export function ConnectionModal({
   };
 
   const drivers = useCapabilityStore((s) => s.drivers);
-  const isFileBased = drivers.find((d) => d.id === formData.driver)?.fileBased ?? false;
+  const selected = drivers.find((d) => d.id === formData.driver);
+  const isFileBased = selected?.fileBased ?? false;
+  const databaseOptional = selected?.databaseOptional ?? false;
 
   const isEditing = !!editData;
   const name = formData.name.trim();
@@ -267,6 +269,7 @@ export function ConnectionModal({
                 <DatabaseField
                   value={formData.database}
                   onChange={(value) => setFormData({ ...formData, database: value })}
+                  optional={databaseOptional}
                 />
 
                 <UsernameField

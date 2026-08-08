@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { DriverFactory } from "@/lib/database-driver";
 import { startBackgroundUpdateCheck } from "@/lib/updater";
 import { useCapabilityStore } from "@/stores/capability-store";
 import { useProjectStore } from "@/stores/project-store";
@@ -17,12 +16,14 @@ export function useAppStartup() {
   }, [loadProjects]);
 
   // Ahead of any connection, so the tree and tabs are gated from the first
-  // render rather than filling in late.
+  // render rather than filling in late. The engine list comes from the backend
+  // so it cannot drift from what can actually be opened.
   useEffect(() => {
-    void loadDrivers();
-    for (const driver of DriverFactory.getSupportedDrivers()) {
-      void loadCapabilities(driver);
-    }
+    void loadDrivers().then(() => {
+      for (const { id } of useCapabilityStore.getState().drivers) {
+        void loadCapabilities(id);
+      }
+    });
   }, [loadCapabilities, loadDrivers]);
 
   // Open the connections flagged with "Connect on startup", once per session.

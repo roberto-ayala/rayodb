@@ -353,6 +353,26 @@ async fn a_hostile_object_name_cannot_break_out() {
     );
 }
 
+/// Connecting without naming a database has to work, and show every database
+/// the account can see — otherwise the field cannot honestly be optional.
+#[tokio::test]
+async fn connecting_without_a_database_lists_them_all() {
+    let mut params = skip_without_server!();
+    params.database = String::new();
+
+    let driver = connect(&params).await.expect("connect with no database");
+
+    let schemas = driver.load_schemas().await.expect("load_schemas");
+    assert!(
+        schemas.contains(&"shop".to_string()),
+        "the server's databases should be browsable: {schemas:?}"
+    );
+
+    // And objects inside one are still reachable by naming it explicitly.
+    let tables = driver.load_tables("shop").await.expect("load_tables");
+    assert!(tables.iter().any(|t| t.0 == "customers"), "{tables:?}");
+}
+
 /// An unsupported auth plugin is the most likely way a real MySQL refuses this
 /// client, and the driver's own message names the plugin without saying what to
 /// do about it.

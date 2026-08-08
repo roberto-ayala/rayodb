@@ -196,6 +196,29 @@ mod tests {
         );
     }
 
+    /// An engine implemented in Rust but missing from the frontend's label map
+    /// is selectable and then fails on connect — which is exactly what happened
+    /// when MySQL was added to the backend alone.
+    #[test]
+    fn the_frontend_knows_every_shipped_engine() {
+        let ts = include_str!("../../../src/lib/database-driver/factory.ts");
+        let configs = ts
+            .split_once("DRIVER_CONFIGS: Partial<Record<DriverType, DriverConfig>> = {")
+            .expect("DRIVER_CONFIGS not found")
+            .1
+            .split_once("};")
+            .expect("unterminated DRIVER_CONFIGS")
+            .0;
+
+        for kind in DriverKind::ALL.into_iter().filter(|k| k.is_implemented()) {
+            assert!(
+                configs.contains(&format!("{}:", kind.as_str())),
+                "{} ships but the frontend has no entry for it",
+                kind.as_str()
+            );
+        }
+    }
+
     #[test]
     fn a_file_based_engine_asks_for_a_path() {
         assert!(DriverKind::Sqlite.is_file_based());

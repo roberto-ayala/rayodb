@@ -9,6 +9,7 @@ export function useAppStartup() {
   const projects = useProjectStore((s) => s.projects);
   const connect = useProjectStore((s) => s.connect);
   const loadCapabilities = useCapabilityStore((s) => s.load);
+  const loadDrivers = useCapabilityStore((s) => s.loadDrivers);
   const autoConnected = useRef(false);
 
   useEffect(() => {
@@ -18,10 +19,11 @@ export function useAppStartup() {
   // Ahead of any connection, so the tree and tabs are gated from the first
   // render rather than filling in late.
   useEffect(() => {
+    void loadDrivers();
     for (const driver of DriverFactory.getSupportedDrivers()) {
       void loadCapabilities(driver);
     }
-  }, [loadCapabilities]);
+  }, [loadCapabilities, loadDrivers]);
 
   // Open the connections flagged with "Connect on startup", once per session.
   useEffect(() => {

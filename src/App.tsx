@@ -25,7 +25,7 @@ import { checkForUpdates } from "@/lib/updater";
 import { useProjectStore } from "@/stores/project-store";
 import { useActiveTab, useTabStore } from "@/stores/tab-store";
 import { SIDEBAR_MIN_WIDTH, useUIStore } from "@/stores/ui-store";
-import type { ProjectDetails } from "@/types";
+import type { DriverType, ProjectDetails } from "@/types";
 import "@/monaco/setup";
 import { EmptyWorkspace } from "@/components/empty-workspace";
 
@@ -67,7 +67,8 @@ export default function App() {
   const handleSaveConnection = useCallback(
     async (connection: {
       name: string;
-      driver: string;
+      driver: DriverType;
+      filePath?: string;
       username: string;
       password: string;
       database: string;
@@ -83,7 +84,7 @@ export default function App() {
       autoConnect?: boolean;
     }) => {
       const details = {
-        driver: connection.driver as "PGSQL",
+        driver: connection.driver,
         username: connection.username,
         password: connection.password,
         database: connection.database,
@@ -97,6 +98,9 @@ export default function App() {
         sshPassword: connection.sshPassword ?? "",
         sshKeyPath: connection.sshKeyPath ?? "",
         autoConnect: connection.autoConnect ? "true" : "false",
+        // Engine-specific settings live as JSON so the fixed columns stay
+        // meaningful for servers that do have a host and port.
+        options: connection.filePath ? JSON.stringify({ path: connection.filePath }) : "",
       };
       if (editingConnection) {
         // The name is the connection's key, so an edit may be a rename.

@@ -100,6 +100,8 @@ impl DriverKind {
     pub fn capabilities(self) -> Capabilities {
         match self {
             DriverKind::Pgsql => Capabilities::postgres(),
+            // No driver behind these yet; claiming nothing is the honest answer.
+            DriverKind::Mysql | DriverKind::Sqlite => Capabilities::none(),
         }
     }
 }

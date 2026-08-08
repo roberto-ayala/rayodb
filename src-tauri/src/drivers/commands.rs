@@ -59,6 +59,35 @@ pub async fn db_capabilities(driver: Option<&str>) -> Result<Capabilities> {
     Ok(DriverKind::parse(driver.unwrap_or_default())?.capabilities())
 }
 
+/// One selectable engine, with what the connection form needs to know to
+/// render itself.
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DriverInfo {
+    pub id: &'static str,
+    pub name: &'static str,
+    pub default_port: &'static str,
+    /// The database is a file on disk, so the form asks for a path instead of
+    /// a host, port, user and password.
+    pub file_based: bool,
+}
+
+/// The engines that can actually be opened. An engine the app has a name for
+/// but no driver behind is left out, so the picker never offers a dead end.
+#[tauri::command(rename_all = "snake_case")]
+pub async fn db_drivers() -> Result<Vec<DriverInfo>> {
+    Ok(DriverKind::ALL
+        .into_iter()
+        .filter(|k| k.is_implemented())
+        .map(|k| DriverInfo {
+            id: k.as_str(),
+            name: k.display_name(),
+            default_port: k.default_port(),
+            file_based: k.is_file_based(),
+        })
+        .collect())
+}
+
 #[tauri::command(rename_all = "snake_case")]
 pub async fn db_test_connection(driver: Option<&str>, key: [&str; 6]) -> Result<String> {
     let kind = DriverKind::parse(driver.unwrap_or_default())?;

@@ -53,6 +53,7 @@ fn main() {
             dbs::workspace::workspace_load_all,
             dbs::workspace::workspace_delete,
             drivers::commands::db_capabilities,
+            drivers::commands::db_drivers,
             drivers::commands::db_test_connection,
             drivers::commands::db_connect,
             drivers::commands::db_disconnect,

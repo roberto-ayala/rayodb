@@ -34,6 +34,7 @@ fn params_from_env() -> Option<ConnectionParams> {
         host: host.to_string(),
         port: port.to_string(),
         use_ssl: false,
+        options: Default::default(),
     })
 }
 

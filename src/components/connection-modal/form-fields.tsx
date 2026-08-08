@@ -1,4 +1,4 @@
-import { DRIVER_CONFIGS } from "@/lib/database-driver";
+import type { DriverInfo } from "@/lib/database-driver/capabilities";
 import type { DriverType } from "@/types";
 import { CheckboxField, Field } from "../ui/field";
 import { Input } from "../ui/input";
@@ -37,20 +37,66 @@ export function ConnStringField({ value, onChange, error }: ConnStringFieldProps
   );
 }
 
-interface DriverDisplayProps {
+interface DriverPickerProps {
   driver: DriverType;
+  drivers: DriverInfo[];
+  onChange: (driver: DriverType) => void;
 }
 
-export function DriverDisplay({ driver }: DriverDisplayProps) {
+/**
+ * A picker only once there is a choice to make: with a single engine
+ * installed, a dropdown of one is noise, so it stays a read-only field.
+ */
+export function DriverPicker({ driver, drivers, onChange }: DriverPickerProps) {
+  const label = drivers.find((d) => d.id === driver)?.name ?? driver;
+
+  if (drivers.length < 2) {
+    return (
+      <Field label="Database Type" htmlFor="driver">
+        <div
+          id="driver"
+          className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
+        >
+          {label}
+        </div>
+      </Field>
+    );
+  }
+
   return (
     <Field label="Database Type" htmlFor="driver">
-      {/* Only one driver ships today, so this reads as a field but is static */}
-      <div
+      <select
         id="driver"
-        className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
+        value={driver}
+        onChange={(e) => onChange(e.target.value as DriverType)}
+        className="h-8 w-full rounded-md border border-border bg-input px-3 text-xs text-foreground"
       >
-        {DRIVER_CONFIGS[driver].name}
-      </div>
+        {drivers.map((d) => (
+          <option key={d.id} value={d.id}>
+            {d.name}
+          </option>
+        ))}
+      </select>
+    </Field>
+  );
+}
+
+interface FilePathFieldProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+/** For file-based engines, which have a path where a server has a host. */
+export function FilePathField({ value, onChange }: FilePathFieldProps) {
+  return (
+    <Field label="Database File" htmlFor="filePath">
+      <Input
+        id="filePath"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="/path/to/database.sqlite"
+        required
+      />
     </Field>
   );
 }

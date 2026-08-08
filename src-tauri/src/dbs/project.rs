@@ -13,7 +13,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
 
     let mut rows = conn
         .query(
-            "SELECT id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect FROM projects ORDER BY id",
+            "SELECT id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect, options FROM projects ORDER BY id",
             (),
         )
         .await
@@ -56,6 +56,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
         let ssh_password: String = row.get::<String>(12).unwrap_or_default();
         let ssh_key_path: String = row.get::<String>(13).unwrap_or_default();
         let auto_connect: String = row.get::<String>(14).unwrap_or_default();
+        let options: String = row.get::<String>(15).unwrap_or_default();
         projects.insert(
             id,
             vec![
@@ -73,6 +74,7 @@ pub async fn project_db_select(app_state: State<'_, AppState>) -> Result<BTreeVe
                 ssh_password,
                 ssh_key_path,
                 auto_connect,
+                options,
             ],
         );
     }
@@ -107,11 +109,12 @@ pub async fn project_db_insert(
     let ssh_password = project_details.get(11).cloned().unwrap_or_default();
     let ssh_key_path = project_details.get(12).cloned().unwrap_or_default();
     let auto_connect = project_details.get(13).cloned().unwrap_or_default();
+    let options = project_details.get(14).cloned().unwrap_or_default();
 
     conn.execute(
-        "INSERT OR REPLACE INTO projects (id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)",
-        libsql::params![project_id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect],
+        "INSERT OR REPLACE INTO projects (id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect, options)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)",
+        libsql::params![project_id, driver, username, password, database, host, port, ssl, ssh_enabled, ssh_host, ssh_port, ssh_user, ssh_password, ssh_key_path, auto_connect, options],
     )
     .await
     .map_err(|e| AppError::DatabaseError(e.to_string()))?;

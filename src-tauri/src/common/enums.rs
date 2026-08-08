@@ -42,6 +42,8 @@ pub enum AppError {
     SerializationError(String),
     #[error("Unknown driver: {0}")]
     UnknownDriver(String),
+    #[error("{0} support is not implemented yet")]
+    DriverNotImplemented(&'static str),
     #[error("{1} does not support {0}")]
     Unsupported(&'static str, &'static str),
 }

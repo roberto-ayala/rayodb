@@ -1,14 +1,19 @@
 import { create } from "zustand";
 import {
   type DriverCapabilities,
+  type DriverInfo,
   fetchCapabilities,
+  fetchDrivers,
   NO_CAPABILITIES,
 } from "@/lib/database-driver/capabilities";
 import type { DriverType } from "@/types";
 
 interface CapabilityState {
   byDriver: Partial<Record<DriverType, DriverCapabilities>>;
+  /** Engines that can be selected in the connection form. */
+  drivers: DriverInfo[];
   load: (driver: DriverType) => Promise<void>;
+  loadDrivers: () => Promise<void>;
 }
 
 /**
@@ -17,6 +22,15 @@ interface CapabilityState {
  */
 export const useCapabilityStore = create<CapabilityState>((set, get) => ({
   byDriver: {},
+  drivers: [],
+
+  loadDrivers: async () => {
+    try {
+      set({ drivers: await fetchDrivers() });
+    } catch (e) {
+      console.error("Failed to load the driver list:", e);
+    }
+  },
 
   load: async (driver) => {
     if (get().byDriver[driver]) return;

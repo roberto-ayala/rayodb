@@ -36,6 +36,7 @@ export function parseProjectDetails(arr: string[]): ProjectDetails {
     sshPassword: arr[11] ?? "",
     sshKeyPath: arr[12] ?? "",
     autoConnect: arr[13] ?? "false",
+    options: arr[14] ?? "",
   };
 }
 
@@ -55,6 +56,7 @@ function serializeProjectDetails(details: ProjectDetails): string[] {
     details.sshPassword ?? "",
     details.sshKeyPath ?? "",
     details.autoConnect ?? "false",
+    details.options ?? "",
   ];
 }
 

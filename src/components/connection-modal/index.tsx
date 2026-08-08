@@ -1,7 +1,8 @@
 import { CheckCircle2, Database, Loader2, XCircle } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { pgsqlTestConnection } from "@/tauri";
+import { useCapabilityStore } from "@/stores/capability-store";
+import { testConnection } from "@/tauri";
 import type { DriverType, ProjectDetails } from "@/types";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -10,7 +11,8 @@ import {
   AutoConnectCheckbox,
   ConnStringField,
   DatabaseField,
-  DriverDisplay,
+  DriverPicker,
+  FilePathField,
   HostPortFields,
   NameField,
   PasswordField,
@@ -31,6 +33,8 @@ export interface ConnectionConfig {
   id: string;
   name: string;
   driver: DriverType;
+  /** File-based engines only; empty for a networked server. */
+  filePath: string;
   host: string;
   port: string;
   database: string;
@@ -49,6 +53,7 @@ export interface ConnectionConfig {
 const defaultForm: Omit<ConnectionConfig, "id"> = {
   name: "",
   driver: "PGSQL",
+  filePath: "",
   host: "localhost",
   port: "5432",
   database: "",
@@ -63,6 +68,17 @@ const defaultForm: Omit<ConnectionConfig, "id"> = {
   sshKeyPath: "",
   autoConnect: false,
 };
+
+/** Pull the file path out of the stored options blob, tolerating junk. */
+function readFilePath(options: string | undefined): string {
+  if (!options) return "";
+  try {
+    const parsed = JSON.parse(options);
+    return typeof parsed?.path === "string" ? parsed.path : "";
+  } catch {
+    return "";
+  }
+}
 
 function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id">> | null {
   try {
@@ -107,6 +123,7 @@ export function ConnectionModal({
       setFormData({
         name: editData.name,
         driver: editData.details.driver,
+        filePath: readFilePath(editData.details.options),
         host: editData.details.host,
         port: editData.details.port,
         database: editData.details.database,
@@ -125,7 +142,14 @@ export function ConnectionModal({
       setConnStringError(false);
       setTestResult(null);
     } else if (open && !editData) {
-      setFormData(defaultForm);
+      // Default to the first engine that actually ships rather than a
+      // hardcoded one, so the form is right the day a second driver lands.
+      const first = useCapabilityStore.getState().drivers[0];
+      setFormData(
+        first
+          ? { ...defaultForm, driver: first.id, port: first.defaultPort || defaultForm.port }
+          : defaultForm,
+      );
       setConnString("");
       setConnStringError(false);
       setTestResult(null);
@@ -144,6 +168,9 @@ export function ConnectionModal({
     }
   };
 
+  const drivers = useCapabilityStore((s) => s.drivers);
+  const isFileBased = drivers.find((d) => d.id === formData.driver)?.fileBased ?? false;
+
   const isEditing = !!editData;
   const name = formData.name.trim();
   const nameTaken = name !== editData?.name && existingNames.includes(name);
@@ -160,7 +187,7 @@ export function ConnectionModal({
         formData.port,
         formData.ssl ? "true" : "false",
       ];
-      const version = await pgsqlTestConnection(key);
+      const version = await testConnection(formData.driver, key);
       setTestResult({ ok: true, message: version });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -202,7 +229,19 @@ export function ConnectionModal({
               />
             )}
 
-            <DriverDisplay driver={formData.driver} />
+            <DriverPicker
+              driver={formData.driver}
+              drivers={drivers}
+              onChange={(driver) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  driver,
+                  // Carry the new engine's default rather than leaving the old
+                  // one's port sitting in the field.
+                  port: drivers.find((d) => d.id === driver)?.defaultPort ?? prev.port,
+                }))
+              }
+            />
 
             <NameField
               value={formData.name}
@@ -210,32 +249,41 @@ export function ConnectionModal({
               error={nameTaken ? "A connection with this name already exists" : undefined}
             />
 
-            <HostPortFields
-              host={formData.host}
-              port={formData.port}
-              onHostChange={(value) => setFormData({ ...formData, host: value })}
-              onPortChange={(value) => setFormData({ ...formData, port: value })}
-            />
+            {isFileBased ? (
+              <FilePathField
+                value={formData.filePath}
+                onChange={(value) => setFormData({ ...formData, filePath: value })}
+              />
+            ) : (
+              <>
+                <HostPortFields
+                  host={formData.host}
+                  port={formData.port}
+                  onHostChange={(value) => setFormData({ ...formData, host: value })}
+                  onPortChange={(value) => setFormData({ ...formData, port: value })}
+                />
 
-            <DatabaseField
-              value={formData.database}
-              onChange={(value) => setFormData({ ...formData, database: value })}
-            />
+                <DatabaseField
+                  value={formData.database}
+                  onChange={(value) => setFormData({ ...formData, database: value })}
+                />
 
-            <UsernameField
-              value={formData.username}
-              onChange={(value) => setFormData({ ...formData, username: value })}
-            />
+                <UsernameField
+                  value={formData.username}
+                  onChange={(value) => setFormData({ ...formData, username: value })}
+                />
 
-            <PasswordField
-              value={formData.password}
-              onChange={(value) => setFormData({ ...formData, password: value })}
-            />
+                <PasswordField
+                  value={formData.password}
+                  onChange={(value) => setFormData({ ...formData, password: value })}
+                />
 
-            <SslCheckbox
-              checked={formData.ssl}
-              onChange={(checked) => setFormData({ ...formData, ssl: checked })}
-            />
+                <SslCheckbox
+                  checked={formData.ssl}
+                  onChange={(checked) => setFormData({ ...formData, ssl: checked })}
+                />
+              </>
+            )}
 
             <AutoConnectCheckbox
               checked={formData.autoConnect}

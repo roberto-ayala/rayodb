@@ -91,3 +91,20 @@ export async function fetchCapabilities(driver: DriverType): Promise<DriverCapab
   cache.set(driver, caps);
   return caps;
 }
+
+/** A selectable engine, as reported by the backend. */
+export interface DriverInfo {
+  id: DriverType;
+  name: string;
+  defaultPort: string;
+  /** The database is a file on disk: ask for a path, not a host and port. */
+  fileBased: boolean;
+}
+
+/**
+ * The engines that can actually be opened. Engines the app has a name for but
+ * no driver behind are absent, so the picker never offers a dead end.
+ */
+export async function fetchDrivers(): Promise<DriverInfo[]> {
+  return await invoke<DriverInfo[]>("db_drivers");
+}

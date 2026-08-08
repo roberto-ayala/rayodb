@@ -13,9 +13,15 @@ export interface ProjectDetails {
   sshPassword: string;
   sshKeyPath: string;
   autoConnect: string;
+  /** Driver-specific settings as a JSON object, e.g. a SQLite file path. */
+  options?: string;
 }
 
-export type DriverType = "PGSQL";
+/**
+ * Every engine the app has a name for. Not every one is selectable —
+ * `db_drivers` reports which have a driver behind them.
+ */
+export type DriverType = "PGSQL" | "MYSQL" | "SQLITE";
 
 export type ProjectMap = Record<string, ProjectDetails>;
 

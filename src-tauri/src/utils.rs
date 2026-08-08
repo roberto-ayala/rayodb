@@ -114,45 +114,29 @@ pub async fn system_resource_usage(
         monitor.sample()
     };
 
-    let (query_open, query_available, query_max, query_waiting) = {
-        let clients = app_state.clients.lock().await;
+    // Sum every connected driver's pools. Engines that keep no pool report
+    // nothing and simply do not contribute.
+    let (open, available, max, waiting) = {
+        let connections = app_state.connections.lock().await;
         let mut open = 0usize;
         let mut available = 0usize;
         let mut max = 0usize;
         let mut waiting = 0usize;
-        for pool in clients.values() {
-            let status = pool.status();
-            open = open.saturating_add(status.size);
-            available = available.saturating_add(status.available);
-            max = max.saturating_add(status.max_size);
-            waiting = waiting.saturating_add(status.waiting);
+        for stats in connections.values().filter_map(|d| d.pool_stats()) {
+            for gauge in [stats.query, stats.meta] {
+                open = open.saturating_add(gauge.open);
+                available = available.saturating_add(gauge.available);
+                max = max.saturating_add(gauge.max);
+                waiting = waiting.saturating_add(gauge.waiting);
+            }
         }
         (open, available, max, waiting)
     };
 
-    let (meta_open, meta_available, meta_max, meta_waiting) = {
-        let clients = app_state.meta_clients.lock().await;
-        let mut open = 0usize;
-        let mut available = 0usize;
-        let mut max = 0usize;
-        let mut waiting = 0usize;
-        for pool in clients.values() {
-            let status = pool.status();
-            open = open.saturating_add(status.size);
-            available = available.saturating_add(status.available);
-            max = max.saturating_add(status.max_size);
-            waiting = waiting.saturating_add(status.waiting);
-        }
-        (open, available, max, waiting)
-    };
-
-    let total_open = query_open.saturating_add(meta_open);
-    let total_available = query_available.saturating_add(meta_available);
-
-    usage.db_connections_open = total_open;
-    usage.db_connections_max = query_max.saturating_add(meta_max);
-    usage.db_connections_waiting = query_waiting.saturating_add(meta_waiting);
-    usage.db_connections_in_use = total_open.saturating_sub(total_available);
+    usage.db_connections_open = open;
+    usage.db_connections_max = max;
+    usage.db_connections_waiting = waiting;
+    usage.db_connections_in_use = open.saturating_sub(available);
 
     Ok(usage)
 }

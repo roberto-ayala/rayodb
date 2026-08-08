@@ -130,10 +130,7 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
         }
 
         let state = AppState {
-            clients: Arc::new(Mutex::new(BTreeMap::new())),
-            meta_clients: Arc::new(Mutex::new(BTreeMap::new())),
-            cancel_tokens: Arc::new(Mutex::new(BTreeMap::new())),
-            client_ssl: Arc::new(Mutex::new(BTreeMap::new())),
+            connections: Arc::new(Mutex::new(BTreeMap::new())),
             local_db: db,
             resource_monitor: Arc::new(Mutex::new(utils::ResourceMonitor::new())),
             virtual_cache: Arc::new(Mutex::new(BTreeMap::new())),

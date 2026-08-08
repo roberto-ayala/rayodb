@@ -58,5 +58,5 @@ export async function workspaceDelete(name: string): Promise<void> {
 export async function pgsqlTestConnection(
   key: [string, string, string, string, string, string],
 ): Promise<string> {
-  return await invoke<string>("pgsql_test_connection", { key });
+  return await invoke<string>("db_test_connection", { key });
 }

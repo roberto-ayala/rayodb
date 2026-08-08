@@ -40,6 +40,10 @@ pub enum AppError {
     DatabaseError(String),
     #[error("Serialization error: {0}")]
     SerializationError(String),
+    #[error("Unknown driver: {0}")]
+    UnknownDriver(String),
+    #[error("{1} does not support {0}")]
+    Unsupported(&'static str, &'static str),
 }
 
 impl From<AppError> for tauri::Error {

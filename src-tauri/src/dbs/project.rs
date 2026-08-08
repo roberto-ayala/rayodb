@@ -151,10 +151,7 @@ pub async fn project_db_delete(project_id: &str, app_state: State<'_, AppState>)
     .map_err(|e| AppError::DatabaseError(e.to_string()))?;
 
     // Best-effort cleanup for in-memory connection state.
-    app_state.clients.lock().await.remove(project_id);
-    app_state.meta_clients.lock().await.remove(project_id);
-    app_state.cancel_tokens.lock().await.remove(project_id);
-    app_state.client_ssl.lock().await.remove(project_id);
+    app_state.connections.lock().await.remove(project_id);
     if let Some(tunnel) = app_state.ssh_tunnels.lock().await.remove(project_id) {
         tunnel.stop();
     }

@@ -56,29 +56,29 @@ export class PostgreSQLDriver implements DatabaseDriver {
     key: [string, string, string, string, string, string],
     ssh?: string[],
   ) {
-    return invoke<ProjectConnectionStatus>("pgsql_connector", {
+    return invoke<ProjectConnectionStatus>("db_connect", {
       project_id: projectId,
       key,
       ssh: ssh ?? null,
     });
   }
   async disconnect(projectId: string) {
-    await invoke("pgsql_disconnect", { project_id: projectId });
+    await invoke("db_disconnect", { project_id: projectId });
   }
   async cancelQuery(projectId: string) {
-    return invoke<boolean>("pgsql_cancel_query", { project_id: projectId });
+    return invoke<boolean>("db_cancel_query", { project_id: projectId });
   }
   async loadSchemas(projectId: string) {
-    return invoke<string[]>("pgsql_load_schemas", { project_id: projectId });
+    return invoke<string[]>("db_load_schemas", { project_id: projectId });
   }
   async loadTables(projectId: string, schema: string) {
-    return invoke<WireTableInfo[]>("pgsql_load_tables", { project_id: projectId, schema });
+    return invoke<WireTableInfo[]>("db_load_tables", { project_id: projectId, schema });
   }
   async loadColumns(projectId: string, schema: string, table: string) {
-    return invoke<string[]>("pgsql_load_columns", { project_id: projectId, schema, table });
+    return invoke<string[]>("db_load_columns", { project_id: projectId, schema, table });
   }
   async loadColumnDetails(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WireColumnDetail[]>("pgsql_load_column_details", {
+    const wire = await invoke<WireColumnDetail[]>("db_load_column_details", {
       project_id: projectId,
       schema,
       table,
@@ -86,7 +86,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parseColumnDetails(wire);
   }
   async loadIndexes(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WireIndexDetail[]>("pgsql_load_indexes", {
+    const wire = await invoke<WireIndexDetail[]>("db_load_indexes", {
       project_id: projectId,
       schema,
       table,
@@ -94,7 +94,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parseIndexDetails(wire);
   }
   async loadConstraints(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WireConstraintDetail[]>("pgsql_load_constraints", {
+    const wire = await invoke<WireConstraintDetail[]>("db_load_constraints", {
       project_id: projectId,
       schema,
       table,
@@ -102,7 +102,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parseConstraintDetails(wire);
   }
   async loadTriggers(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WireTriggerDetail[]>("pgsql_load_triggers", {
+    const wire = await invoke<WireTriggerDetail[]>("db_load_triggers", {
       project_id: projectId,
       schema,
       table,
@@ -110,7 +110,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parseTriggerDetails(wire);
   }
   async loadRules(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WireRuleDetail[]>("pgsql_load_rules", {
+    const wire = await invoke<WireRuleDetail[]>("db_load_rules", {
       project_id: projectId,
       schema,
       table,
@@ -118,7 +118,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parseRuleDetails(wire);
   }
   async loadPolicies(projectId: string, schema: string, table: string) {
-    const wire = await invoke<WirePolicyDetail[]>("pgsql_load_policies", {
+    const wire = await invoke<WirePolicyDetail[]>("db_load_policies", {
       project_id: projectId,
       schema,
       table,
@@ -126,54 +126,54 @@ export class PostgreSQLDriver implements DatabaseDriver {
     return parsePolicyDetails(wire);
   }
   async loadViews(projectId: string, schema: string) {
-    return invoke<string[]>("pgsql_load_views", { project_id: projectId, schema });
+    return invoke<string[]>("db_load_views", { project_id: projectId, schema });
   }
   async loadMaterializedViews(projectId: string, schema: string) {
-    return invoke<string[]>("pgsql_load_materialized_views", { project_id: projectId, schema });
+    return invoke<string[]>("db_load_materialized_views", { project_id: projectId, schema });
   }
   async loadSequences(projectId: string, schema: string) {
-    const wire = await invoke<WireSequenceInfo[]>("pgsql_load_sequences", {
+    const wire = await invoke<WireSequenceInfo[]>("db_load_sequences", {
       project_id: projectId,
       schema,
     });
     return parseSequenceInfo(wire);
   }
   async loadFunctions(projectId: string, schema: string) {
-    const wire = await invoke<WireFunctionInfo[]>("pgsql_load_functions", {
+    const wire = await invoke<WireFunctionInfo[]>("db_load_functions", {
       project_id: projectId,
       schema,
     });
     return parseFunctionInfo(wire);
   }
   async loadForeignTables(projectId: string, schema: string) {
-    const wire = await invoke<WireForeignTableInfo[]>("pgsql_load_foreign_tables", {
+    const wire = await invoke<WireForeignTableInfo[]>("db_load_foreign_tables", {
       project_id: projectId,
       schema,
     });
     return parseForeignTableInfo(wire);
   }
   async loadEventTriggers(projectId: string) {
-    const wire = await invoke<WireEventTriggerInfo[]>("pgsql_load_event_triggers", {
+    const wire = await invoke<WireEventTriggerInfo[]>("db_load_event_triggers", {
       project_id: projectId,
     });
     return parseEventTriggerInfo(wire);
   }
   async loadDataTypes(projectId: string, schema: string) {
-    const wire = await invoke<WireDataTypeInfo[]>("pgsql_load_data_types", {
+    const wire = await invoke<WireDataTypeInfo[]>("db_load_data_types", {
       project_id: projectId,
       schema,
     });
     return parseDataTypeInfo(wire);
   }
   async loadProcedures(projectId: string, schema: string) {
-    const wire = await invoke<WireProcedureInfo[]>("pgsql_load_procedures", {
+    const wire = await invoke<WireProcedureInfo[]>("db_load_procedures", {
       project_id: projectId,
       schema,
     });
     return parseProcedureInfo(wire);
   }
   async loadTriggerFunctions(projectId: string, schema: string) {
-    const wire = await invoke<WireTriggerFunctionInfo[]>("pgsql_load_trigger_functions", {
+    const wire = await invoke<WireTriggerFunctionInfo[]>("db_load_trigger_functions", {
       project_id: projectId,
       schema,
     });
@@ -181,7 +181,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
   }
   async runQuery(projectId: string, sql: string, timeoutMs?: number) {
     // Use packed format for faster IPC (avoids JSON overhead of nested arrays)
-    const [packed, time] = await invoke<WirePackedResult>("pgsql_run_query_packed", {
+    const [packed, time] = await invoke<WirePackedResult>("db_run_query_packed", {
       project_id: projectId,
       sql,
       timeout_ms: timeoutMs ?? null,
@@ -225,7 +225,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
       }
     });
 
-    invoke("pgsql_run_query_streamed", {
+    invoke("db_run_query_streamed", {
       project_id: projectId,
       sql,
       stream_id: streamId,
@@ -243,7 +243,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     pageSize: number,
     timeoutMs?: number,
   ) {
-    return invoke<[string, number, string, number]>("pgsql_execute_virtual", {
+    return invoke<[string, number, string, number]>("db_execute_virtual", {
       project_id: projectId,
       sql,
       query_id: queryId,
@@ -258,7 +258,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     offset: number,
     limit: number,
   ) {
-    return invoke<string>("pgsql_fetch_page", {
+    return invoke<string>("db_fetch_page", {
       query_id: queryId,
       col_count: colCount,
       offset,
@@ -266,21 +266,21 @@ export class PostgreSQLDriver implements DatabaseDriver {
     });
   }
   async closeVirtual(_projectId: string, queryId: string) {
-    return invoke<void>("pgsql_close_virtual", {
+    return invoke<void>("db_close_virtual", {
       query_id: queryId,
     });
   }
   async loadActivity(projectId: string) {
-    return invoke<string[][]>("pgsql_load_activity", { project_id: projectId });
+    return invoke<string[][]>("db_load_activity", { project_id: projectId });
   }
   async loadDatabaseStats(projectId: string) {
-    return invoke<[string, string][]>("pgsql_load_database_stats", { project_id: projectId });
+    return invoke<[string, string][]>("db_load_database_stats", { project_id: projectId });
   }
   async loadTableStats(projectId: string) {
-    return invoke<string[][]>("pgsql_load_table_stats", { project_id: projectId });
+    return invoke<string[][]>("db_load_table_stats", { project_id: projectId });
   }
   async loadForeignKeys(projectId: string, schema: string) {
-    const wire = await invoke<WireForeignKeyInfo[]>("pgsql_load_foreign_keys", {
+    const wire = await invoke<WireForeignKeyInfo[]>("db_load_foreign_keys", {
       project_id: projectId,
       schema,
     });
@@ -292,7 +292,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     }));
   }
   async loadTableStatistics(projectId: string, schema: string, table: string) {
-    return invoke<[string, string][]>("pgsql_table_statistics", {
+    return invoke<[string, string][]>("db_table_statistics", {
       project_id: projectId,
       schema,
       table,
@@ -300,29 +300,29 @@ export class PostgreSQLDriver implements DatabaseDriver {
   }
   async loadFKDetails(projectId: string, schema: string, table: string, direction: string) {
     return invoke<[string, string, string, string, string, string, string, string, string][]>(
-      "pgsql_fk_details",
+      "db_fk_details",
       { project_id: projectId, schema, table, direction },
     );
   }
   async loadViewInfo(projectId: string, schema: string, view: string) {
-    return invoke<[string, string][]>("pgsql_view_info", { project_id: projectId, schema, view });
+    return invoke<[string, string][]>("db_view_info", { project_id: projectId, schema, view });
   }
   async loadMatviewInfo(projectId: string, schema: string, matview: string) {
-    return invoke<[string, string][]>("pgsql_matview_info", {
+    return invoke<[string, string][]>("db_matview_info", {
       project_id: projectId,
       schema,
       matview,
     });
   }
   async loadFunctionInfo(projectId: string, schema: string, funcName: string) {
-    return invoke<[string, string][]>("pgsql_function_info", {
+    return invoke<[string, string][]>("db_function_info", {
       project_id: projectId,
       schema,
       func_name: funcName,
     });
   }
   async generateDDL(projectId: string, schema: string, name: string, objectType: string) {
-    return invoke<string>("pgsql_generate_ddl", {
+    return invoke<string>("db_generate_ddl", {
       project_id: projectId,
       schema,
       name,
@@ -330,7 +330,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     });
   }
   async csvPreview(filePath: string) {
-    return invoke<[string[], string[][]]>("pgsql_csv_preview", { file_path: filePath });
+    return invoke<[string[], string[][]]>("db_csv_preview", { file_path: filePath });
   }
   async csvImport(
     projectId: string,
@@ -339,7 +339,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     table: string,
     columnMapping: [number, string][],
   ) {
-    return invoke<number>("pgsql_csv_import", {
+    return invoke<number>("db_csv_import", {
       project_id: projectId,
       file_path: filePath,
       schema,
@@ -348,28 +348,28 @@ export class PostgreSQLDriver implements DatabaseDriver {
     });
   }
   async listenStart(projectId: string, channel: string) {
-    return invoke<boolean>("pgsql_listen_start", { project_id: projectId, channel });
+    return invoke<boolean>("db_listen_start", { project_id: projectId, channel });
   }
   async listenStop(projectId: string, channel: string) {
-    return invoke<boolean>("pgsql_listen_stop", { project_id: projectId, channel });
+    return invoke<boolean>("db_listen_stop", { project_id: projectId, channel });
   }
   async notifySend(projectId: string, channel: string, payload: string) {
-    return invoke<boolean>("pgsql_notify_send", { project_id: projectId, channel, payload });
+    return invoke<boolean>("db_notify_send", { project_id: projectId, channel, payload });
   }
   async discoverChannels(projectId: string) {
-    return invoke<string[]>("pgsql_discover_channels", { project_id: projectId });
+    return invoke<string[]>("db_discover_channels", { project_id: projectId });
   }
   async loadRoles(projectId: string) {
-    return invoke<PgRole[]>("pgsql_load_roles", { project_id: projectId });
+    return invoke<PgRole[]>("db_load_roles", { project_id: projectId });
   }
   async createRole(projectId: string, spec: RoleSpec) {
-    return invoke<string>("pgsql_create_role", { project_id: projectId, spec });
+    return invoke<string>("db_create_role", { project_id: projectId, spec });
   }
   async alterRole(projectId: string, spec: RoleSpec) {
-    return invoke<string>("pgsql_alter_role", { project_id: projectId, spec });
+    return invoke<string>("db_alter_role", { project_id: projectId, spec });
   }
   async dropRole(projectId: string, name: string) {
-    return invoke<string>("pgsql_drop_role", { project_id: projectId, name });
+    return invoke<string>("db_drop_role", { project_id: projectId, name });
   }
   async setDatabasePrivilege(
     projectId: string,
@@ -378,7 +378,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     privilege: string,
     granted: boolean,
   ) {
-    return invoke<string>("pgsql_set_database_privilege", {
+    return invoke<string>("db_set_database_privilege", {
       project_id: projectId,
       database,
       role_name: roleName,
@@ -387,13 +387,13 @@ export class PostgreSQLDriver implements DatabaseDriver {
     });
   }
   async loadSchemaTableGrants(projectId: string, roleName: string) {
-    return invoke<SchemaGrant[]>("pgsql_load_schema_table_grants", {
+    return invoke<SchemaGrant[]>("db_load_schema_table_grants", {
       project_id: projectId,
       role_name: roleName,
     });
   }
   async loadDefaultTableGrants(projectId: string, roleName: string) {
-    return invoke<DefaultGrant[]>("pgsql_load_default_table_grants", {
+    return invoke<DefaultGrant[]>("db_load_default_table_grants", {
       project_id: projectId,
       role_name: roleName,
     });
@@ -405,7 +405,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     privilege: string,
     granted: boolean,
   ) {
-    return invoke<string>("pgsql_set_schema_table_privilege", {
+    return invoke<string>("db_set_schema_table_privilege", {
       project_id: projectId,
       schema,
       role_name: roleName,
@@ -420,7 +420,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     privilege: string,
     granted: boolean,
   ) {
-    return invoke<string>("pgsql_set_default_table_privilege", {
+    return invoke<string>("db_set_default_table_privilege", {
       project_id: projectId,
       schema,
       role_name: roleName,
@@ -428,13 +428,8 @@ export class PostgreSQLDriver implements DatabaseDriver {
       granted,
     });
   }
-  async revokeTablePrivileges(
-    projectId: string,
-    schema: string,
-    table: string,
-    roleName: string,
-  ) {
-    return invoke<string>("pgsql_revoke_table_privileges", {
+  async revokeTablePrivileges(projectId: string, schema: string, table: string, roleName: string) {
+    return invoke<string>("db_revoke_table_privileges", {
       project_id: projectId,
       schema,
       table,
@@ -442,46 +437,48 @@ export class PostgreSQLDriver implements DatabaseDriver {
     });
   }
   async loadTableGrants(projectId: string, roleName: string) {
-    return invoke<TableGrant[]>("pgsql_load_table_grants", {
+    return invoke<TableGrant[]>("db_load_table_grants", {
       project_id: projectId,
       role_name: roleName,
     });
   }
   async loadDatabaseGrants(projectId: string, roleName: string) {
-    return invoke<DbGrant[]>("pgsql_load_database_grants", {
+    return invoke<DbGrant[]>("db_load_database_grants", {
       project_id: projectId,
       role_name: roleName,
     });
   }
   async extractSchemaObjects(projectId: string, schema: string) {
-    return invoke<SchemaObject[]>("pgsql_extract_schema_objects", {
+    return invoke<SchemaObject[]>("db_extract_schema_objects", {
       project_id: projectId,
       schema,
     });
   }
   async loadLocks(projectId: string) {
-    return invoke<string[][]>("pgsql_load_locks", { project_id: projectId });
+    return invoke<string[][]>("db_load_locks", { project_id: projectId });
   }
   async loadIndexUsage(projectId: string) {
-    return invoke<string[][]>("pgsql_load_index_usage", { project_id: projectId });
+    return invoke<string[][]>("db_load_index_usage", { project_id: projectId });
   }
   async loadTableBloat(projectId: string) {
-    return invoke<string[][]>("pgsql_load_table_bloat", { project_id: projectId });
+    return invoke<string[][]>("db_load_table_bloat", { project_id: projectId });
   }
   async loadDatabases(projectId: string) {
-    return invoke<string[]>("pgsql_load_databases", { project_id: projectId });
+    return invoke<string[]>("db_load_databases", { project_id: projectId });
   }
   async loadTablespaces(projectId: string) {
-    return invoke<[string, string, string, string][]>("pgsql_load_tablespaces", { project_id: projectId });
+    return invoke<[string, string, string, string][]>("db_load_tablespaces", {
+      project_id: projectId,
+    });
   }
   async loadExtensions(projectId: string) {
-    return invoke<string[][]>("pgsql_load_extensions", { project_id: projectId });
+    return invoke<string[][]>("db_load_extensions", { project_id: projectId });
   }
   async loadAvailableExtensions(projectId: string) {
-    return invoke<string[][]>("pgsql_load_available_extensions", { project_id: projectId });
+    return invoke<string[][]>("db_load_available_extensions", { project_id: projectId });
   }
   async loadPgSettings(projectId: string) {
-    return invoke<string[][]>("pgsql_load_pg_settings", { project_id: projectId });
+    return invoke<string[][]>("db_load_server_settings", { project_id: projectId });
   }
   async tableAction(
     projectId: string,
@@ -490,7 +487,7 @@ export class PostgreSQLDriver implements DatabaseDriver {
     table: string,
     objectType: string,
   ) {
-    return invoke<string>("pgsql_table_action", {
+    return invoke<string>("db_table_action", {
       project_id: projectId,
       action,
       schema,

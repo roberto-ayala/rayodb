@@ -9,6 +9,9 @@ pub mod query_execution;
 pub mod roles_schema_objects;
 pub mod statistics_activity;
 
+#[cfg(test)]
+mod tests;
+
 pub use commands::*;
 pub use ddl_generation::*;
 pub use extensions::*;

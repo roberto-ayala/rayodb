@@ -371,7 +371,8 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             {/* Tables category */}
             <SectionHeader
               indent={I.schemaObj}
-              label={`Tables${schemaTables ? ` (${rootTables.length})` : ""}`}
+              label={`Tables (${rootTables.length})`}
+              empty={rootTables.length === 0}
               icon={<Table className="h-3 w-3" />}
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
@@ -404,11 +405,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}
 
             {/* Foreign Tables category */}
-            {caps.foreignTables && schemaForeignTables && schemaForeignTables.length > 0 && (
+            {caps.foreignTables && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Foreign Tables (${schemaForeignTables.length})`}
+                  label={`Foreign Tables (${schemaForeignTables?.length ?? 0})`}
+                  empty={!schemaForeignTables?.length}
                   icon={<ExternalLink className="h-3 w-3" />}
                   sectionKey={`${sKey}::ftables`}
                   expanded={isOpen(`${sKey}::ftables`)}
@@ -423,7 +425,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::ftables`) &&
-                  schemaForeignTables.map((ft) => {
+                  (schemaForeignTables ?? []).map((ft) => {
                     const ftKey = `ftable::${pid}::${schema}::${ft.name}`;
                     return (
                       <TreeRow
@@ -461,11 +463,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Views category */}
-            {schemaViews && schemaViews.length > 0 && (
+            {
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Views (${schemaViews.length})`}
+                  label={`Views (${schemaViews?.length ?? 0})`}
+                  empty={!schemaViews?.length}
                   icon={<Eye className="h-3 w-3" />}
                   sectionKey={`${sKey}::views`}
                   expanded={isOpen(`${sKey}::views`)}
@@ -480,7 +483,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::views`) &&
-                  schemaViews.map((v) => {
+                  (schemaViews ?? []).map((v) => {
                     const vKey = `view::${pid}::${schema}::${v}`;
                     return (
                       <TreeRow
@@ -525,14 +528,15 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     );
                   })}
               </>
-            )}
+            }
 
             {/* Materialized Views category */}
-            {caps.materializedViews && schemaMatViews && schemaMatViews.length > 0 && (
+            {caps.materializedViews && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Materialized Views (${schemaMatViews.length})`}
+                  label={`Materialized Views (${schemaMatViews?.length ?? 0})`}
+                  empty={!schemaMatViews?.length}
                   icon={<Layers className="h-3 w-3" />}
                   sectionKey={`${sKey}::matviews`}
                   expanded={isOpen(`${sKey}::matviews`)}
@@ -547,7 +551,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::matviews`) &&
-                  schemaMatViews.map((mv) => {
+                  (schemaMatViews ?? []).map((mv) => {
                     const mvKey = `matview::${pid}::${schema}::${mv}`;
                     return (
                       <TreeRow
@@ -596,11 +600,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Sequences category */}
-            {caps.sequences && schemaSequences && schemaSequences.length > 0 && (
+            {caps.sequences && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Sequences (${schemaSequences.length})`}
+                  label={`Sequences (${schemaSequences?.length ?? 0})`}
+                  empty={!schemaSequences?.length}
                   icon={<Hash className="h-3 w-3" />}
                   sectionKey={`${sKey}::seqs`}
                   expanded={isOpen(`${sKey}::seqs`)}
@@ -615,7 +620,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::seqs`) &&
-                  schemaSequences.map((seq) => {
+                  (schemaSequences ?? []).map((seq) => {
                     const seqKey = `sequence::${pid}::${schema}::${seq.name}`;
                     return (
                       <TreeRow
@@ -659,11 +664,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Functions category */}
-            {caps.functions && schemaFns && schemaFns.length > 0 && (
+            {caps.functions && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Functions (${schemaFns.length})`}
+                  label={`Functions (${schemaFns?.length ?? 0})`}
+                  empty={!schemaFns?.length}
                   icon={<FileCode className="h-3 w-3" />}
                   sectionKey={`${sKey}::fns`}
                   expanded={isOpen(`${sKey}::fns`)}
@@ -678,7 +684,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::fns`) &&
-                  schemaFns.map((fn, i) => {
+                  (schemaFns ?? []).map((fn, i) => {
                     const fnKey = `fn::${pid}::${schema}::${fn.name}::${i}`;
                     return (
                       <div
@@ -725,11 +731,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Procedures category */}
-            {caps.procedures && schemaProcs && schemaProcs.length > 0 && (
+            {caps.procedures && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Procedures (${schemaProcs.length})`}
+                  label={`Procedures (${schemaProcs?.length ?? 0})`}
+                  empty={!schemaProcs?.length}
                   icon={<SquarePlay className="h-3 w-3" />}
                   sectionKey={`${sKey}::procs`}
                   expanded={isOpen(`${sKey}::procs`)}
@@ -744,7 +751,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::procs`) &&
-                  schemaProcs.map((proc, i) => {
+                  (schemaProcs ?? []).map((proc, i) => {
                     const procKey = `procedure::${pid}::${schema}::${proc.name}::${i}`;
                     return (
                       // biome-ignore lint/a11y/noStaticElementInteractions: mirrors the function rows — selection and a context menu, no primary action
@@ -799,11 +806,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Data Types category */}
-            {caps.dataTypes && schemaDataTypes && schemaDataTypes.length > 0 && (
+            {caps.dataTypes && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Data Types (${schemaDataTypes.length})`}
+                  label={`Data Types (${schemaDataTypes?.length ?? 0})`}
+                  empty={!schemaDataTypes?.length}
                   icon={<Shapes className="h-3 w-3" />}
                   sectionKey={`${sKey}::types`}
                   expanded={isOpen(`${sKey}::types`)}
@@ -818,7 +826,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::types`) &&
-                  schemaDataTypes.map((dt) => {
+                  (schemaDataTypes ?? []).map((dt) => {
                     const dtKey = `datatype::${pid}::${schema}::${dt.name}`;
                     return (
                       // biome-ignore lint/a11y/noStaticElementInteractions: a type is a label — selection and a context menu, no primary action
@@ -868,11 +876,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Trigger Functions category */}
-            {caps.triggerFunctions && schemaTrigFns && schemaTrigFns.length > 0 && (
+            {caps.triggerFunctions && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Trigger Functions (${schemaTrigFns.length})`}
+                  label={`Trigger Functions (${schemaTrigFns?.length ?? 0})`}
+                  empty={!schemaTrigFns?.length}
                   icon={<Zap className="h-3 w-3" />}
                   sectionKey={`${sKey}::trigfns`}
                   expanded={isOpen(`${sKey}::trigfns`)}
@@ -887,7 +896,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::trigfns`) &&
-                  schemaTrigFns.map((fn, i) => {
+                  (schemaTrigFns ?? []).map((fn, i) => {
                     const tfKey = `trigfn::${pid}::${schema}::${fn.name}::${i}`;
                     return (
                       <div

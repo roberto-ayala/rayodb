@@ -25,6 +25,7 @@ import { ProjectConnectionStatus } from "@/types";
 import { I } from "./constants";
 import { newEventTriggerTemplate } from "./ddl-queries";
 import { renderSchemas } from "./render-schema-objects";
+import { SectionHeader } from "./section-header";
 import { newDatabaseTemplateFor, newSchemaTemplateFor } from "./templates-by-driver";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
@@ -377,72 +378,75 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                         {renderSchemas(ctx, dbPid)}
                         {/* Event triggers fire on DDL anywhere in the database,
                             so they sit beside the schemas rather than inside one */}
-                        {capsFor(dbPid).eventTriggers &&
-                          (eventTriggers[dbPid]?.length ?? 0) > 0 && (
-                            <>
-                              <TreeRow
-                                indent={I.schema}
-                                icon={<FileCog className="h-3.5 w-3.5 text-muted-foreground" />}
-                                label={`Event Triggers (${eventTriggers[dbPid].length})`}
-                                expanded={isOpen(`${dbKey}::evttrig`)}
-                                onClick={() => toggle(`${dbKey}::evttrig`)}
-                                onContextMenu={(e) =>
-                                  showMenu(e, [
-                                    {
-                                      label: "New Event Trigger…",
-                                      icon: <FileCog className="h-3 w-3" />,
-                                      onClick: () =>
-                                        openTab(dbPid, newEventTriggerTemplate(), {
-                                          title: "New event trigger",
-                                        }),
-                                    },
-                                  ])
-                                }
-                              />
-                              {isOpen(`${dbKey}::evttrig`) &&
-                                eventTriggers[dbPid].map((evt) => (
-                                  // biome-ignore lint/a11y/noStaticElementInteractions: a label with a context menu, like the function rows
-                                  <div
-                                    key={evt.name}
-                                    className="relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none hover:bg-sidebar-accent"
-                                    style={{ paddingLeft: `${I.schemaObj}px` }}
-                                    onContextMenu={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      showMenu(e, [
-                                        { header: evt.event },
-                                        {
-                                          label: "Copy Name",
-                                          icon: <Copy className="h-3 w-3" />,
-                                          onClick: () => copy(evt.name),
-                                        },
-                                        {
-                                          label: "Copy Function Name",
-                                          icon: <Copy className="h-3 w-3" />,
-                                          onClick: () => copy(evt.function),
-                                        },
-                                      ]);
-                                    }}
+                        {capsFor(dbPid).eventTriggers && (
+                          <>
+                            {/* A category, like the ones inside a schema, so
+                                  it stays put when empty — that row is where
+                                  "New Event Trigger…" lives. */}
+                            <SectionHeader
+                              indent={I.schema}
+                              icon={<FileCog className="h-3 w-3" />}
+                              label={`Event Triggers (${eventTriggers[dbPid]?.length ?? 0})`}
+                              expanded={isOpen(`${dbKey}::evttrig`)}
+                              empty={!eventTriggers[dbPid]?.length}
+                              onClick={() => toggle(`${dbKey}::evttrig`)}
+                              onContextMenu={(e) =>
+                                showMenu(e, [
+                                  {
+                                    label: "New Event Trigger…",
+                                    icon: <FileCog className="h-3 w-3" />,
+                                    onClick: () =>
+                                      openTab(dbPid, newEventTriggerTemplate(), {
+                                        title: "New event trigger",
+                                      }),
+                                  },
+                                ])
+                              }
+                            />
+                            {isOpen(`${dbKey}::evttrig`) &&
+                              (eventTriggers[dbPid] ?? []).map((evt) => (
+                                // biome-ignore lint/a11y/noStaticElementInteractions: a label with a context menu, like the function rows
+                                <div
+                                  key={evt.name}
+                                  className="relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none hover:bg-sidebar-accent"
+                                  style={{ paddingLeft: `${I.schemaObj}px` }}
+                                  onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    showMenu(e, [
+                                      { header: evt.event },
+                                      {
+                                        label: "Copy Name",
+                                        icon: <Copy className="h-3 w-3" />,
+                                        onClick: () => copy(evt.name),
+                                      },
+                                      {
+                                        label: "Copy Function Name",
+                                        icon: <Copy className="h-3 w-3" />,
+                                        onClick: () => copy(evt.function),
+                                      },
+                                    ]);
+                                  }}
+                                >
+                                  <FileCog className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                                  <span className="text-xs text-foreground">{evt.name}</span>
+                                  <span className="text-3xs text-muted-foreground">
+                                    {evt.event}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      "text-3xs",
+                                      evt.enabled === "enabled"
+                                        ? "text-muted-foreground/40"
+                                        : "text-warning",
+                                    )}
                                   >
-                                    <FileCog className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                                    <span className="text-xs text-foreground">{evt.name}</span>
-                                    <span className="text-3xs text-muted-foreground">
-                                      {evt.event}
-                                    </span>
-                                    <span
-                                      className={cn(
-                                        "text-3xs",
-                                        evt.enabled === "enabled"
-                                          ? "text-muted-foreground/40"
-                                          : "text-warning",
-                                      )}
-                                    >
-                                      {evt.enabled === "enabled" ? evt.function : evt.enabled}
-                                    </span>
-                                  </div>
-                                ))}
-                            </>
-                          )}
+                                    {evt.enabled === "enabled" ? evt.function : evt.enabled}
+                                  </span>
+                                </div>
+                              ))}
+                          </>
+                        )}
                       </>
                     )}
                   </div>

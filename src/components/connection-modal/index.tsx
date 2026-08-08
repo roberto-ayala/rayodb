@@ -1,16 +1,20 @@
-import { CheckCircle2, Database, Loader2, XCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { pgsqlTestConnection } from "@/tauri";
+import { toast } from "sonner";
+import { useCapabilityStore } from "@/stores/capability-store";
+import { testConnection } from "@/tauri";
 import type { DriverType, ProjectDetails } from "@/types";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
+import { DriverIcon } from "../ui/driver-icon";
 import { ModalBanner } from "../ui/modal-banner";
 import {
   AutoConnectCheckbox,
   ConnStringField,
   DatabaseField,
-  DriverDisplay,
+  DriverPicker,
+  FilePathField,
   HostPortFields,
   NameField,
   PasswordField,
@@ -31,6 +35,8 @@ export interface ConnectionConfig {
   id: string;
   name: string;
   driver: DriverType;
+  /** File-based engines only; empty for a networked server. */
+  filePath: string;
   host: string;
   port: string;
   database: string;
@@ -49,6 +55,7 @@ export interface ConnectionConfig {
 const defaultForm: Omit<ConnectionConfig, "id"> = {
   name: "",
   driver: "PGSQL",
+  filePath: "",
   host: "localhost",
   port: "5432",
   database: "",
@@ -64,21 +71,52 @@ const defaultForm: Omit<ConnectionConfig, "id"> = {
   autoConnect: false,
 };
 
-function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id">> | null {
+/** Pull the file path out of the stored options blob, tolerating junk. */
+function readFilePath(options: string | undefined): string {
+  if (!options) return "";
   try {
-    // Handle postgresql:// and postgres:// schemes
-    const normalized = url.trim().replace(/^postgres:\/\//, "postgresql://");
-    if (!normalized.startsWith("postgresql://")) return null;
-    const parsed = new URL(normalized);
+    const parsed = JSON.parse(options);
+    return typeof parsed?.path === "string" ? parsed.path : "";
+  } catch {
+    return "";
+  }
+}
+
+function parseConnectionString(url: string): Partial<Omit<ConnectionConfig, "id">> | null {
+  const raw = url.trim();
+  if (!raw) return null;
+
+  // A bare path or a sqlite: URL is a file, not a server.
+  if (raw.startsWith("sqlite:") || raw.startsWith("/") || raw.startsWith("~/")) {
+    const path = raw.replace(/^sqlite:(\/\/)?/, "");
+    return path ? { driver: "SQLITE", filePath: path } : null;
+  }
+
+  // Each engine has its own scheme; the rest of the URL is shaped the same.
+  const schemes: Record<string, DriverType> = {
+    "postgresql:": "PGSQL",
+    "postgres:": "PGSQL",
+    "mysql:": "MYSQL",
+    "mariadb:": "MYSQL",
+  };
+
+  try {
+    const parsed = new URL(raw);
+    const driver = schemes[parsed.protocol];
+    if (!driver) return null;
+
     const params = parsed.searchParams;
     const ssl =
       params.get("sslmode") === "require" ||
       params.get("sslmode") === "verify-full" ||
       params.get("ssl") === "true";
+
     return {
-      driver: "PGSQL",
+      driver,
       host: parsed.hostname || "localhost",
-      port: parsed.port || "5432",
+      port: parsed.port || (driver === "MYSQL" ? "3306" : "5432"),
+      // A URL without a path names no database, which is allowed: what blank
+      // means is the engine's business, not the parser's.
       database: parsed.pathname.replace(/^\//, "") || "",
       username: decodeURIComponent(parsed.username || ""),
       password: decodeURIComponent(parsed.password || ""),
@@ -100,13 +138,13 @@ export function ConnectionModal({
   const [connString, setConnString] = useState("");
   const [connStringError, setConnStringError] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   useEffect(() => {
     if (open && editData) {
       setFormData({
         name: editData.name,
         driver: editData.details.driver,
+        filePath: readFilePath(editData.details.options),
         host: editData.details.host,
         port: editData.details.port,
         database: editData.details.database,
@@ -123,12 +161,17 @@ export function ConnectionModal({
       });
       setConnString("");
       setConnStringError(false);
-      setTestResult(null);
     } else if (open && !editData) {
-      setFormData(defaultForm);
+      // Default to the first engine that actually ships rather than a
+      // hardcoded one, so the form is right the day a second driver lands.
+      const first = useCapabilityStore.getState().drivers[0];
+      setFormData(
+        first
+          ? { ...defaultForm, driver: first.id, port: first.defaultPort || defaultForm.port }
+          : defaultForm,
+      );
       setConnString("");
       setConnStringError(false);
-      setTestResult(null);
     }
   }, [open, editData]);
 
@@ -138,11 +181,27 @@ export function ConnectionModal({
     if (!value.trim()) return;
     const parsed = parseConnectionString(value);
     if (parsed) {
-      setFormData((prev) => ({ ...prev, ...parsed, name: prev.name || parsed.database || "" }));
+      setFormData((prev) => ({
+        ...prev,
+        ...parsed,
+        // Name it after whatever the URL identified it by.
+        name:
+          prev.name || parsed.database || parsed.filePath?.split("/").pop() || parsed.host || "",
+      }));
     } else {
       setConnStringError(true);
     }
   };
+
+  const drivers = useCapabilityStore((s) => s.drivers);
+  const selected = drivers.find((d) => d.id === formData.driver);
+  const isFileBased = selected?.fileBased ?? false;
+  const databaseOptional = selected?.databaseOptional ?? false;
+  // A file-based engine needs its path; a server needs a host, and a database
+  // only when the engine cannot do without one.
+  const canTest = isFileBased
+    ? !!formData.filePath
+    : !!formData.host && (databaseOptional || !!formData.database);
 
   const isEditing = !!editData;
   const name = formData.name.trim();
@@ -150,21 +209,25 @@ export function ConnectionModal({
 
   const handleTestConnection = async () => {
     setTesting(true);
-    setTestResult(null);
     try {
       const key: [string, string, string, string, string, string] = [
         formData.username,
         formData.password,
-        formData.database,
+        // A file-based engine has a path where a server has a database name.
+        isFileBased ? formData.filePath : formData.database,
         formData.host,
         formData.port,
         formData.ssl ? "true" : "false",
       ];
-      const version = await pgsqlTestConnection(key);
-      setTestResult({ ok: true, message: version });
+      const version = await testConnection(formData.driver, key);
+      // The banner runs to a compiler and a target triple; the part worth
+      // reading is what comes before the first comma.
+      toast.success("Connection successful", {
+        description: version.split(",")[0].trim(),
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setTestResult({ ok: false, message: msg });
+      toast.error("Connection failed", { description: msg, duration: 10000 });
     } finally {
       setTesting(false);
     }
@@ -187,7 +250,7 @@ export function ConnectionModal({
       <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[500px]">
         <ModalBanner
           className="shrink-0"
-          icon={<Database className="h-5 w-5 text-primary" />}
+          icon={<DriverIcon driver={formData.driver} className="h-5 w-5" branded />}
           title={isEditing ? editData.name : "New Connection"}
           badge={formData.driver}
           description={isEditing ? "Update connection details" : "Add a new database connection"}
@@ -199,10 +262,23 @@ export function ConnectionModal({
                 value={connString}
                 onChange={handleConnStringPaste}
                 error={connStringError}
+                driver={formData.driver}
               />
             )}
 
-            <DriverDisplay driver={formData.driver} />
+            <DriverPicker
+              driver={formData.driver}
+              drivers={drivers}
+              onChange={(driver) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  driver,
+                  // Carry the new engine's default rather than leaving the old
+                  // one's port sitting in the field.
+                  port: drivers.find((d) => d.id === driver)?.defaultPort ?? prev.port,
+                }))
+              }
+            />
 
             <NameField
               value={formData.name}
@@ -210,32 +286,44 @@ export function ConnectionModal({
               error={nameTaken ? "A connection with this name already exists" : undefined}
             />
 
-            <HostPortFields
-              host={formData.host}
-              port={formData.port}
-              onHostChange={(value) => setFormData({ ...formData, host: value })}
-              onPortChange={(value) => setFormData({ ...formData, port: value })}
-            />
+            {isFileBased ? (
+              <FilePathField
+                value={formData.filePath}
+                onChange={(value) => setFormData({ ...formData, filePath: value })}
+              />
+            ) : (
+              <>
+                <HostPortFields
+                  host={formData.host}
+                  port={formData.port}
+                  onHostChange={(value) => setFormData({ ...formData, host: value })}
+                  onPortChange={(value) => setFormData({ ...formData, port: value })}
+                />
 
-            <DatabaseField
-              value={formData.database}
-              onChange={(value) => setFormData({ ...formData, database: value })}
-            />
+                <DatabaseField
+                  value={formData.database}
+                  onChange={(value) => setFormData({ ...formData, database: value })}
+                  optional={databaseOptional}
+                  driver={formData.driver}
+                />
 
-            <UsernameField
-              value={formData.username}
-              onChange={(value) => setFormData({ ...formData, username: value })}
-            />
+                <UsernameField
+                  value={formData.username}
+                  onChange={(value) => setFormData({ ...formData, username: value })}
+                  driver={formData.driver}
+                />
 
-            <PasswordField
-              value={formData.password}
-              onChange={(value) => setFormData({ ...formData, password: value })}
-            />
+                <PasswordField
+                  value={formData.password}
+                  onChange={(value) => setFormData({ ...formData, password: value })}
+                />
 
-            <SslCheckbox
-              checked={formData.ssl}
-              onChange={(checked) => setFormData({ ...formData, ssl: checked })}
-            />
+                <SslCheckbox
+                  checked={formData.ssl}
+                  onChange={(checked) => setFormData({ ...formData, ssl: checked })}
+                />
+              </>
+            )}
 
             <AutoConnectCheckbox
               checked={formData.autoConnect}
@@ -256,23 +344,6 @@ export function ConnectionModal({
               onSshPasswordChange={(value) => setFormData({ ...formData, sshPassword: value })}
               onSshKeyPathChange={(value) => setFormData({ ...formData, sshKeyPath: value })}
             />
-
-            {testResult && (
-              <div
-                className={`flex items-start gap-2 rounded-md border px-3 py-2 text-xs ${
-                  testResult.ok
-                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500"
-                    : "border-destructive/30 bg-destructive/5 text-destructive"
-                }`}
-              >
-                {testResult.ok ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                ) : (
-                  <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                )}
-                <span className="break-all">{testResult.message}</span>
-              </div>
-            )}
           </div>
 
           <div className="flex shrink-0 justify-between border-border border-t px-5 py-4">
@@ -280,7 +351,7 @@ export function ConnectionModal({
               type="button"
               variant="outline"
               onClick={() => void handleTestConnection()}
-              disabled={testing || !formData.host || !formData.database}
+              disabled={testing || !canTest}
               className="text-xs"
             >
               {testing && <Loader2 className="h-3 w-3 animate-spin mr-1.5" />}

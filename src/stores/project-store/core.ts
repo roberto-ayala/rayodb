@@ -36,6 +36,7 @@ export function parseProjectDetails(arr: string[]): ProjectDetails {
     sshPassword: arr[11] ?? "",
     sshKeyPath: arr[12] ?? "",
     autoConnect: arr[13] ?? "false",
+    options: arr[14] ?? "",
   };
 }
 
@@ -55,6 +56,7 @@ function serializeProjectDetails(details: ProjectDetails): string[] {
     details.sshPassword ?? "",
     details.sshKeyPath ?? "",
     details.autoConnect ?? "false",
+    details.options ?? "",
   ];
 }
 
@@ -154,5 +156,9 @@ export const createCoreSlice: StateCreator<
     if (!source) return;
     const details = { ...source, database };
     await get().saveConnection(name, details);
+    // Clicking a database in the tree, or picking "Connect" from its menu,
+    // means open it. Saving the connection and stopping there left the user to
+    // click a second time on something that looked no different.
+    await get().connect(name);
   },
 });

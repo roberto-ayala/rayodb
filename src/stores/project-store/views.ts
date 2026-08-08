@@ -1,12 +1,16 @@
 import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
+import { ensureCapabilities } from "@/stores/capability-store";
 import type {
   DataTypeInfo,
   EventTriggerInfo,
   ForeignTableInfo,
   FunctionInfo,
+  PolicyDetail,
   ProcedureInfo,
+  RuleDetail,
   SequenceInfo,
+  TriggerDetail,
   TriggerFunctionInfo,
 } from "@/types";
 import type { ProjectState } from "./index";
@@ -80,13 +84,18 @@ export const createViewsSlice: StateCreator<
     if (!d) return;
     const driver = DriverFactory.getDriver(d.driver);
 
+    // Only ask for what the engine has. Without this the unsupported calls
+    // still go out and fail, which costs a round trip and buries a real error
+    // among expected ones.
+    const caps = await ensureCapabilities(d.driver);
+    const none = <T>(): Promise<T[]> => Promise.resolve([]);
     const [colsR, idxsR, consR, trigsR, rlsR, polsR] = await Promise.allSettled([
       driver.loadColumnDetails(projectId, schema, table),
       driver.loadIndexes(projectId, schema, table),
       driver.loadConstraints(projectId, schema, table),
-      driver.loadTriggers(projectId, schema, table),
-      driver.loadRules(projectId, schema, table),
-      driver.loadPolicies(projectId, schema, table),
+      caps.triggers ? driver.loadTriggers(projectId, schema, table) : none<TriggerDetail>(),
+      caps.rules ? driver.loadRules(projectId, schema, table) : none<RuleDetail>(),
+      caps.policies ? driver.loadPolicies(projectId, schema, table) : none<PolicyDetail>(),
     ]);
 
     const val = <T>(r: PromiseSettledResult<T>, fallback: T): T =>

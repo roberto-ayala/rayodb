@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useCapabilities } from "@/hooks/use-capabilities";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/project-store";
 import { useTabStore } from "@/stores/tab-store";
@@ -114,10 +115,12 @@ export function ObjectPropertiesModal({
     [getDriver, projectId, schema, name, objectType, fetchLiveData],
   );
 
+  const caps = useCapabilities(projectId);
+
   const availableTabs: { key: Tab; label: string }[] = [];
   availableTabs.push({ key: "overview", label: "Overview" });
   if (objectType === "table") {
-    availableTabs.push({ key: "structure", label: "Structure" });
+    if (caps.structureEditing) availableTabs.push({ key: "structure", label: "Structure" });
     availableTabs.push({
       key: "columns",
       label: `Columns${cols ? ` (${cols.length})` : ""}`,
@@ -128,8 +131,8 @@ export function ObjectPropertiesModal({
     });
     availableTabs.push({ key: "fkeys", label: `Foreign Keys` });
   }
-  availableTabs.push({ key: "ddl", label: "DDL" });
-  availableTabs.push({ key: "actions", label: "Actions" });
+  if (caps.ddlGeneration) availableTabs.push({ key: "ddl", label: "DDL" });
+  if (caps.tableMaintenance) availableTabs.push({ key: "actions", label: "Actions" });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -190,6 +193,7 @@ export function ObjectPropertiesModal({
               pols={pols}
               copyText={copyText}
               copied={copied}
+              loading={loading}
             />
           )}
           {activeTab === "columns" && <ColumnsContent cols={cols} pkCols={pkCols} />}

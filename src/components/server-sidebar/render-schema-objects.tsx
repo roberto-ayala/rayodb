@@ -28,18 +28,20 @@ import {
   detachPartitionTemplate,
   newDataTypeTemplate,
   newForeignTableTemplate,
-  newFunctionTemplate,
   newMatViewTemplate,
   newPartitionedTableTemplate,
   newPartitionTemplate,
-  newProcedureTemplate,
   newSequenceTemplate,
-  newTableTemplate,
   newTriggerFunctionTemplate,
-  newViewTemplate,
 } from "./ddl-queries";
 import { renderTableDetails } from "./render-table-details";
 import { SectionHeader } from "./section-header";
+import {
+  newFunctionTemplateFor,
+  newProcedureTemplateFor,
+  newTableTemplateFor,
+  newViewTemplateFor,
+} from "./templates-by-driver";
 import { TreeRow } from "./tree-row";
 import type { SidebarRenderCtx } from "./types";
 
@@ -58,6 +60,7 @@ function renderTable(
   depth: number,
 ) {
   const {
+    capsFor,
     loading,
     selectedItem,
     setSelectedItem,
@@ -118,21 +121,25 @@ function renderTable(
               icon: <Table className="h-3 w-3" />,
               onClick: () => openTab(pid, `SELECT COUNT(*) FROM "${schema}"."${ti.name}";`),
             },
-            { separator: true as const },
-            {
-              label: "Import CSV",
-              icon: <FileUp className="h-3 w-3" />,
-              onClick: () => {
-                void loadColumns(pid, schema, ti.name).then((cols) => {
-                  setCsvImportTarget({
-                    projectId: pid,
-                    schema,
-                    table: ti.name,
-                    columns: cols,
-                  });
-                });
-              },
-            },
+            ...(capsFor(pid).csvImport
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Import CSV",
+                    icon: <FileUp className="h-3 w-3" />,
+                    onClick: () => {
+                      void loadColumns(pid, schema, ti.name).then((cols) => {
+                        setCsvImportTarget({
+                          projectId: pid,
+                          schema,
+                          table: ti.name,
+                          columns: cols,
+                        });
+                      });
+                    },
+                  },
+                ]
+              : []),
             ...(ti.partitionKey
               ? [
                   { separator: true as const },
@@ -251,6 +258,10 @@ function newObjectMenu(
   sql: string,
   title: string,
 ) {
+  // The templates are PostgreSQL statements; an engine without its own gets
+  // no menu rather than a statement it would reject.
+  if (!ctx.capsFor(pid).objectTemplates) return undefined;
+
   return (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -261,6 +272,8 @@ function newObjectMenu(
 /** Render schemas + tables/views/functions for a connected database project */
 export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
   const {
+    capsFor,
+    driverOf,
     schemas,
     status,
     tables,
@@ -289,6 +302,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
   } = ctx;
 
   const projectSchemas = schemas[pid] || [];
+  const caps = capsFor(pid);
   const isConnected = status[pid] === ProjectConnectionStatus.Connected;
   if (!isConnected || !projectSchemas.length) return null;
 
@@ -315,56 +329,66 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
     }
     const rootTables = (schemaTables ?? []).filter((ti) => !ti.parent);
     const schemaTrigFns = triggerFunctions[schemaStoreKey];
-    const isSchemaOpen = isOpen(sKey);
+    // Where a database *is* the schema, the level carries no information:
+    // show the objects directly under the database rather than nesting them
+    // one deeper inside a node with the same name.
+    const isSchemaOpen = caps.schemas ? isOpen(sKey) : true;
 
     return (
       <div key={schema}>
-        <TreeRow
-          indent={I.schema}
-          icon={<FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />}
-          label={schema}
-          expanded={isSchemaOpen}
-          loading={loading[sKey]}
-          onClick={() => onExpandSchema(pid, schema)}
-          onContextMenu={(e) =>
-            showMenu(e, [
-              {
-                label: "ERD Diagram",
-                icon: <Layers className="h-3 w-3" />,
-                onClick: () => openERDTab(pid, schema),
-              },
-              {
-                label: "Copy Schema Name",
-                icon: <Copy className="h-3 w-3" />,
-                onClick: () => copy(schema),
-              },
-              {
-                label: "New Query",
-                icon: <Plus className="h-3 w-3" />,
-                onClick: () => openTab(pid, `-- Schema: ${schema}\n`),
-              },
-            ])
-          }
-        />
+        {caps.schemas && (
+          <TreeRow
+            indent={I.schema}
+            icon={<FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />}
+            label={schema}
+            expanded={isSchemaOpen}
+            loading={loading[sKey]}
+            onClick={() => onExpandSchema(pid, schema)}
+            onContextMenu={(e) =>
+              showMenu(e, [
+                {
+                  label: "ERD Diagram",
+                  icon: <Layers className="h-3 w-3" />,
+                  onClick: () => openERDTab(pid, schema),
+                },
+                {
+                  label: "Copy Schema Name",
+                  icon: <Copy className="h-3 w-3" />,
+                  onClick: () => copy(schema),
+                },
+                {
+                  label: "New Query",
+                  icon: <Plus className="h-3 w-3" />,
+                  onClick: () => openTab(pid, `-- Schema: ${schema}\n`),
+                },
+              ])
+            }
+          />
+        )}
 
         {isSchemaOpen && (
           <>
             {/* Tables category */}
             <SectionHeader
               indent={I.schemaObj}
-              label={`Tables${schemaTables ? ` (${rootTables.length})` : ""}`}
+              label={`Tables (${rootTables.length})`}
+              empty={rootTables.length === 0}
               icon={<Table className="h-3 w-3" />}
               sectionKey={`${sKey}::tables`}
               expanded={isOpen(`${sKey}::tables`, true)}
               onClick={() => toggle(`${sKey}::tables`, true)}
               onContextMenu={(e) => {
+                if (!caps.objectTemplates) return;
                 e.preventDefault();
                 e.stopPropagation();
                 showMenu(e, [
                   {
                     label: "New Table…",
                     icon: <Table className="h-3 w-3" />,
-                    onClick: () => openTab(pid, newTableTemplate(schema), { title: "New table" }),
+                    onClick: () =>
+                      openTab(pid, newTableTemplateFor(driverOf(pid), schema), {
+                        title: "New table",
+                      }),
                   },
                   {
                     label: "New Partitioned Table…",
@@ -381,11 +405,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}
 
             {/* Foreign Tables category */}
-            {schemaForeignTables && schemaForeignTables.length > 0 && (
+            {caps.foreignTables && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Foreign Tables (${schemaForeignTables.length})`}
+                  label={`Foreign Tables (${schemaForeignTables?.length ?? 0})`}
+                  empty={!schemaForeignTables?.length}
                   icon={<ExternalLink className="h-3 w-3" />}
                   sectionKey={`${sKey}::ftables`}
                   expanded={isOpen(`${sKey}::ftables`)}
@@ -400,7 +425,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::ftables`) &&
-                  schemaForeignTables.map((ft) => {
+                  (schemaForeignTables ?? []).map((ft) => {
                     const ftKey = `ftable::${pid}::${schema}::${ft.name}`;
                     return (
                       <TreeRow
@@ -438,11 +463,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Views category */}
-            {schemaViews && schemaViews.length > 0 && (
+            {
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Views (${schemaViews.length})`}
+                  label={`Views (${schemaViews?.length ?? 0})`}
+                  empty={!schemaViews?.length}
                   icon={<Eye className="h-3 w-3" />}
                   sectionKey={`${sKey}::views`}
                   expanded={isOpen(`${sKey}::views`)}
@@ -452,12 +478,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New View…",
                     <Eye className="h-3 w-3" />,
-                    newViewTemplate(schema),
+                    newViewTemplateFor(driverOf(pid), schema),
                     "New view",
                   )}
                 />
                 {isOpen(`${sKey}::views`) &&
-                  schemaViews.map((v) => {
+                  (schemaViews ?? []).map((v) => {
                     const vKey = `view::${pid}::${schema}::${v}`;
                     return (
                       <TreeRow
@@ -502,14 +528,15 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     );
                   })}
               </>
-            )}
+            }
 
             {/* Materialized Views category */}
-            {schemaMatViews && schemaMatViews.length > 0 && (
+            {caps.materializedViews && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Materialized Views (${schemaMatViews.length})`}
+                  label={`Materialized Views (${schemaMatViews?.length ?? 0})`}
+                  empty={!schemaMatViews?.length}
                   icon={<Layers className="h-3 w-3" />}
                   sectionKey={`${sKey}::matviews`}
                   expanded={isOpen(`${sKey}::matviews`)}
@@ -524,7 +551,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::matviews`) &&
-                  schemaMatViews.map((mv) => {
+                  (schemaMatViews ?? []).map((mv) => {
                     const mvKey = `matview::${pid}::${schema}::${mv}`;
                     return (
                       <TreeRow
@@ -573,11 +600,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Sequences category */}
-            {schemaSequences && schemaSequences.length > 0 && (
+            {caps.sequences && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Sequences (${schemaSequences.length})`}
+                  label={`Sequences (${schemaSequences?.length ?? 0})`}
+                  empty={!schemaSequences?.length}
                   icon={<Hash className="h-3 w-3" />}
                   sectionKey={`${sKey}::seqs`}
                   expanded={isOpen(`${sKey}::seqs`)}
@@ -592,7 +620,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::seqs`) &&
-                  schemaSequences.map((seq) => {
+                  (schemaSequences ?? []).map((seq) => {
                     const seqKey = `sequence::${pid}::${schema}::${seq.name}`;
                     return (
                       <TreeRow
@@ -636,11 +664,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Functions category */}
-            {schemaFns && schemaFns.length > 0 && (
+            {caps.functions && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Functions (${schemaFns.length})`}
+                  label={`Functions (${schemaFns?.length ?? 0})`}
+                  empty={!schemaFns?.length}
                   icon={<FileCode className="h-3 w-3" />}
                   sectionKey={`${sKey}::fns`}
                   expanded={isOpen(`${sKey}::fns`)}
@@ -650,12 +679,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New Function…",
                     <FileCode className="h-3 w-3" />,
-                    newFunctionTemplate(schema),
+                    newFunctionTemplateFor(driverOf(pid), schema),
                     "New function",
                   )}
                 />
                 {isOpen(`${sKey}::fns`) &&
-                  schemaFns.map((fn, i) => {
+                  (schemaFns ?? []).map((fn, i) => {
                     const fnKey = `fn::${pid}::${schema}::${fn.name}::${i}`;
                     return (
                       <div
@@ -702,11 +731,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Procedures category */}
-            {schemaProcs && schemaProcs.length > 0 && (
+            {caps.procedures && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Procedures (${schemaProcs.length})`}
+                  label={`Procedures (${schemaProcs?.length ?? 0})`}
+                  empty={!schemaProcs?.length}
                   icon={<SquarePlay className="h-3 w-3" />}
                   sectionKey={`${sKey}::procs`}
                   expanded={isOpen(`${sKey}::procs`)}
@@ -716,12 +746,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                     pid,
                     "New Procedure…",
                     <SquarePlay className="h-3 w-3" />,
-                    newProcedureTemplate(schema),
+                    newProcedureTemplateFor(driverOf(pid), schema),
                     "New procedure",
                   )}
                 />
                 {isOpen(`${sKey}::procs`) &&
-                  schemaProcs.map((proc, i) => {
+                  (schemaProcs ?? []).map((proc, i) => {
                     const procKey = `procedure::${pid}::${schema}::${proc.name}::${i}`;
                     return (
                       // biome-ignore lint/a11y/noStaticElementInteractions: mirrors the function rows — selection and a context menu, no primary action
@@ -776,11 +806,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Data Types category */}
-            {schemaDataTypes && schemaDataTypes.length > 0 && (
+            {caps.dataTypes && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Data Types (${schemaDataTypes.length})`}
+                  label={`Data Types (${schemaDataTypes?.length ?? 0})`}
+                  empty={!schemaDataTypes?.length}
                   icon={<Shapes className="h-3 w-3" />}
                   sectionKey={`${sKey}::types`}
                   expanded={isOpen(`${sKey}::types`)}
@@ -795,7 +826,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::types`) &&
-                  schemaDataTypes.map((dt) => {
+                  (schemaDataTypes ?? []).map((dt) => {
                     const dtKey = `datatype::${pid}::${schema}::${dt.name}`;
                     return (
                       // biome-ignore lint/a11y/noStaticElementInteractions: a type is a label — selection and a context menu, no primary action
@@ -845,11 +876,12 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Trigger Functions category */}
-            {schemaTrigFns && schemaTrigFns.length > 0 && (
+            {caps.triggerFunctions && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
-                  label={`Trigger Functions (${schemaTrigFns.length})`}
+                  label={`Trigger Functions (${schemaTrigFns?.length ?? 0})`}
+                  empty={!schemaTrigFns?.length}
                   icon={<Zap className="h-3 w-3" />}
                   sectionKey={`${sKey}::trigfns`}
                   expanded={isOpen(`${sKey}::trigfns`)}
@@ -864,7 +896,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
                   )}
                 />
                 {isOpen(`${sKey}::trigfns`) &&
-                  schemaTrigFns.map((fn, i) => {
+                  (schemaTrigFns ?? []).map((fn, i) => {
                     const tfKey = `trigfn::${pid}::${schema}::${fn.name}::${i}`;
                     return (
                       <div

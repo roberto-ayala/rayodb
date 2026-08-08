@@ -230,10 +230,22 @@ pub async fn load_rules(
 ) -> Result<Vec<RuleDetail>, AppError> {
     let rows = client
         .query(
-            r#"SELECT rulename, ev_type
-               FROM pg_rules
-               WHERE schemaname = $1 AND tablename = $2
-               ORDER BY rulename"#,
+            // pg_rules exposes the rule text but not its event, so the event
+            // has to come from pg_rewrite. _RETURN is the rule that makes a
+            // view a view; pg_rules hides it and so do we.
+            r#"SELECT r.rulename,
+                      CASE r.ev_type
+                          WHEN '1' THEN 'SELECT'
+                          WHEN '2' THEN 'UPDATE'
+                          WHEN '3' THEN 'INSERT'
+                          WHEN '4' THEN 'DELETE'
+                          ELSE r.ev_type::text
+                      END AS ev_type
+               FROM pg_rewrite r
+               JOIN pg_class c ON c.oid = r.ev_class
+               JOIN pg_namespace n ON n.oid = c.relnamespace
+               WHERE n.nspname = $1 AND c.relname = $2 AND r.rulename <> '_RETURN'
+               ORDER BY r.rulename"#,
             &[&schema, &table],
         )
         .await

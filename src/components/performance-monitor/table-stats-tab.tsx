@@ -10,7 +10,7 @@ export function TableStatsTab({ tableStats }: TableStatsTabProps) {
   return (
     <div className="space-y-2">
       <p className="text-3xs text-muted-foreground px-1">
-        Cumulative stats since server start or last pg_stat_reset(). Source: pg_stat_user_tables
+        Cumulative stats since server start or the last reset.
       </p>
       <PanelCard>
         <div className={tableClasses.wrapper}>

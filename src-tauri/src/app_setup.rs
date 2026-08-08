@@ -5,6 +5,34 @@ use tokio::sync::Mutex;
 
 use crate::{AppState, LOCAL_DB_NAME, terminal, utils};
 
+/// Columns added to `projects` after the table's first shipped shape. Applied
+/// one by one, ignoring "duplicate column" errors, so an install of any age
+/// converges on the current schema.
+pub const PROJECT_ADDED_COLUMNS: [&str; 8] = [
+    "ssh_enabled",
+    "ssh_host",
+    "ssh_port",
+    "ssh_user",
+    "ssh_password",
+    "ssh_key_path",
+    "auto_connect",
+    // Driver-specific settings as JSON: a SQLite file path, a MySQL socket,
+    // anything the fixed columns cannot express.
+    "options",
+];
+
+/// The `projects` table as first shipped. Later columns arrive by migration.
+pub const PROJECTS_TABLE_DDL: &str = "CREATE TABLE IF NOT EXISTS projects (
+                id TEXT PRIMARY KEY,
+                driver TEXT NOT NULL DEFAULT 'PGSQL',
+                username TEXT NOT NULL DEFAULT '',
+                password TEXT NOT NULL DEFAULT '',
+                database TEXT NOT NULL DEFAULT '',
+                host TEXT NOT NULL DEFAULT '',
+                port TEXT NOT NULL DEFAULT '',
+                ssl TEXT NOT NULL DEFAULT 'false'
+            )";
+
 pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(desktop)]
     if let Some(pubkey) = option_env!("TAURI_UPDATER_PUBLIC_KEY") {
@@ -36,21 +64,9 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
             .expect("Failed to open local database");
 
         let conn = db.connect().expect("Failed to create connection");
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS projects (
-                id TEXT PRIMARY KEY,
-                driver TEXT NOT NULL DEFAULT 'PGSQL',
-                username TEXT NOT NULL DEFAULT '',
-                password TEXT NOT NULL DEFAULT '',
-                database TEXT NOT NULL DEFAULT '',
-                host TEXT NOT NULL DEFAULT '',
-                port TEXT NOT NULL DEFAULT '',
-                ssl TEXT NOT NULL DEFAULT 'false'
-            )",
-            (),
-        )
-        .await
-        .expect("Failed to create projects table");
+        conn.execute(PROJECTS_TABLE_DDL, ())
+            .await
+            .expect("Failed to create projects table");
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS queries (
@@ -109,15 +125,7 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
         .await
         .ok();
 
-        for col in [
-            "ssh_enabled",
-            "ssh_host",
-            "ssh_port",
-            "ssh_user",
-            "ssh_password",
-            "ssh_key_path",
-            "auto_connect",
-        ] {
+        for col in PROJECT_ADDED_COLUMNS {
             conn.execute(
                 &format!(
                     "ALTER TABLE projects ADD COLUMN {} TEXT NOT NULL DEFAULT ''",
@@ -130,10 +138,7 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
         }
 
         let state = AppState {
-            clients: Arc::new(Mutex::new(BTreeMap::new())),
-            meta_clients: Arc::new(Mutex::new(BTreeMap::new())),
-            cancel_tokens: Arc::new(Mutex::new(BTreeMap::new())),
-            client_ssl: Arc::new(Mutex::new(BTreeMap::new())),
+            connections: Arc::new(Mutex::new(BTreeMap::new())),
             local_db: db,
             resource_monitor: Arc::new(Mutex::new(utils::ResourceMonitor::new())),
             virtual_cache: Arc::new(Mutex::new(BTreeMap::new())),
@@ -207,4 +212,96 @@ pub fn setup_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>>
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Apply the migration the way `setup_app` does.
+    async fn migrate(conn: &libsql::Connection) {
+        for col in PROJECT_ADDED_COLUMNS {
+            conn.execute(
+                &format!("ALTER TABLE projects ADD COLUMN {col} TEXT NOT NULL DEFAULT ''"),
+                (),
+            )
+            .await
+            .ok();
+        }
+    }
+
+    /// An install predating the `options` column must keep its rows and read
+    /// back an empty value, not fail to open.
+    #[tokio::test]
+    async fn an_existing_database_gains_options_without_losing_rows() {
+        let db = libsql::Builder::new_local(":memory:")
+            .build()
+            .await
+            .unwrap();
+        let conn = db.connect().unwrap();
+
+        // The schema as it shipped before this phase.
+        conn.execute(PROJECTS_TABLE_DDL, ()).await.unwrap();
+        for col in ["ssh_enabled", "ssh_host", "auto_connect"] {
+            conn.execute(
+                &format!("ALTER TABLE projects ADD COLUMN {col} TEXT NOT NULL DEFAULT ''"),
+                (),
+            )
+            .await
+            .unwrap();
+        }
+        conn.execute(
+            "INSERT INTO projects (id, driver, username, database, host, port)
+             VALUES ('p1', 'PGSQL', 'alice', 'shop', 'db.internal', '5432')",
+            (),
+        )
+        .await
+        .unwrap();
+
+        migrate(&conn).await;
+
+        let mut rows = conn
+            .query(
+                "SELECT driver, username, host, options FROM projects WHERE id = 'p1'",
+                (),
+            )
+            .await
+            .unwrap();
+        let row = rows.next().await.unwrap().expect("row survived migration");
+        assert_eq!(row.get::<String>(0).unwrap(), "PGSQL");
+        assert_eq!(row.get::<String>(1).unwrap(), "alice");
+        assert_eq!(row.get::<String>(2).unwrap(), "db.internal");
+        assert_eq!(
+            row.get::<String>(3).unwrap(),
+            "",
+            "options defaults to empty"
+        );
+    }
+
+    /// Startup runs the migration every time; the second pass must be a no-op.
+    #[tokio::test]
+    async fn migrating_twice_is_harmless() {
+        let db = libsql::Builder::new_local(":memory:")
+            .build()
+            .await
+            .unwrap();
+        let conn = db.connect().unwrap();
+        conn.execute(PROJECTS_TABLE_DDL, ()).await.unwrap();
+
+        migrate(&conn).await;
+        conn.execute(
+            "INSERT INTO projects (id, options) VALUES ('p1', '{\"path\":\"/tmp/a.db\"}')",
+            (),
+        )
+        .await
+        .unwrap();
+        migrate(&conn).await;
+
+        let mut rows = conn
+            .query("SELECT options FROM projects WHERE id = 'p1'", ())
+            .await
+            .unwrap();
+        let row = rows.next().await.unwrap().unwrap();
+        assert_eq!(row.get::<String>(0).unwrap(), "{\"path\":\"/tmp/a.db\"}");
+    }
 }

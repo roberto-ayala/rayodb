@@ -1,12 +1,11 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::AppState;
-use crate::common::enums::{AppError};
-use crate::drivers::pgsql::execute_virtual;
+use crate::common::enums::AppError;
 
 use tokio::time::{Duration, sleep};
 
-use super::pool_connection::{acquire_client, is_sqlite_lock_error, set_cancel_token};
+use super::pool_connection::is_sqlite_lock_error;
 use super::{CELL_SEP, SNAPSHOT_PAGE_WRITE_RETRIES};
 
 #[derive(Clone)]
@@ -231,17 +230,25 @@ pub(crate) async fn restore_virtual_from_snapshot(
         return Ok(false);
     };
 
-    let client = acquire_client(&app_state.clients, &meta.project_id).await?;
-    set_cancel_token(app_state, &meta.project_id, client.cancel_token()).await?;
+    // Re-run through whichever driver owns the project: a snapshot outlives the
+    // in-memory cache, so the connection may well be a different one by now.
+    let driver = {
+        let connections = app_state.connections.lock().await;
+        connections
+            .get(&meta.project_id)
+            .cloned()
+            .ok_or_else(|| AppError::ClientNotConnected(meta.project_id.clone()))?
+    };
 
-    let (columns_packed, total_rows, first_page_packed, _) = execute_virtual(
-        &client,
-        &app_state.virtual_cache,
-        &meta.sql,
-        query_id,
-        meta.page_size,
-    )
-    .await?;
+    let (columns_packed, total_rows, first_page_packed, _) = driver
+        .execute_virtual(
+            &app_state.virtual_cache,
+            &meta.sql,
+            query_id,
+            meta.page_size,
+            0,
+        )
+        .await?;
 
     if columns_packed.is_empty() {
         return Ok(false);

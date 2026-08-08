@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
+import { ensureCapabilities } from "@/stores/capability-store";
 import { ProjectConnectionStatus as PCS } from "@/types";
 import type { ProjectState } from "./index";
 
@@ -93,6 +94,19 @@ export const createConnectionSlice: StateCreator<
           s.serverTablespaces[projectId] = tsp.status === "fulfilled" && tsp.value ? tsp.value : [];
           s.eventTriggers[projectId] = evt.status === "fulfilled" ? evt.value : [];
         });
+
+        // Engines without schemas show their objects directly under the
+        // database, so nothing ever expands the schema node that would
+        // otherwise trigger the load. Do it here instead.
+        const loaded = sc.status === "fulfilled" ? sc.value : [];
+        const caps = await ensureCapabilities(d.driver);
+        if (!caps.schemas && loaded.length === 1) {
+          const only = loaded[0];
+          await Promise.allSettled([
+            get().loadTables(projectId, only),
+            get().loadSchemaObjects(projectId, only),
+          ]);
+        }
       }
     } catch (err: unknown) {
       const msg =

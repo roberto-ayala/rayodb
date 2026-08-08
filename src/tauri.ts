@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { DriverType } from "@/types";
 
 // Raw wire types from Rust backend (string arrays)
 export type RawProjectMap = Record<string, string[]>;
@@ -55,8 +56,10 @@ export async function workspaceDelete(name: string): Promise<void> {
   await invoke("workspace_delete", { name });
 }
 
-export async function pgsqlTestConnection(
+/** Verify credentials without saving or registering a connection. */
+export async function testConnection(
+  driver: DriverType,
   key: [string, string, string, string, string, string],
 ): Promise<string> {
-  return await invoke<string>("pgsql_test_connection", { key });
+  return await invoke<string>("db_test_connection", { driver, key });
 }

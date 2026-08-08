@@ -1,14 +1,18 @@
 import { Plus } from "lucide-react";
-import React from "react";
+import React, { useCallback } from "react";
 import { CSVImportModal } from "@/components/csv-import-modal";
 import { ObjectPropertiesModal } from "@/components/object-properties-modal";
 import { Button } from "@/components/ui/button";
 import { ContextMenu, useContextMenu } from "@/components/ui/context-menu";
+import { NO_CAPABILITIES } from "@/lib/database-driver/capabilities";
 import { serverFingerprint } from "@/lib/server-group";
+import { quoteIdent } from "@/lib/sql-utils";
+import { useCapabilityStore } from "@/stores/capability-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useTabStore } from "@/stores/tab-store";
 import { useUIStore } from "@/stores/ui-store";
+import type { DriverType } from "@/types";
 import { ProjectConnectionStatus } from "@/types";
 import { AddDatabaseDialog } from "./add-database-dialog";
 import { renderSavedQueries } from "./render-saved-queries";
@@ -176,16 +180,20 @@ export function ServerSidebar({
     toggle(`table::${projectId}::${schema}::${table}`);
   };
 
-  const selectQuery = (schema: string, table: string) =>
-    `SELECT * FROM "${schema}"."${table}" LIMIT 100;`;
+  // Quoting differs by engine, so the browse query is built per project rather
+  // than with a fixed double-quoted literal.
+  const selectQuery = (projectId: string, schema: string, table: string) => {
+    const driver = projects[projectId]?.driver;
+    return `SELECT * FROM ${quoteIdent(schema, driver)}.${quoteIdent(table, driver)} LIMIT 100;`;
+  };
 
   const onOpenTableQuery = (projectId: string, schema: string, table: string) => {
-    openTab(projectId, selectQuery(schema, table));
+    openTab(projectId, selectQuery(projectId, schema, table));
   };
 
   /** A single click browses: it reuses the preview tab and names it after the object */
   const onPreviewTableQuery = (projectId: string, schema: string, table: string) => {
-    openTab(projectId, selectQuery(schema, table), {
+    openTab(projectId, selectQuery(projectId, schema, table), {
       preview: true,
       title: `${schema}.${table}`,
     });
@@ -195,8 +203,24 @@ export function ServerSidebar({
 
   const copy = (text: string) => navigator.clipboard.writeText(text);
 
+  const capsByDriver = useCapabilityStore((s) => s.byDriver);
+  const driverOf = useCallback(
+    (projectId: string): DriverType => projects[projectId]?.driver ?? "PGSQL",
+    [projects],
+  );
+
+  const capsFor = useCallback(
+    (projectId: string) => {
+      const driver = projects[projectId]?.driver;
+      return (driver && capsByDriver[driver]) || NO_CAPABILITIES;
+    },
+    [projects, capsByDriver],
+  );
+
   const ctx: SidebarRenderCtx = {
     projects,
+    capsFor,
+    driverOf,
     status,
     serverDatabases,
     serverTablespaces,

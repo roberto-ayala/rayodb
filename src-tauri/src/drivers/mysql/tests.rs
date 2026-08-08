@@ -384,7 +384,7 @@ fn an_unsupported_auth_plugin_explains_itself() {
             .to_string()
             .into(),
     );
-    let msg = super::explain(raw).to_string();
+    let msg = super::explain(&ConnectionParams::default(), raw).to_string();
 
     assert!(msg.contains("sha256_password"), "names the plugin: {msg}");
     assert!(
@@ -398,7 +398,11 @@ fn an_unsupported_auth_plugin_explains_itself() {
 #[test]
 fn other_failures_keep_their_message() {
     let raw = mysql_async::Error::Other("Access denied for user 'bob'".to_string().into());
-    assert!(super::explain(raw).to_string().contains("Access denied"));
+    assert!(
+        super::explain(&ConnectionParams::default(), raw)
+            .to_string()
+            .contains("Access denied")
+    );
 }
 
 /// The generic dispatch has to reach this driver, which is what the command

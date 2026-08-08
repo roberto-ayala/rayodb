@@ -17,15 +17,16 @@ pub(crate) fn is_sqlite_lock_error(message: &str) -> bool {
     lower.contains("database is locked") || lower.contains("database busy")
 }
 
-pub(crate) fn full_error_chain(e: &dyn std::error::Error) -> String {
-    let mut msg = e.to_string();
-    let mut src = e.source();
-    while let Some(cause) = src {
-        msg.push_str(": ");
-        msg.push_str(&cause.to_string());
-        src = cause.source();
+pub(crate) fn full_error_chain(e: &(dyn std::error::Error + 'static)) -> String {
+    crate::drivers::errors::error_chain(e)
+}
+
+/// A connection failure, said in terms of what the user typed.
+fn connection_failed(params: &ConnectionParams, e: &(dyn std::error::Error + 'static)) -> AppError {
+    if let Some(msg) = crate::drivers::errors::explain_network(&params.host, &params.port, e) {
+        return AppError::ConnectionFailed(msg);
     }
-    msg
+    AppError::ConnectionFailed(full_error_chain(e))
 }
 
 pub(crate) fn create_pg_pool(
@@ -95,7 +96,7 @@ pub async fn test_connection(params: &ConnectionParams) -> Result<String, AppErr
     let client = pool
         .get()
         .await
-        .map_err(|e| AppError::ConnectionFailed(full_error_chain(&e)))?;
+        .map_err(|e| connection_failed(params, &e))?;
 
     let row = client
         .query_one("SELECT version()", &[])
@@ -119,11 +120,11 @@ pub async fn connect(params: &ConnectionParams) -> Result<PgsqlDriver, AppError>
 
     if let Err(e) = query_pool.get().await {
         tracing::error!("Query pool initial connection failed: {:?}", e);
-        return Err(AppError::ConnectionFailed(full_error_chain(&e)));
+        return Err(connection_failed(params, &e));
     }
     if let Err(e) = meta_pool.get().await {
         tracing::error!("Meta pool initial connection failed: {:?}", e);
-        return Err(AppError::ConnectionFailed(full_error_chain(&e)));
+        return Err(connection_failed(params, &e));
     }
 
     Ok(PgsqlDriver::new(

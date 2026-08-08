@@ -43,8 +43,14 @@ fn opts_from(params: &ConnectionParams) -> Result<Opts, AppError> {
 /// mysql_old_password, mysql_clear_password and MariaDB's client_ed25519.
 /// A server whose account uses anything else — sha256_password, most often —
 /// fails with a message that names the plugin but not the way out.
-fn explain(e: mysql_async::Error) -> AppError {
-    let raw = e.to_string();
+fn explain(params: &ConnectionParams, e: mysql_async::Error) -> AppError {
+    // A refused or unreachable server is worth saying plainly, whatever the
+    // driver wrapped it in.
+    if let Some(msg) = crate::drivers::errors::explain_network(&params.host, &params.port, &e) {
+        return AppError::ConnectionFailed(msg);
+    }
+
+    let raw = crate::drivers::errors::error_chain(&e);
 
     if raw.contains("Unknown authentication plugin") {
         let plugin = raw.split('`').nth(1).unwrap_or("that plugin").to_string();
@@ -67,7 +73,7 @@ pub async fn connect(params: &ConnectionParams) -> Result<MysqlDriver, AppError>
 
     // Validate eagerly so a bad password fails here rather than on the first
     // sidebar refresh.
-    let mut conn = pool.get_conn().await.map_err(explain)?;
+    let mut conn = pool.get_conn().await.map_err(|e| explain(params, e))?;
     introspection::fetch_grid(&mut conn, "SELECT 1").await?;
     drop(conn);
 
@@ -77,7 +83,7 @@ pub async fn connect(params: &ConnectionParams) -> Result<MysqlDriver, AppError>
 /// Report the server version, matching the PostgreSQL connection test.
 pub async fn test_connection(params: &ConnectionParams) -> Result<String, AppError> {
     let pool = Pool::new(opts_from(params)?);
-    let mut conn = pool.get_conn().await.map_err(explain)?;
+    let mut conn = pool.get_conn().await.map_err(|e| explain(params, e))?;
 
     let (_, rows) = introspection::fetch_grid(&mut conn, "SELECT VERSION()").await?;
     let version = rows

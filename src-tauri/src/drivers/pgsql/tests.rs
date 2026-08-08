@@ -103,6 +103,37 @@ async fn connecting_without_a_database_uses_the_user_default() {
     }
 }
 
+/// The message a stopped server produces, which is the one most people meet
+/// first. It has to name the address rather than recite the pool's wrappers.
+#[tokio::test]
+async fn a_stopped_server_says_so_plainly() {
+    // Port 1 has nothing on it, and needs no fixture.
+    let params = ConnectionParams {
+        username: "someone".into(),
+        database: "somedb".into(),
+        host: "127.0.0.1".into(),
+        port: "1".into(),
+        ..Default::default()
+    };
+
+    let err = match connect(&params).await {
+        Err(e) => e.to_string(),
+        Ok(_) => panic!("nothing should be listening on port 1"),
+    };
+
+    assert!(err.contains("127.0.0.1:1"), "names the address: {err}");
+    assert!(err.contains("Nothing is listening"), "{err}");
+    assert!(
+        !err.contains("creating a new object"),
+        "the pool's wrapper leaked: {err}"
+    );
+    assert_eq!(
+        err.matches("error connecting to server").count(),
+        0,
+        "the driver's repeated wrapper leaked: {err}"
+    );
+}
+
 #[tokio::test]
 async fn schema_tree_loads() {
     let params = skip_without_server!();

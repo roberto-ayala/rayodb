@@ -37,16 +37,37 @@ fn opts_from(params: &ConnectionParams) -> Result<Opts, AppError> {
     Ok(Opts::from(builder))
 }
 
+/// Turn a connection failure into something the user can act on.
+///
+/// The driver supports mysql_native_password, caching_sha2_password,
+/// mysql_old_password, mysql_clear_password and MariaDB's client_ed25519.
+/// A server whose account uses anything else — sha256_password, most often —
+/// fails with a message that names the plugin but not the way out.
+fn explain(e: mysql_async::Error) -> AppError {
+    let raw = e.to_string();
+
+    if raw.contains("Unknown authentication plugin") {
+        let plugin = raw.split('`').nth(1).unwrap_or("that plugin").to_string();
+        return AppError::ConnectionFailed(format!(
+            "This account authenticates with `{plugin}`, which this client does not \
+             support. Supported: mysql_native_password, caching_sha2_password, \
+             mysql_clear_password and client_ed25519. On the server, either grant the \
+             account one of those — ALTER USER 'user'@'host' IDENTIFIED WITH \
+             caching_sha2_password BY 'password'; — or connect as an account that \
+             already uses one."
+        ));
+    }
+
+    AppError::ConnectionFailed(raw)
+}
+
 pub async fn connect(params: &ConnectionParams) -> Result<MysqlDriver, AppError> {
     let opts = opts_from(params)?;
     let pool = Pool::new(opts.clone());
 
     // Validate eagerly so a bad password fails here rather than on the first
     // sidebar refresh.
-    let mut conn = pool
-        .get_conn()
-        .await
-        .map_err(|e| AppError::ConnectionFailed(e.to_string()))?;
+    let mut conn = pool.get_conn().await.map_err(explain)?;
     introspection::fetch_grid(&mut conn, "SELECT 1").await?;
     drop(conn);
 
@@ -56,10 +77,7 @@ pub async fn connect(params: &ConnectionParams) -> Result<MysqlDriver, AppError>
 /// Report the server version, matching the PostgreSQL connection test.
 pub async fn test_connection(params: &ConnectionParams) -> Result<String, AppError> {
     let pool = Pool::new(opts_from(params)?);
-    let mut conn = pool
-        .get_conn()
-        .await
-        .map_err(|e| AppError::ConnectionFailed(e.to_string()))?;
+    let mut conn = pool.get_conn().await.map_err(explain)?;
 
     let (_, rows) = introspection::fetch_grid(&mut conn, "SELECT VERSION()").await?;
     let version = rows

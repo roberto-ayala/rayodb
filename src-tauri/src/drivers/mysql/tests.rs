@@ -353,6 +353,34 @@ async fn a_hostile_object_name_cannot_break_out() {
     );
 }
 
+/// An unsupported auth plugin is the most likely way a real MySQL refuses this
+/// client, and the driver's own message names the plugin without saying what to
+/// do about it.
+#[test]
+fn an_unsupported_auth_plugin_explains_itself() {
+    // The shape mysql_async produces.
+    let raw = mysql_async::Error::Other(
+        "Unknown authentication plugin `sha256_password'."
+            .to_string()
+            .into(),
+    );
+    let msg = super::explain(raw).to_string();
+
+    assert!(msg.contains("sha256_password"), "names the plugin: {msg}");
+    assert!(
+        msg.contains("caching_sha2_password"),
+        "names a way out: {msg}"
+    );
+    assert!(msg.contains("ALTER USER"), "gives the statement: {msg}");
+}
+
+/// Anything else must reach the user unchanged rather than be swallowed.
+#[test]
+fn other_failures_keep_their_message() {
+    let raw = mysql_async::Error::Other("Access denied for user 'bob'".to_string().into());
+    assert!(super::explain(raw).to_string().contains("Access denied"));
+}
+
 /// The generic dispatch has to reach this driver, which is what the command
 /// layer actually calls.
 #[tokio::test]

@@ -176,16 +176,23 @@ export function DatabaseField({ value, onChange }: DatabaseFieldProps) {
 interface UsernameFieldProps {
   value: string;
   onChange: (value: string) => void;
+  driver: DriverType;
 }
 
-export function UsernameField({ value, onChange }: UsernameFieldProps) {
+/** Each engine has its own conventional superuser, so the hint follows it. */
+const DEFAULT_USER: Partial<Record<DriverType, string>> = {
+  PGSQL: "postgres",
+  MYSQL: "root",
+};
+
+export function UsernameField({ value, onChange, driver }: UsernameFieldProps) {
   return (
     <Field label="Username" htmlFor="username">
       <Input
         id="username"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="postgres"
+        placeholder={DEFAULT_USER[driver] ?? ""}
         required
       />
     </Field>

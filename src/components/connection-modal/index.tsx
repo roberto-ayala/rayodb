@@ -272,6 +272,7 @@ export function ConnectionModal({
                 <UsernameField
                   value={formData.username}
                   onChange={(value) => setFormData({ ...formData, username: value })}
+                  driver={formData.driver}
                 />
 
                 <PasswordField

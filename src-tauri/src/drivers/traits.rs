@@ -15,6 +15,7 @@ use tokio::sync::Mutex;
 
 use crate::common::enums::AppError;
 use crate::drivers::cache::VirtualCache;
+use crate::drivers::capabilities::Capabilities;
 use crate::drivers::kind::DriverKind;
 use crate::drivers::pgsql::roles_schema_objects::{
     DbGrant, DefaultGrant, PgRole, RoleSpec, SchemaGrant, SchemaObject, TableGrant,
@@ -52,6 +53,13 @@ pub trait Driver: Send + Sync {
     // ---- core ----------------------------------------------------------
 
     fn kind(&self) -> DriverKind;
+
+    /// What this connection supports. Defaults to the engine's static set;
+    /// override only if a driver must narrow it per server (an old version
+    /// lacking a feature, say).
+    fn capabilities(&self) -> Capabilities {
+        self.kind().capabilities()
+    }
 
     /// Release engine-side resources. The connection registry drops the handle
     /// afterwards, so this only needs to cover what `Drop` cannot.

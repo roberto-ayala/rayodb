@@ -1,4 +1,5 @@
 pub mod cache;
+pub mod capabilities;
 pub mod commands;
 pub mod connection;
 pub mod kind;

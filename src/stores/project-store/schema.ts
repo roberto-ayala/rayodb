@@ -1,6 +1,16 @@
 import type { StateCreator } from "zustand";
 import { DriverFactory } from "@/lib/database-driver";
-import type { ColumnDetail, TableInfo } from "@/types";
+import { ensureCapabilities } from "@/stores/capability-store";
+import type {
+  ColumnDetail,
+  DataTypeInfo,
+  ForeignTableInfo,
+  FunctionInfo,
+  ProcedureInfo,
+  SequenceInfo,
+  TableInfo,
+  TriggerFunctionInfo,
+} from "@/types";
 import type { ProjectState } from "./index";
 
 export type SchemaSlice = {
@@ -96,15 +106,21 @@ export const createSchemaSlice: StateCreator<
     const d = projects[projectId];
     if (!d) return;
     const driver = DriverFactory.getDriver(d.driver);
+    // Skip what the engine does not have, so an unsupported category costs no
+    // round trip and logs no error the user cannot act on.
+    const caps = await ensureCapabilities(d.driver);
+    const none = <T>(): Promise<T[]> => Promise.resolve([]);
     const [vR, mvR, seqR, fnR, procR, dtR, ftR, tfnR] = await Promise.allSettled([
       driver.loadViews(projectId, schema),
-      driver.loadMaterializedViews(projectId, schema),
-      driver.loadSequences(projectId, schema),
-      driver.loadFunctions(projectId, schema),
-      driver.loadProcedures(projectId, schema),
-      driver.loadDataTypes(projectId, schema),
-      driver.loadForeignTables(projectId, schema),
-      driver.loadTriggerFunctions(projectId, schema),
+      caps.materializedViews ? driver.loadMaterializedViews(projectId, schema) : none<string>(),
+      caps.sequences ? driver.loadSequences(projectId, schema) : none<SequenceInfo>(),
+      caps.functions ? driver.loadFunctions(projectId, schema) : none<FunctionInfo>(),
+      caps.procedures ? driver.loadProcedures(projectId, schema) : none<ProcedureInfo>(),
+      caps.dataTypes ? driver.loadDataTypes(projectId, schema) : none<DataTypeInfo>(),
+      caps.foreignTables ? driver.loadForeignTables(projectId, schema) : none<ForeignTableInfo>(),
+      caps.triggerFunctions
+        ? driver.loadTriggerFunctions(projectId, schema)
+        : none<TriggerFunctionInfo>(),
     ]);
 
     const val = <T>(r: PromiseSettledResult<T>, fallback: T): T =>

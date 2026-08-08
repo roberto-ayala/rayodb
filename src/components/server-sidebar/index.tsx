@@ -1,10 +1,12 @@
 import { Plus } from "lucide-react";
-import React from "react";
+import React, { useCallback } from "react";
 import { CSVImportModal } from "@/components/csv-import-modal";
 import { ObjectPropertiesModal } from "@/components/object-properties-modal";
 import { Button } from "@/components/ui/button";
 import { ContextMenu, useContextMenu } from "@/components/ui/context-menu";
+import { NO_CAPABILITIES } from "@/lib/database-driver/capabilities";
 import { serverFingerprint } from "@/lib/server-group";
+import { useCapabilityStore } from "@/stores/capability-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
 import { useTabStore } from "@/stores/tab-store";
@@ -195,8 +197,18 @@ export function ServerSidebar({
 
   const copy = (text: string) => navigator.clipboard.writeText(text);
 
+  const capsByDriver = useCapabilityStore((s) => s.byDriver);
+  const capsFor = useCallback(
+    (projectId: string) => {
+      const driver = projects[projectId]?.driver;
+      return (driver && capsByDriver[driver]) || NO_CAPABILITIES;
+    },
+    [projects, capsByDriver],
+  );
+
   const ctx: SidebarRenderCtx = {
     projects,
+    capsFor,
     status,
     serverDatabases,
     serverTablespaces,

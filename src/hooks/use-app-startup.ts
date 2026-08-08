@@ -1,16 +1,27 @@
 import { useEffect, useRef } from "react";
+import { DriverFactory } from "@/lib/database-driver";
 import { startBackgroundUpdateCheck } from "@/lib/updater";
+import { useCapabilityStore } from "@/stores/capability-store";
 import { useProjectStore } from "@/stores/project-store";
 
 export function useAppStartup() {
   const loadProjects = useProjectStore((s) => s.loadProjects);
   const projects = useProjectStore((s) => s.projects);
   const connect = useProjectStore((s) => s.connect);
+  const loadCapabilities = useCapabilityStore((s) => s.load);
   const autoConnected = useRef(false);
 
   useEffect(() => {
     void loadProjects();
   }, [loadProjects]);
+
+  // Ahead of any connection, so the tree and tabs are gated from the first
+  // render rather than filling in late.
+  useEffect(() => {
+    for (const driver of DriverFactory.getSupportedDrivers()) {
+      void loadCapabilities(driver);
+    }
+  }, [loadCapabilities]);
 
   // Open the connections flagged with "Connect on startup", once per session.
   useEffect(() => {

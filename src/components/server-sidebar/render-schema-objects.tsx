@@ -58,6 +58,7 @@ function renderTable(
   depth: number,
 ) {
   const {
+    capsFor,
     loading,
     selectedItem,
     setSelectedItem,
@@ -118,21 +119,25 @@ function renderTable(
               icon: <Table className="h-3 w-3" />,
               onClick: () => openTab(pid, `SELECT COUNT(*) FROM "${schema}"."${ti.name}";`),
             },
-            { separator: true as const },
-            {
-              label: "Import CSV",
-              icon: <FileUp className="h-3 w-3" />,
-              onClick: () => {
-                void loadColumns(pid, schema, ti.name).then((cols) => {
-                  setCsvImportTarget({
-                    projectId: pid,
-                    schema,
-                    table: ti.name,
-                    columns: cols,
-                  });
-                });
-              },
-            },
+            ...(capsFor(pid).csvImport
+              ? [
+                  { separator: true as const },
+                  {
+                    label: "Import CSV",
+                    icon: <FileUp className="h-3 w-3" />,
+                    onClick: () => {
+                      void loadColumns(pid, schema, ti.name).then((cols) => {
+                        setCsvImportTarget({
+                          projectId: pid,
+                          schema,
+                          table: ti.name,
+                          columns: cols,
+                        });
+                      });
+                    },
+                  },
+                ]
+              : []),
             ...(ti.partitionKey
               ? [
                   { separator: true as const },
@@ -261,6 +266,7 @@ function newObjectMenu(
 /** Render schemas + tables/views/functions for a connected database project */
 export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
   const {
+    capsFor,
     schemas,
     status,
     tables,
@@ -289,6 +295,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
   } = ctx;
 
   const projectSchemas = schemas[pid] || [];
+  const caps = capsFor(pid);
   const isConnected = status[pid] === ProjectConnectionStatus.Connected;
   if (!isConnected || !projectSchemas.length) return null;
 
@@ -381,7 +388,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               rootTables.map((ti) => renderTable(ctx, pid, schema, ti, partitionsOf, 0))}
 
             {/* Foreign Tables category */}
-            {schemaForeignTables && schemaForeignTables.length > 0 && (
+            {caps.foreignTables && schemaForeignTables && schemaForeignTables.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -505,7 +512,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Materialized Views category */}
-            {schemaMatViews && schemaMatViews.length > 0 && (
+            {caps.materializedViews && schemaMatViews && schemaMatViews.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -573,7 +580,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Sequences category */}
-            {schemaSequences && schemaSequences.length > 0 && (
+            {caps.sequences && schemaSequences && schemaSequences.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -636,7 +643,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Functions category */}
-            {schemaFns && schemaFns.length > 0 && (
+            {caps.functions && schemaFns && schemaFns.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -702,7 +709,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Procedures category */}
-            {schemaProcs && schemaProcs.length > 0 && (
+            {caps.procedures && schemaProcs && schemaProcs.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -776,7 +783,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Data Types category */}
-            {schemaDataTypes && schemaDataTypes.length > 0 && (
+            {caps.dataTypes && schemaDataTypes && schemaDataTypes.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}
@@ -845,7 +852,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
             )}
 
             {/* Trigger Functions category */}
-            {schemaTrigFns && schemaTrigFns.length > 0 && (
+            {caps.triggerFunctions && schemaTrigFns && schemaTrigFns.length > 0 && (
               <>
                 <SectionHeader
                   indent={I.schemaObj}

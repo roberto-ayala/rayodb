@@ -11,6 +11,7 @@ use tauri::{AppHandle, Manager, Result, State};
 
 use crate::AppState;
 use crate::common::enums::{AppError, ProjectConnectionStatus};
+use crate::drivers::capabilities::Capabilities;
 use crate::drivers::connection::{
     ConnectionParams, connect, load_project_params, project_driver_kind, test_connection,
 };
@@ -50,6 +51,13 @@ fn raw<T: serde::Serialize>(value: &T) -> Result<Response> {
 }
 
 // ---- connection --------------------------------------------------------
+
+/// What an engine supports. Static per driver, so the UI can gate its tree and
+/// tabs before any connection exists.
+#[tauri::command(rename_all = "snake_case")]
+pub async fn db_capabilities(driver: Option<&str>) -> Result<Capabilities> {
+    Ok(DriverKind::parse(driver.unwrap_or_default())?.capabilities())
+}
 
 #[tauri::command(rename_all = "snake_case")]
 pub async fn db_test_connection(driver: Option<&str>, key: [&str; 6]) -> Result<String> {

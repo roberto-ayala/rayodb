@@ -37,6 +37,7 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
     projects,
     status,
     serverDatabases,
+    capsFor,
     serverTablespaces,
     eventTriggers,
     isOpen,
@@ -133,16 +134,24 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                     icon: <Plus className="h-3 w-3" />,
                     onClick: () => openTab(connectedPid),
                   },
-                  {
-                    label: "Performance Monitor",
-                    icon: <Activity className="h-3 w-3" />,
-                    onClick: () => openMonitorTab(connectedPid),
-                  },
-                  {
-                    label: "PG Settings",
-                    icon: <Settings className="h-3 w-3" />,
-                    onClick: () => openPgSettingsTab(connectedPid),
-                  },
+                  ...(capsFor(connectedPid).monitoring
+                    ? [
+                        {
+                          label: "Performance Monitor",
+                          icon: <Activity className="h-3 w-3" />,
+                          onClick: () => openMonitorTab(connectedPid),
+                        },
+                      ]
+                    : []),
+                  ...(capsFor(connectedPid).serverSettings
+                    ? [
+                        {
+                          label: "Server Settings",
+                          icon: <Settings className="h-3 w-3" />,
+                          onClick: () => openPgSettingsTab(connectedPid),
+                        },
+                      ]
+                    : []),
                 ]
               : []),
             {
@@ -274,21 +283,33 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                   icon: <Unplug className="h-3 w-3" />,
                                   onClick: () => void onDisconnect(dbPid),
                                 },
-                                {
-                                  label: "LISTEN/NOTIFY",
-                                  icon: <Bell className="h-3 w-3" />,
-                                  onClick: () => openNotifyTab(dbPid),
-                                },
-                                {
-                                  label: "Schema Diff",
-                                  icon: <Columns3 className="h-3 w-3" />,
-                                  onClick: () => openSchemaDiffTab(dbPid),
-                                },
-                                {
-                                  label: "Extensions",
-                                  icon: <Package className="h-3 w-3" />,
-                                  onClick: () => openExtensionsTab(dbPid),
-                                },
+                                ...(capsFor(dbPid).pubsub
+                                  ? [
+                                      {
+                                        label: "LISTEN/NOTIFY",
+                                        icon: <Bell className="h-3 w-3" />,
+                                        onClick: () => openNotifyTab(dbPid),
+                                      },
+                                    ]
+                                  : []),
+                                ...(capsFor(dbPid).schemaDiff
+                                  ? [
+                                      {
+                                        label: "Schema Diff",
+                                        icon: <Columns3 className="h-3 w-3" />,
+                                        onClick: () => openSchemaDiffTab(dbPid),
+                                      },
+                                    ]
+                                  : []),
+                                ...(capsFor(dbPid).extensions
+                                  ? [
+                                      {
+                                        label: "Extensions",
+                                        icon: <Package className="h-3 w-3" />,
+                                        onClick: () => openExtensionsTab(dbPid),
+                                      },
+                                    ]
+                                  : []),
                                 {
                                   label: "New Schema…",
                                   icon: <FolderPlus className="h-3 w-3" />,
@@ -298,11 +319,15 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                 // Roles belong to the server, not to this
                                 // database — reachable from here, but not a
                                 // branch of it
-                                {
-                                  label: "Server Roles",
-                                  icon: <Shield className="h-3 w-3" />,
-                                  onClick: () => openRolesTab(dbPid),
-                                },
+                                ...(capsFor(dbPid).roles
+                                  ? [
+                                      {
+                                        label: "Server Roles",
+                                        icon: <Shield className="h-3 w-3" />,
+                                        onClick: () => openRolesTab(dbPid),
+                                      },
+                                    ]
+                                  : []),
                               ]
                             : []),
                           ...(onEditConnection
@@ -337,71 +362,72 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                         {renderSchemas(ctx, dbPid)}
                         {/* Event triggers fire on DDL anywhere in the database,
                             so they sit beside the schemas rather than inside one */}
-                        {(eventTriggers[dbPid]?.length ?? 0) > 0 && (
-                          <>
-                            <TreeRow
-                              indent={I.schema}
-                              icon={<FileCog className="h-3.5 w-3.5 text-muted-foreground" />}
-                              label={`Event Triggers (${eventTriggers[dbPid].length})`}
-                              expanded={isOpen(`${dbKey}::evttrig`)}
-                              onClick={() => toggle(`${dbKey}::evttrig`)}
-                              onContextMenu={(e) =>
-                                showMenu(e, [
-                                  {
-                                    label: "New Event Trigger…",
-                                    icon: <FileCog className="h-3 w-3" />,
-                                    onClick: () =>
-                                      openTab(dbPid, newEventTriggerTemplate(), {
-                                        title: "New event trigger",
-                                      }),
-                                  },
-                                ])
-                              }
-                            />
-                            {isOpen(`${dbKey}::evttrig`) &&
-                              eventTriggers[dbPid].map((evt) => (
-                                // biome-ignore lint/a11y/noStaticElementInteractions: a label with a context menu, like the function rows
-                                <div
-                                  key={evt.name}
-                                  className="relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none hover:bg-sidebar-accent"
-                                  style={{ paddingLeft: `${I.schemaObj}px` }}
-                                  onContextMenu={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    showMenu(e, [
-                                      { header: evt.event },
-                                      {
-                                        label: "Copy Name",
-                                        icon: <Copy className="h-3 w-3" />,
-                                        onClick: () => copy(evt.name),
-                                      },
-                                      {
-                                        label: "Copy Function Name",
-                                        icon: <Copy className="h-3 w-3" />,
-                                        onClick: () => copy(evt.function),
-                                      },
-                                    ]);
-                                  }}
-                                >
-                                  <FileCog className="h-3 w-3 shrink-0 text-muted-foreground/50" />
-                                  <span className="text-xs text-foreground">{evt.name}</span>
-                                  <span className="text-3xs text-muted-foreground">
-                                    {evt.event}
-                                  </span>
-                                  <span
-                                    className={cn(
-                                      "text-3xs",
-                                      evt.enabled === "enabled"
-                                        ? "text-muted-foreground/40"
-                                        : "text-warning",
-                                    )}
+                        {capsFor(dbPid).eventTriggers &&
+                          (eventTriggers[dbPid]?.length ?? 0) > 0 && (
+                            <>
+                              <TreeRow
+                                indent={I.schema}
+                                icon={<FileCog className="h-3.5 w-3.5 text-muted-foreground" />}
+                                label={`Event Triggers (${eventTriggers[dbPid].length})`}
+                                expanded={isOpen(`${dbKey}::evttrig`)}
+                                onClick={() => toggle(`${dbKey}::evttrig`)}
+                                onContextMenu={(e) =>
+                                  showMenu(e, [
+                                    {
+                                      label: "New Event Trigger…",
+                                      icon: <FileCog className="h-3 w-3" />,
+                                      onClick: () =>
+                                        openTab(dbPid, newEventTriggerTemplate(), {
+                                          title: "New event trigger",
+                                        }),
+                                    },
+                                  ])
+                                }
+                              />
+                              {isOpen(`${dbKey}::evttrig`) &&
+                                eventTriggers[dbPid].map((evt) => (
+                                  // biome-ignore lint/a11y/noStaticElementInteractions: a label with a context menu, like the function rows
+                                  <div
+                                    key={evt.name}
+                                    className="relative flex items-center gap-1.5 py-0.5 rounded-sm whitespace-nowrap select-none hover:bg-sidebar-accent"
+                                    style={{ paddingLeft: `${I.schemaObj}px` }}
+                                    onContextMenu={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      showMenu(e, [
+                                        { header: evt.event },
+                                        {
+                                          label: "Copy Name",
+                                          icon: <Copy className="h-3 w-3" />,
+                                          onClick: () => copy(evt.name),
+                                        },
+                                        {
+                                          label: "Copy Function Name",
+                                          icon: <Copy className="h-3 w-3" />,
+                                          onClick: () => copy(evt.function),
+                                        },
+                                      ]);
+                                    }}
                                   >
-                                    {evt.enabled === "enabled" ? evt.function : evt.enabled}
-                                  </span>
-                                </div>
-                              ))}
-                          </>
-                        )}
+                                    <FileCog className="h-3 w-3 shrink-0 text-muted-foreground/50" />
+                                    <span className="text-xs text-foreground">{evt.name}</span>
+                                    <span className="text-3xs text-muted-foreground">
+                                      {evt.event}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "text-3xs",
+                                        evt.enabled === "enabled"
+                                          ? "text-muted-foreground/40"
+                                          : "text-warning",
+                                      )}
+                                    >
+                                      {evt.enabled === "enabled" ? evt.function : evt.enabled}
+                                    </span>
+                                  </div>
+                                ))}
+                            </>
+                          )}
                       </>
                     )}
                   </div>
@@ -453,6 +479,9 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
           {(() => {
             const tspCatKey = `${gKey}::tablespaces`;
             const tspData = connectedPid ? serverTablespaces[connectedPid] || [] : [];
+            // Engines without tablespaces should not show the branch at all,
+            // not an empty one.
+            if (!capsFor(connectedPid ?? pids[0]).tablespaces) return null;
             return (
               <>
                 <TreeRow

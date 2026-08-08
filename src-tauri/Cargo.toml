@@ -32,7 +32,6 @@ tracing = "0.1.41"
 tracing-subscriber = {version = "0.3.20", features = ["fmt"] }
 libsql = "0.9.29"
 tauri-plugin-shell = "2.3.1"
-tauri-plugin-fs = "2.4.2"
 thiserror = "2"
 tauri-plugin-dialog = "2.6.0"
 tauri-plugin-process = "2.3.1"

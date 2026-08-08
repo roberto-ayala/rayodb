@@ -1,18 +1,24 @@
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { DriverFactory } from "@/lib/database-driver";
+import { saveTextFile } from "@/lib/export";
 import { useProjectStore } from "@/stores/project-store";
 import type { ColumnDetail, IndexDetail } from "@/types";
 import {
+  createGestureHandlers,
   createHandleMouseDown,
   createHandleMouseMove,
   createHandleMouseUp,
   createHandleWheel,
   ERDStatusBar,
   ERDToolbar,
+  MAX_ZOOM,
+  MIN_ZOOM,
 } from "./interactions";
 import { layoutTables } from "./layout";
 import { ERDDefs, ERDFKLines, ERDGridBackground, ERDTableBoxes } from "./rendering";
+import { erdFileName, serialiseERD } from "./svg-export";
 import { useTableDetails } from "./table-details";
 import type { ERDColumn, ERDProps, ForeignKey } from "./types";
 
@@ -161,19 +167,64 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
 
   const { connectedTables, connectedFKs } = useTableDetails(hoveredTable, fks);
 
-  const handleWheel = useCallback(createHandleWheel(setZoom), []);
+  // The handler reads the live view through a ref, so it can be attached once
+  const viewRef = useRef({ zoom, pan });
+  viewRef.current = { zoom, pan };
+  /**
+   * The listeners go on through the ref rather than an effect: the diagram
+   * renders a spinner first, so on mount there is no element to attach to and
+   * an effect would never run again once one appeared.
+   *
+   * They are also native rather than React's own, because React registers
+   * wheel handlers passively — preventDefault there does nothing, and the
+   * webview would zoom itself on a pinch.
+   */
+  const attachViewport = useCallback((el: HTMLDivElement | null) => {
+    containerRef.current = el;
+    if (!el) return;
 
-  const handleMouseDown = useCallback(
-    createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart),
-    [],
+    const onWheel = createHandleWheel(containerRef, viewRef, setZoom, setPan);
+    const gesture = createGestureHandlers(containerRef, viewRef, setZoom, setPan);
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("gesturestart", gesture.onStart, { passive: false });
+    el.addEventListener("gesturechange", gesture.onChange, { passive: false });
+
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("gesturestart", gesture.onStart);
+      el.removeEventListener("gesturechange", gesture.onChange);
+      containerRef.current = null;
+    };
+  }, []);
+
+  /**
+   * Rebuilt each render on purpose. Memoising them with an empty dependency
+   * list froze the first render's values, and on the first render the diagram
+   * is still loading: boxMap was empty, so no table could ever be picked up,
+   * and dragging was null, so no movement was ever acted on.
+   */
+  const handleMouseDown = createHandleMouseDown(pan, zoom, boxMap, setDragging, setDragStart);
+  const handleMouseMove = createHandleMouseMove(
+    dragging,
+    dragStart,
+    zoom,
+    setPan,
+    setTablePositions,
   );
+  const handleMouseUp = createHandleMouseUp(setDragging);
 
-  const handleMouseMove = useCallback(
-    createHandleMouseMove(dragging, dragStart, zoom, setPan, setTablePositions),
-    [],
-  );
-
-  const handleMouseUp = useCallback(createHandleMouseUp(setDragging), []);
+  /** The buttons zoom about the middle of the view, as the wheel does about the pointer */
+  const zoomBy = useCallback((factor: number) => {
+    const el = containerRef.current;
+    const { zoom, pan } = viewRef.current;
+    const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * factor));
+    if (next === zoom) return;
+    const cx = el ? el.clientWidth / 2 : 0;
+    const cy = el ? el.clientHeight / 2 : 0;
+    const ratio = next / zoom;
+    setPan({ x: cx - (cx - pan.x) * ratio, y: cy - (cy - pan.y) * ratio });
+    setZoom(next);
+  }, []);
 
   const fitToView = useCallback(() => {
     if (!containerRef.current || boxes.length === 0) return;
@@ -185,19 +236,24 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
     setPan({ x: 10, y: 10 });
   }, [boxes, totalWidth, totalHeight]);
 
-  const exportSVG = useCallback(() => {
+  const exportSVG = useCallback(async () => {
     if (!svgRef.current) return;
-    const clone = svgRef.current.cloneNode(true) as SVGSVGElement;
-    clone.setAttribute("width", String(totalWidth));
-    clone.setAttribute("height", String(totalHeight));
-    const blob = new Blob([clone.outerHTML], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `erd-${schema}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [totalWidth, totalHeight, schema]);
+    try {
+      const content = serialiseERD(svgRef.current, totalWidth, totalHeight);
+      const database = useProjectStore.getState().projects[projectId]?.database ?? projectId;
+      const filePath = await saveTextFile(
+        erdFileName(database, schema),
+        "SVG Image",
+        "svg",
+        content,
+      );
+      if (filePath) toast.success("Diagram exported", { description: filePath });
+    } catch (err: unknown) {
+      toast.error("Could not export the diagram", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }, [totalWidth, totalHeight, schema, projectId]);
 
   if (loading || (!detailsReady && schemaTables.length > 0)) {
     return (
@@ -218,14 +274,13 @@ export function ERDDiagram({ projectId, schema }: ERDProps) {
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      <ERDToolbar setZoom={setZoom} fitToView={fitToView} exportSVG={exportSVG} />
+      <ERDToolbar zoomBy={zoomBy} fitToView={fitToView} exportSVG={exportSVG} />
 
       <ERDStatusBar boxCount={boxes.length} fkCount={fks.length} zoom={zoom} />
 
       <div
-        ref={containerRef}
+        ref={attachViewport}
         className="h-full cursor-grab active:cursor-grabbing bg-background"
-        onWheel={handleWheel}
         onMouseDown={(e) => handleMouseDown(e)}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

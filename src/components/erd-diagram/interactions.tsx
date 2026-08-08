@@ -5,17 +5,17 @@ export type DragState = { type: "pan" | "table"; tableName?: string } | null;
 export type Point = { x: number; y: number };
 
 interface ERDToolbarProps {
-  setZoom: React.Dispatch<React.SetStateAction<number>>;
+  zoomBy: (factor: number) => void;
   fitToView: () => void;
-  exportSVG: () => void;
+  exportSVG: () => void | Promise<void>;
 }
 
-export function ERDToolbar({ setZoom, fitToView, exportSVG }: ERDToolbarProps) {
+export function ERDToolbar({ zoomBy, fitToView, exportSVG }: ERDToolbarProps) {
   return (
     <div className="absolute top-3 right-3 z-20 flex flex-col gap-1">
       <button
         type="button"
-        onClick={() => setZoom((z) => Math.min(3, z * 1.2))}
+        onClick={() => zoomBy(1.2)}
         className="p-1.5 rounded bg-card border border-border hover:bg-accent transition-colors shadow-sm"
         title="Zoom in"
       >
@@ -23,7 +23,7 @@ export function ERDToolbar({ setZoom, fitToView, exportSVG }: ERDToolbarProps) {
       </button>
       <button
         type="button"
-        onClick={() => setZoom((z) => Math.max(0.1, z * 0.8))}
+        onClick={() => zoomBy(0.8)}
         className="p-1.5 rounded bg-card border border-border hover:bg-accent transition-colors shadow-sm"
         title="Zoom out"
       >
@@ -39,7 +39,7 @@ export function ERDToolbar({ setZoom, fitToView, exportSVG }: ERDToolbarProps) {
       </button>
       <button
         type="button"
-        onClick={exportSVG}
+        onClick={() => void exportSVG()}
         className="p-1.5 rounded bg-card border border-border hover:bg-accent transition-colors shadow-sm"
         title="Export SVG"
       >
@@ -68,11 +68,114 @@ export function ERDStatusBar({ boxCount, fkCount, zoom }: ERDStatusBarProps) {
 // Pure handler factories — invoked inside useCallback in index.tsx so the
 // hook order in the parent component is preserved exactly.
 
-export function createHandleWheel(setZoom: React.Dispatch<React.SetStateAction<number>>) {
-  return (e: React.WheelEvent) => {
+export const MIN_ZOOM = 0.1;
+export const MAX_ZOOM = 3;
+
+/** Roughly 18% per mouse notch, and proportionally less for a trackpad nudge */
+const ZOOM_PER_PIXEL = 0.002;
+
+/** Wheel events arrive in pixels, lines or pages depending on the device */
+function pixelDelta(value: number, mode: number): number {
+  if (mode === 1) return value * 16;
+  if (mode === 2) return value * 100;
+  return value;
+}
+
+/** WebKit's own pinch event, which is not in the DOM typings */
+export interface WebKitGestureEvent extends UIEvent {
+  scale: number;
+  clientX: number;
+  clientY: number;
+}
+
+/** Applies a new zoom while holding the given screen point in place */
+function zoomAround(
+  view: React.RefObject<{ zoom: number; pan: Point }>,
+  setZoom: React.Dispatch<React.SetStateAction<number>>,
+  setPan: React.Dispatch<React.SetStateAction<Point>>,
+  target: number,
+  cx: number,
+  cy: number,
+) {
+  const { zoom, pan } = view.current;
+  const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, target));
+  if (next === zoom) return;
+  const ratio = next / zoom;
+  setPan({ x: cx - (cx - pan.x) * ratio, y: cy - (cy - pan.y) * ratio });
+  setZoom(next);
+}
+
+/**
+ * Safari and the webview Tauri runs on report a trackpad pinch as their own
+ * gesture events, not as ctrl + wheel the way Chrome does, so the pinch has to
+ * be handled twice to work in both.
+ */
+export function createGestureHandlers(
+  container: React.RefObject<HTMLDivElement | null>,
+  view: React.RefObject<{ zoom: number; pan: Point }>,
+  setZoom: React.Dispatch<React.SetStateAction<number>>,
+  setPan: React.Dispatch<React.SetStateAction<Point>>,
+) {
+  // scale arrives relative to the start of the gesture, not the last event
+  let zoomAtStart = 1;
+
+  const onStart = (e: Event) => {
     e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom((z) => Math.min(3, Math.max(0.1, z * delta)));
+    zoomAtStart = view.current.zoom;
+  };
+
+  const onChange = (e: Event) => {
+    e.preventDefault();
+    const gesture = e as WebKitGestureEvent;
+    const rect = container.current?.getBoundingClientRect();
+    zoomAround(
+      view,
+      setZoom,
+      setPan,
+      zoomAtStart * gesture.scale,
+      rect ? gesture.clientX - rect.left : 0,
+      rect ? gesture.clientY - rect.top : 0,
+    );
+  };
+
+  return { onStart, onChange };
+}
+
+/**
+ * The wheel pans and the modifier zooms, which is also what a trackpad sends:
+ * two fingers arrive as a plain wheel, a pinch arrives as ctrl + wheel.
+ *
+ * Zoom follows the size of the gesture rather than counting events. A fixed
+ * step per event is what made this unusable: one trackpad swipe fires dozens of
+ * them, so a nudge compounded into an enormous jump.
+ */
+export function createHandleWheel(
+  container: React.RefObject<HTMLDivElement | null>,
+  view: React.RefObject<{ zoom: number; pan: Point }>,
+  setZoom: React.Dispatch<React.SetStateAction<number>>,
+  setPan: React.Dispatch<React.SetStateAction<Point>>,
+) {
+  return (e: WheelEvent) => {
+    e.preventDefault();
+    const { zoom, pan } = view.current;
+    const dx = pixelDelta(e.deltaX, e.deltaMode);
+    const dy = pixelDelta(e.deltaY, e.deltaMode);
+
+    if (!e.ctrlKey && !e.metaKey) {
+      setPan({ x: pan.x - dx, y: pan.y - dy });
+      return;
+    }
+
+    // Keep whatever is under the pointer under the pointer
+    const rect = container.current?.getBoundingClientRect();
+    zoomAround(
+      view,
+      setZoom,
+      setPan,
+      zoom * Math.exp(-dy * ZOOM_PER_PIXEL),
+      rect ? e.clientX - rect.left : 0,
+      rect ? e.clientY - rect.top : 0,
+    );
   };
 }
 

@@ -38,7 +38,6 @@ fn main() {
         .init();
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
@@ -124,6 +123,7 @@ fn main() {
             terminal::terminal_resize,
             terminal::terminal_kill,
             utils::compute_diff,
+            utils::save_text_file,
             utils::system_resource_usage,
         ])
         .run(tauri::generate_context!())

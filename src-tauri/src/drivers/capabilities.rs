@@ -219,6 +219,25 @@ mod tests {
         }
     }
 
+    /// A missing logo renders as nothing at all rather than failing, so the
+    /// sidebar would quietly lose its icon for the new engine.
+    #[test]
+    fn every_shipped_engine_has_a_logo() {
+        let ts = include_str!("../../../src/components/ui/driver-icon.tsx");
+        let logos = ts
+            .split_once("const LOGOS: Record<DriverType, DriverLogo> = {")
+            .expect("LOGOS not found")
+            .1;
+
+        for kind in DriverKind::ALL.into_iter().filter(|k| k.is_implemented()) {
+            assert!(
+                logos.contains(&format!("{}: {{", kind.as_str())),
+                "{} ships but has no logo",
+                kind.as_str()
+            );
+        }
+    }
+
     #[test]
     fn a_file_based_engine_asks_for_a_path() {
         assert!(DriverKind::Sqlite.is_file_based());

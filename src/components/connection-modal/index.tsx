@@ -1,4 +1,4 @@
-import { Database, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -7,6 +7,7 @@ import { testConnection } from "@/tauri";
 import type { DriverType, ProjectDetails } from "@/types";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
+import { DriverIcon } from "../ui/driver-icon";
 import { ModalBanner } from "../ui/modal-banner";
 import {
   AutoConnectCheckbox,
@@ -249,7 +250,7 @@ export function ConnectionModal({
       <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[500px]">
         <ModalBanner
           className="shrink-0"
-          icon={<Database className="h-5 w-5 text-primary" />}
+          icon={<DriverIcon driver={formData.driver} className="h-5 w-5" branded />}
           title={isEditing ? editData.name : "New Connection"}
           badge={formData.driver}
           description={isEditing ? "Update connection details" : "Add a new database connection"}

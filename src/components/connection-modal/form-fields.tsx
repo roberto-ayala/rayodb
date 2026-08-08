@@ -1,7 +1,9 @@
 import type { DriverInfo } from "@/lib/database-driver/capabilities";
 import type { DriverType } from "@/types";
+import { DriverIcon } from "../ui/driver-icon";
 import { CheckboxField, Field } from "../ui/field";
 import { Input } from "../ui/input";
+import { Select } from "../ui/select";
 
 interface ConnStringFieldProps {
   value: string;
@@ -60,33 +62,34 @@ interface DriverPickerProps {
 export function DriverPicker({ driver, drivers, onChange }: DriverPickerProps) {
   const label = drivers.find((d) => d.id === driver)?.name ?? driver;
 
-  if (drivers.length < 2) {
-    return (
-      <Field label="Database Type" htmlFor="driver">
-        <div
-          id="driver"
-          className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
-        >
-          {label}
-        </div>
-      </Field>
-    );
-  }
-
+  // A dropdown of one is noise, so with a single engine installed this stays a
+  // read-only field. Either way the logo sits alongside: <option> cannot carry
+  // one, so it shows the current choice rather than decorating the list.
   return (
     <Field label="Database Type" htmlFor="driver">
-      <select
-        id="driver"
-        value={driver}
-        onChange={(e) => onChange(e.target.value as DriverType)}
-        className="h-8 w-full rounded-md border border-border bg-input px-3 text-xs text-foreground"
-      >
-        {drivers.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.name}
-          </option>
-        ))}
-      </select>
+      <div className="flex items-center gap-2">
+        <DriverIcon driver={driver} className="h-4 w-4 shrink-0" branded />
+        {drivers.length < 2 ? (
+          <div
+            id="driver"
+            className="flex h-8 w-full items-center rounded-md border border-border bg-input px-3 text-xs text-foreground"
+          >
+            {label}
+          </div>
+        ) : (
+          <Select
+            id="driver"
+            value={driver}
+            onChange={(e) => onChange(e.target.value as DriverType)}
+          >
+            {drivers.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </Select>
+        )}
+      </div>
     </Field>
   );
 }

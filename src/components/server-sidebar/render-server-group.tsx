@@ -13,12 +13,12 @@ import {
   Package,
   Plus,
   RefreshCw,
-  Server,
   Settings,
   Shield,
   Trash2,
   Unplug,
 } from "lucide-react";
+import { DriverIcon } from "@/components/ui/driver-icon";
 import { cn } from "@/lib/utils";
 import type { ProjectDetails } from "@/types";
 import { ProjectConnectionStatus } from "@/types";
@@ -105,7 +105,12 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
       <TreeRow
         indent={I.server}
         icon={
-          <Server
+          // The engine's logo rather than a generic server: with several
+          // connections open, this is what tells them apart at a glance. It
+          // still takes the connection-state colour, which is the more urgent
+          // signal.
+          <DriverIcon
+            driver={driverOf(pids[0])}
             className={cn(
               "h-3.5 w-3.5",
               anyConnected ? "text-success" : anyConnecting ? "text-warning" : "text-primary",

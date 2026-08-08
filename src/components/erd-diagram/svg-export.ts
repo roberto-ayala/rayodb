@@ -42,7 +42,7 @@ export function erdFileName(database: string, schema: string): string {
       .replace(/^-+|-+$/g, "")
       .toLowerCase();
 
-  return [slug(database), slug(schema), "erd"].filter(Boolean).join("-") + ".svg";
+  return `${[slug(database), slug(schema), "erd"].filter(Boolean).join("-")}.svg`;
 }
 
 export function serialiseERD(svg: SVGSVGElement, width: number, height: number): string {

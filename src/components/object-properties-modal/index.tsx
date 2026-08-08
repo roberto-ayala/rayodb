@@ -120,7 +120,7 @@ export function ObjectPropertiesModal({
   const availableTabs: { key: Tab; label: string }[] = [];
   availableTabs.push({ key: "overview", label: "Overview" });
   if (objectType === "table") {
-    availableTabs.push({ key: "structure", label: "Structure" });
+    if (caps.structureEditing) availableTabs.push({ key: "structure", label: "Structure" });
     availableTabs.push({
       key: "columns",
       label: `Columns${cols ? ` (${cols.length})` : ""}`,

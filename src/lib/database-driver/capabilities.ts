@@ -43,6 +43,14 @@ export interface DriverCapabilities {
   ddlGeneration: boolean;
   tableMaintenance: boolean;
   schemaDiff: boolean;
+  /**
+   * The sidebar's "New table…" and friends. These are complete PostgreSQL
+   * statements, not just quoted identifiers, so an engine only gets them once
+   * it has templates of its own.
+   */
+  objectTemplates: boolean;
+  /** The properties modal's structure editor, PostgreSQL-shaped for the same reason. */
+  structureEditing: boolean;
 }
 
 /**
@@ -77,6 +85,8 @@ export const NO_CAPABILITIES: DriverCapabilities = {
   ddlGeneration: false,
   tableMaintenance: false,
   schemaDiff: false,
+  objectTemplates: false,
+  structureEditing: false,
 };
 
 // Capabilities are static per engine, so one round trip per driver is enough

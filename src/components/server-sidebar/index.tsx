@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ContextMenu, useContextMenu } from "@/components/ui/context-menu";
 import { NO_CAPABILITIES } from "@/lib/database-driver/capabilities";
 import { serverFingerprint } from "@/lib/server-group";
+import { quoteIdent } from "@/lib/sql-utils";
 import { useCapabilityStore } from "@/stores/capability-store";
 import { useProjectStore } from "@/stores/project-store";
 import { useQueryStore } from "@/stores/query-store";
@@ -178,16 +179,20 @@ export function ServerSidebar({
     toggle(`table::${projectId}::${schema}::${table}`);
   };
 
-  const selectQuery = (schema: string, table: string) =>
-    `SELECT * FROM "${schema}"."${table}" LIMIT 100;`;
+  // Quoting differs by engine, so the browse query is built per project rather
+  // than with a fixed double-quoted literal.
+  const selectQuery = (projectId: string, schema: string, table: string) => {
+    const driver = projects[projectId]?.driver;
+    return `SELECT * FROM ${quoteIdent(schema, driver)}.${quoteIdent(table, driver)} LIMIT 100;`;
+  };
 
   const onOpenTableQuery = (projectId: string, schema: string, table: string) => {
-    openTab(projectId, selectQuery(schema, table));
+    openTab(projectId, selectQuery(projectId, schema, table));
   };
 
   /** A single click browses: it reuses the preview tab and names it after the object */
   const onPreviewTableQuery = (projectId: string, schema: string, table: string) => {
-    openTab(projectId, selectQuery(schema, table), {
+    openTab(projectId, selectQuery(projectId, schema, table), {
       preview: true,
       title: `${schema}.${table}`,
     });

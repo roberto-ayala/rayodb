@@ -310,12 +310,18 @@ export function renderServerGroup(ctx: SidebarRenderCtx, fp: string, pids: strin
                                       },
                                     ]
                                   : []),
-                                {
-                                  label: "New Schema…",
-                                  icon: <FolderPlus className="h-3 w-3" />,
-                                  onClick: () =>
-                                    openTab(dbPid, newSchemaTemplate(), { title: "New schema" }),
-                                },
+                                ...(capsFor(dbPid).objectTemplates
+                                  ? [
+                                      {
+                                        label: "New Schema…",
+                                        icon: <FolderPlus className="h-3 w-3" />,
+                                        onClick: () =>
+                                          openTab(dbPid, newSchemaTemplate(), {
+                                            title: "New schema",
+                                          }),
+                                      },
+                                    ]
+                                  : []),
                                 // Roles belong to the server, not to this
                                 // database — reachable from here, but not a
                                 // branch of it

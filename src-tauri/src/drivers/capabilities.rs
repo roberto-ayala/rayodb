@@ -51,6 +51,13 @@ pub struct Capabilities {
     pub ddl_generation: bool,
     pub table_maintenance: bool,
     pub schema_diff: bool,
+    /// The sidebar's "New table…", "New view…" and friends. These are complete
+    /// PostgreSQL statements, not just quoted identifiers, so an engine only
+    /// gets them once it has templates of its own.
+    pub object_templates: bool,
+    /// The properties modal's structure editor, which composes ALTER TABLE in
+    /// the frontend and is PostgreSQL-shaped for the same reason.
+    pub structure_editing: bool,
 }
 
 impl Capabilities {
@@ -107,6 +114,28 @@ impl Capabilities {
             ddl_generation: true,
             table_maintenance: true,
             schema_diff: true,
+            object_templates: true,
+            structure_editing: true,
+        }
+    }
+
+    /// MySQL: the structural half of the trait maps over, but a database is
+    /// the schema rather than something inside one. Off are the things
+    /// PostgreSQL has and it does not, plus the two frontend SQL generators
+    /// that still emit PostgreSQL — those wait for the dialect work.
+    pub fn mysql() -> Self {
+        Self {
+            schemas: true,
+            functions: true,
+            procedures: true,
+            triggers: true,
+            databases: true,
+            server_settings: true,
+            monitoring: true,
+            query_cancellation: true,
+            streaming: true,
+            ddl_generation: true,
+            ..Self::none()
         }
     }
 }
@@ -117,8 +146,7 @@ impl DriverKind {
         match self {
             DriverKind::Pgsql => Capabilities::postgres(),
             DriverKind::Sqlite => Capabilities::sqlite(),
-            // No driver behind this yet; claiming nothing is the honest answer.
-            DriverKind::Mysql => Capabilities::none(),
+            DriverKind::Mysql => Capabilities::mysql(),
         }
     }
 }

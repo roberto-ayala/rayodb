@@ -256,6 +256,10 @@ function newObjectMenu(
   sql: string,
   title: string,
 ) {
+  // The templates are PostgreSQL statements; an engine without its own gets
+  // no menu rather than a statement it would reject.
+  if (!ctx.capsFor(pid).objectTemplates) return undefined;
+
   return (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -365,6 +369,7 @@ export function renderSchemas(ctx: SidebarRenderCtx, pid: string) {
               expanded={isOpen(`${sKey}::tables`, true)}
               onClick={() => toggle(`${sKey}::tables`, true)}
               onContextMenu={(e) => {
+                if (!caps.objectTemplates) return;
                 e.preventDefault();
                 e.stopPropagation();
                 showMenu(e, [

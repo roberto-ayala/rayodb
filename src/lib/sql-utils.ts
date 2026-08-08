@@ -1,3 +1,4 @@
+import type { DriverType } from "@/types";
 /**
  * Parse a simple SELECT query to extract the target table.
  * Returns null for complex queries (JOINs, subqueries, UNIONs, CTEs).
@@ -20,7 +21,15 @@ export function parseSelectTable(sql: string): { schema: string; table: string }
   return { schema: fromMatch[1] ?? "public", table: fromMatch[2] };
 }
 
-export function quoteIdent(name: string): string {
+/**
+ * Quote an identifier for `driver`. MySQL reads double quotes as a string
+ * literal unless ANSI_QUOTES is set, so the same statement is valid on one
+ * engine and wrong on the other — this is the one place that difference lives.
+ */
+export function quoteIdent(name: string, driver: DriverType = "PGSQL"): string {
+  if (driver === "MYSQL") {
+    return `\`${name.replace(/`/g, "``")}\``;
+  }
   return `"${name.replace(/"/g, '""')}"`;
 }
 

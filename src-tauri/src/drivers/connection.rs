@@ -137,7 +137,10 @@ pub async fn connect(
             let driver = crate::drivers::sqlite::connect(params).await?;
             Ok(Arc::new(driver))
         }
-        other => Err(AppError::DriverNotImplemented(other.display_name())),
+        DriverKind::Mysql => {
+            let driver = crate::drivers::mysql::connect(params).await?;
+            Ok(Arc::new(driver))
+        }
     }
 }
 
@@ -150,7 +153,7 @@ pub async fn test_connection(
     match kind {
         DriverKind::Pgsql => crate::drivers::pgsql::test_connection(params).await,
         DriverKind::Sqlite => crate::drivers::sqlite::test_connection(params).await,
-        other => Err(AppError::DriverNotImplemented(other.display_name())),
+        DriverKind::Mysql => crate::drivers::mysql::test_connection(params).await,
     }
 }
 

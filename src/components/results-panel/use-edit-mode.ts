@@ -71,7 +71,8 @@ export function useEditMode({ projectId, editorValue, result }: UseEditModeArgs)
       if (!target || !projectId) return;
 
       const pid = projectId;
-      const sql = `SELECT * FROM ${quoteIdent(target.schema)}.${quoteIdent(target.table)} WHERE ${quoteIdent(target.column)} = ${quoteLiteral(value)} LIMIT 100`;
+      const kind = useProjectStore.getState().projects[pid]?.driver;
+      const sql = `SELECT * FROM ${quoteIdent(target.schema, kind)}.${quoteIdent(target.table, kind)} WHERE ${quoteIdent(target.column, kind)} = ${quoteLiteral(value)} LIMIT 100`;
       useTabStore.getState().openTab(pid, sql);
 
       const d = useProjectStore.getState().projects[pid];

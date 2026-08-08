@@ -42,7 +42,10 @@ impl DriverKind {
     /// Whether a driver actually exists behind this name yet. The UI lists only
     /// these, so a half-built engine is never offered.
     pub fn is_implemented(self) -> bool {
-        matches!(self, DriverKind::Pgsql | DriverKind::Sqlite)
+        matches!(
+            self,
+            DriverKind::Pgsql | DriverKind::Sqlite | DriverKind::Mysql
+        )
     }
 
     /// Where the connection lives: a file on disk rather than a host and port.

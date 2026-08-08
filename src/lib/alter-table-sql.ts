@@ -198,7 +198,7 @@ export function generateAlterTableSQL(
     draft.primaryKey &&
     (draft.primaryKey._status === "added" || draft.primaryKey._status === "modified")
   ) {
-    const pkCols = draft.primaryKey.columns.map(quoteIdent).join(", ");
+    const pkCols = draft.primaryKey.columns.map((c) => quoteIdent(c)).join(", ");
     stmts.push(
       `ALTER TABLE ${target} ADD CONSTRAINT ${quoteIdent(draft.primaryKey.constraintName)} PRIMARY KEY (${pkCols});`,
     );
@@ -206,7 +206,7 @@ export function generateAlterTableSQL(
 
   for (const uc of draft.uniqueConstraints) {
     if (uc._status === "added") {
-      const ucCols = uc.columns.map(quoteIdent).join(", ");
+      const ucCols = uc.columns.map((c) => quoteIdent(c)).join(", ");
       stmts.push(
         `ALTER TABLE ${target} ADD CONSTRAINT ${quoteIdent(uc.constraintName)} UNIQUE (${ucCols});`,
       );
@@ -215,7 +215,7 @@ export function generateAlterTableSQL(
 
   for (const idx of draft.indexes) {
     if (idx._status === "added") {
-      const idxCols = idx.columns.map(quoteIdent).join(", ");
+      const idxCols = idx.columns.map((c) => quoteIdent(c)).join(", ");
       const unique = idx.isUnique ? "UNIQUE " : "";
       stmts.push(`CREATE ${unique}INDEX ${quoteIdent(idx.indexName)} ON ${target} (${idxCols});`);
     }
@@ -223,8 +223,8 @@ export function generateAlterTableSQL(
 
   for (const fk of draft.foreignKeys) {
     if (fk._status === "added") {
-      const srcCols = fk.sourceColumns.map(quoteIdent).join(", ");
-      const tgtCols = fk.targetColumns.map(quoteIdent).join(", ");
+      const srcCols = fk.sourceColumns.map((c) => quoteIdent(c)).join(", ");
+      const tgtCols = fk.targetColumns.map((c) => quoteIdent(c)).join(", ");
       const tgtTable = `${quoteIdent(fk.targetSchema)}.${quoteIdent(fk.targetTable)}`;
       stmts.push(
         `ALTER TABLE ${target} ADD CONSTRAINT ${quoteIdent(fk.constraintName)} ` +

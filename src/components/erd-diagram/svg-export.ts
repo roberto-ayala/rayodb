@@ -1,3 +1,5 @@
+import { slugForFileName } from "@/lib/export";
+
 /**
  * Turning the on-screen diagram into a file that stands on its own.
  *
@@ -35,14 +37,8 @@ function inlineCustomProperties(markup: string, scope: Element): string {
  * may be named with spaces, slashes or quotes.
  */
 export function erdFileName(database: string, schema: string): string {
-  const slug = (value: string) =>
-    value
-      .trim()
-      .replace(/[^\w.-]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .toLowerCase();
-
-  return `${[slug(database), slug(schema), "erd"].filter(Boolean).join("-")}.svg`;
+  const parts = [database, schema].map(slugForFileName).filter(Boolean);
+  return `${[...parts, "erd"].join("-")}.svg`;
 }
 
 export function serialiseERD(svg: SVGSVGElement, width: number, height: number): string {

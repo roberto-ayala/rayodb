@@ -3,6 +3,9 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard, type ExportFormat, exportResults } from "@/lib/export";
+import { parseSelectTable } from "@/lib/sql-utils";
+import { useProjectStore } from "@/stores/project-store";
+import { useActiveTab } from "@/stores/tab-store";
 
 interface ToolbarExportProps {
   columns: string[];
@@ -11,12 +14,24 @@ interface ToolbarExportProps {
 }
 
 export function ToolbarExport({ columns, filteredRows, hasResult }: ToolbarExportProps) {
+  const activeTab = useActiveTab();
+  const projects = useProjectStore((s) => s.projects);
+
+  /** The file is named after where the rows came from, when it can be told */
+  const context = () => {
+    const projectId = activeTab?.projectId;
+    const parsed = activeTab?.editorValue ? parseSelectTable(activeTab.editorValue) : null;
+    return {
+      database: projectId ? (projects[projectId]?.database ?? projectId) : undefined,
+      source: parsed?.table,
+    };
+  };
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
   const handleExport = (format: ExportFormat) => {
     if (!hasResult) return;
-    exportResults(format, columns, filteredRows);
+    void exportResults(format, columns, filteredRows, context());
     setExportOpen(false);
   };
 

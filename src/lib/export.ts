@@ -122,15 +122,54 @@ export async function saveTextFile(
   return filePath;
 }
 
+/** Anything a file system would rather not see becomes a dash */
+export function slugForFileName(value: string): string {
+  return value
+    .trim()
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+}
+
+/**
+ * Local time, most significant first, so a folder of exports sorts itself. Down
+ * to the second because two exports a minute apart is normal and two in the
+ * same second is not.
+ */
+function timestamp(now = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  return `${date}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+}
+
+/**
+ * What the rows are and when they were taken: export.csv said neither, so a
+ * folder of them was a pile of files that had to be opened to be told apart.
+ */
+export function resultsFileName(
+  extension: string,
+  database?: string,
+  source?: string,
+  now?: Date,
+): string {
+  const parts = [database, source ?? "query"].filter(Boolean).map((p) => slugForFileName(p ?? ""));
+  return `${[...parts.filter(Boolean), timestamp(now)].join("-")}.${extension}`;
+}
+
 export async function exportResults(
   format: ExportFormat,
   columns: string[],
   rows: string[][],
-  tableName?: string,
+  context?: { database?: string; source?: string },
 ) {
-  const content = formatters[format](columns, rows, tableName);
+  const content = formatters[format](columns, rows, context?.source);
   const ext = extensions[format];
-  await saveTextFile(`export.${ext}`, filterNames[format], ext, content);
+  await saveTextFile(
+    resultsFileName(ext, context?.database, context?.source),
+    filterNames[format],
+    ext,
+    content,
+  );
 }
 
 export function copyToClipboard(

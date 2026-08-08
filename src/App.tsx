@@ -31,6 +31,7 @@ import { EmptyWorkspace } from "@/components/empty-workspace";
 
 export default function App() {
   const syncSystemTheme = useUIStore((s) => s.syncSystemTheme);
+  const theme = useUIStore((s) => s.theme);
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     media.addEventListener("change", syncSystemTheme);
@@ -293,7 +294,28 @@ export default function App() {
         onExplain={() => void runExplain()}
         onCheckUpdates={() => void checkForUpdates()}
       />
-      <Toaster theme="dark" position="bottom-right" richColors />
+      {/* Sonner's own palette ignored the app's: richColors painted every
+          toast in its built-in greens and reds, and the theme was pinned to
+          dark whatever the window was set to. Dressed in the popover surface
+          instead, with only the icon carrying the outcome's colour. */}
+      <Toaster
+        theme={theme}
+        position="bottom-right"
+        toastOptions={{
+          classNames: {
+            toast:
+              "bg-popover! text-popover-foreground! border-border! rounded-lg! shadow-[var(--shadow-popover)]!",
+            title: "text-xs! font-medium!",
+            description: "text-xs! text-muted-foreground!",
+            actionButton: "bg-primary! text-primary-foreground!",
+            cancelButton: "bg-muted! text-muted-foreground!",
+            success: "[&_[data-icon]]:text-success!",
+            error: "[&_[data-icon]]:text-destructive!",
+            warning: "[&_[data-icon]]:text-warning!",
+            info: "[&_[data-icon]]:text-primary!",
+          },
+        }}
+      />
     </div>
   );
 }

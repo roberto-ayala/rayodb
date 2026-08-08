@@ -249,17 +249,19 @@ export function ServerSidebar({
 
   return (
     <div className="flex h-full flex-col border-r border-sidebar-border bg-sidebar select-none">
-      <div className="flex h-12 items-center justify-between border-b border-sidebar-border px-3">
-        <span className="tracking-widest uppercase text-3xs font-semibold text-sidebar-foreground">
+      {/* Same height and the same button as the tab strip beside it, so the
+          two headers read as one line across the window */}
+      <div className="flex min-h-[38px] items-center justify-between border-b border-sidebar-border px-2">
+        <span className="pl-1 tracking-widest uppercase text-3xs font-semibold text-sidebar-foreground">
           CONNECTIONS
         </span>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
+          variant="outline"
+          size="icon-sm"
           onClick={() => setConnectionModalOpen(true)}
+          title="New connection"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto overflow-x-auto p-1">
